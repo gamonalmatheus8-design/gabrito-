@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111827">
+<meta name="application-name" content="Gabarito+">
+<meta name="description" content="Plataforma de estudos para ENEM e PISM.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icons/icon-192.png">
+<title>Gabarito+ — Supabase</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<script async src="https://unpkg.com/lucide@latest"></script>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/styles.css?v=1.1.0">
+<script defer src="js/supabase-config.js?v=1.1.0"></script>
+<script defer src="js/gabarito-bootstrap.js?v=1.1.0"></script>
+</head>
+<body>
+<div class="v7-boot" id="v7Boot"><div class="v7-boot-card"><div class="brand-mark"><i data-lucide="cloud" class="icon"></i></div><strong>Gabarito+</strong><span id="v7BootStatus">Preparando aplicativo…</span></div></div>
+<a class="skip-link" href="#mainContent">Ir para o conteúdo</a>
+<header class="app-top">
+ <button class="icon-btn drawer-btn" onclick="toggleDrawer()" aria-label="Abrir menu"><i data-lucide="menu" class="icon"></i></button>
+ <div class="brand"><div class="brand-mark"><i data-lucide="book-open-check" class="icon"></i></div><div><div class="brand-name">Gabarito<span style="color:var(--primary)">+</span></div><div class="brand-sub">ENEM &amp; PISM</div></div></div>
+ <div class="top-spacer"></div>
+ <div class="exam-switch" aria-label="Foco de prova"><button data-exam="ENEM" onclick="setFocusExam('ENEM')">ENEM</button><button data-exam="PISM" onclick="setFocusExam('PISM')">PISM</button></div>
+ <div class="top-actions"><button class="v5-account-btn" id="v5AccountBtn" onclick="openV5Account()" aria-label="Conta e sincronização"><span class="v5-cloud-dot"></span><span id="v5AccountMini">Conta</span></button><button class="icon-btn hide-mobile" onclick="go('settings')" aria-label="Ajustes"><i data-lucide="settings-2" class="icon"></i></button><button class="icon-btn" onclick="toggleTheme()" aria-label="Alternar tema"><i data-lucide="moon" id="themeIcon" class="icon"></i></button></div>
+</header>
+<div class="overlay" onclick="toggleDrawer(false)"></div>
+<div class="shell">
+<aside class="sidebar">
+ <div class="nav-label">Visão geral</div>
+ <button class="nav-btn" data-page="home" onclick="go('home')"><i data-lucide="layout-dashboard" class="icon"></i>Início</button>
+ <button class="nav-btn" data-page="plan" onclick="go('plan')"><i data-lucide="calendar-range" class="icon"></i>Plano</button>
+ <div class="nav-label">Prática</div>
+ <button class="nav-btn" data-page="questions" onclick="v42OpenQuestions()"><i data-lucide="book-open-check" class="icon"></i>Questões <span class="badge" id="sideQCount"></span></button>
+ <button class="nav-btn" data-page="reviews" onclick="go('reviews')"><i data-lucide="brain" class="icon"></i>Revisões <span class="badge" id="sideReviewCount"></span></button>
+ <button class="nav-btn" data-page="mocks" onclick="go('mocks')"><i data-lucide="clipboard-check" class="icon"></i>Simulados</button>
+ <button class="nav-btn" data-page="essay" onclick="go('essay')"><i data-lucide="pen-line" class="icon"></i>Redação</button>
+ <div class="nav-label">Evolução</div>
+ <button class="nav-btn" data-page="performance" onclick="go('performance')"><i data-lucide="chart-no-axes-combined" class="icon"></i>Desempenho</button>
+ <button class="nav-btn v42-more-toggle" id="v42MoreToggle" onclick="toggleMoreNav()"><i data-lucide="ellipsis" class="icon"></i>Mais <i data-lucide="chevron-down" class="icon v42-more-chevron"></i></button>
+ <div class="v42-more-nav" id="v42MoreNav">
+  <button class="nav-btn" data-page="mastery" onclick="go('mastery')"><i data-lucide="radar" class="icon"></i>Domínio</button>
+  <button class="nav-btn" data-page="strategy" onclick="go('strategy')"><i data-lucide="route" class="icon"></i>Estratégia</button>
+  <button class="nav-btn" data-page="calendar" onclick="go('calendar')"><i data-lucide="calendar-days" class="icon"></i>Calendário</button>
+  <button class="nav-btn" data-page="settings" onclick="go('settings')"><i data-lucide="settings" class="icon"></i>Ajustes</button>
+  <a class="nav-btn admin-link" id="adminLink" href="admin.html"><i data-lucide="database" class="icon"></i>Editorial</a>
+ </div><div class="sidebar-foot"><strong>Gabarito+ Cloud</strong><p id="v7BankSource">Banco local</p></div>
+</aside>
+<main>
+<section class="page" id="page-home">
+ <div class="header-row"><div><p class="eyebrow">Painel de estudos</p><h1 id="welcomeTitle">Boa sessão, Estudante.</h1><p class="sub">O que importa agora é saber exatamente o que fazer em seguida.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="go('questions')"><i data-lucide="circle-help" class="icon"></i>Resolver questões</button><button class="btn btn-primary" onclick="startFocusFromPlan()"><i data-lucide="play" class="icon"></i>Começar foco</button></div></div>
+
+<div class="v39-home" id="v39Home">
+ <div class="v39-hero card">
+  <div class="v39-hero-copy">
+   <span class="v39-badge" id="v39ExamBadge">ENEM</span>
+   <h2 id="v39MainTitle">Tudo o que você precisa, sem excesso.</h2>
+   <p id="v39MainText">Veja o próximo passo e comece.</p>
+  </div>
+  <div class="v39-hero-actions">
+   <button class="btn btn-primary" id="v39PrimaryBtn"><i data-lucide="play" class="icon"></i>Começar</button>
+   <button class="btn btn-ghost" onclick="go('plan')">Plano</button>
+  </div>
+ </div>
+ <div class="v39-metrics">
+  <div class="v39-metric"><span>Hoje</span><strong id="v39Today">0 min</strong></div>
+  <div class="v39-metric"><span>Questões</span><strong id="v39Questions">0</strong></div>
+  <div class="v39-metric"><span>Revisões</span><strong id="v39Reviews">0</strong></div>
+  <div class="v39-metric"><span>Preparação</span><strong id="v39Prep">0/100</strong></div>
+ </div>
+ <div class="card focus-card focus-timer-card"><div class="section-title"><i data-lucide="timer" class="icon"></i>Cronômetro de estudos <span class="focus-status" id="focusTimerStatus">Pronto</span></div><div class="focus-timer-layout"><div class="form-group"><label class="label" for="focusSubject">Matéria</label><select id="focusSubject" class="select"></select></div><div class="focus-presets" aria-label="Duração da sessão"><button type="button" onclick="setFocusDuration(25)" data-focus-minutes="25">25 min</button><button type="button" onclick="setFocusDuration(50)" data-focus-minutes="50">50 min</button><button type="button" onclick="setFocusDuration(90)" data-focus-minutes="90">90 min</button></div></div><div class="timer" id="timerDisplay" role="timer" aria-live="polite">25:00</div><div class="focus-session-meta" id="focusSessionMeta">Hoje: 0m · Meta: 60m</div><div class="timer-controls"><button class="btn btn-primary" id="timerStart" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i>Iniciar</button><button class="btn btn-secondary" id="timerFinish" onclick="finishFocusSession()"><i data-lucide="check" class="icon"></i>Concluir</button><button class="btn btn-ghost" onclick="resetTimer()"><i data-lucide="rotate-ccw" class="icon"></i>Reiniciar</button></div><div class="separator"></div><div class="focus-card-footer"><span class="small muted">O tempo continua contando se você trocar de página ou recarregar o app.</span><button class="link-btn" type="button" onclick="go('performance')">Ver evolução</button></div></div>
+ <div class="v39-actions">
+  <button class="v39-action" onclick="v40OpenFocusedQuestions()"><i data-lucide="circle-help" class="icon"></i><span>Questões</span></button>
+  <button class="v39-action" onclick="go('reviews')"><i data-lucide="brain" class="icon"></i><span>Revisões</span></button>
+  <button class="v39-action" onclick="go('mocks')"><i data-lucide="clipboard-check" class="icon"></i><span>Simulados</span></button>
+  <button class="v39-action" onclick="go('essay')"><i data-lucide="pen-line" class="icon"></i><span>Redação</span></button>
+ </div>
+ <div class="v39-panels">
+  <div class="v39-panel card">
+   <div class="v39-panel-head"><h3>Resumo</h3><button class="link-btn" onclick="go('performance')">Dados</button></div>
+   <div class="v39-list">
+    <div><span>Foco atual</span><strong id="v39Weak">—</strong></div>
+    <div><span>Semana</span><strong id="v39Week">0 min</strong></div>
+    <div><span>Sequência</span><strong id="v39Streak">0 dias</strong></div>
+   </div>
+  </div>
+  <div class="v39-panel card">
+   <div class="v39-panel-head"><h3>Rotas</h3><button class="link-btn" onclick="go('plan')">Abrir</button></div>
+   <div class="v39-routes">
+    <button class="v39-route" onclick="v38OpenRoute('ENEM')">ENEM</button>
+    <button class="v39-route" onclick="v38OpenRoute('PISM-I')">PISM I</button>
+    <button class="v39-route" onclick="v38OpenRoute('PISM-II')">PISM II</button>
+    <button class="v39-route" onclick="v38OpenRoute('PISM-III')">PISM III</button>
+   </div>
+  </div>
+ </div>
+</div>
+
+ <div class="v33-brand-stage">
+  <div class="v33-stage-main">
+   <div class="v33-stage-head">
+    <div>
+     <span class="v33-stage-kicker" id="v33StageKicker">Central de Aprovação</span>
+     <h2 id="v33StageTitle">Uma base visual própria para transformar estudo em vantagem competitiva.</h2>
+     <p id="v33StageText">A plataforma diferencia ENEM e PISM não só na função, mas também na experiência: rota, foco, linguagem e prioridade mudam conforme o vestibular em preparo.</p>
+    </div>
+    <div class="v33-brand-emblem">
+      <span class="v33-brand-rank" id="v33BrandRank">Rota ativa</span>
+      <strong id="v33BrandExam">ENEM</strong>
+      <small id="v33BrandExamSub">estratégia nacional por áreas</small>
+    </div>
+   </div>
+   <div class="v33-signal-grid">
+     <div class="v33-signal-card"><span>Vibe da sessão</span><strong id="v33SignalOne">Foco orientado</strong><small id="v33SignalOneSub">estude com clareza, não no automático</small></div>
+     <div class="v33-signal-card"><span>Próximo ganho</span><strong id="v33SignalTwo">—</strong><small id="v33SignalTwoSub">ponto com maior chance de virar acerto</small></div>
+     <div class="v33-signal-card"><span>Estilo de prova</span><strong id="v33SignalThree">—</strong><small id="v33SignalThreeSub">estrutura de treino da rota escolhida</small></div>
+   </div>
+   <div class="v33-chip-row" id="v33ChipRow"></div>
+  </div>
+  <div class="v33-stage-side">
+   <button class="v33-universe-card enem" id="v33UniverseEnem" onclick="setFocusExam('ENEM')">
+    <div class="v33-universe-top"><span class="v33-universe-pill">Universo ENEM</span><span class="v33-universe-state" id="v33EnemState">Pronto</span></div>
+    <strong>Amplitude, estratégia e resistência</strong>
+    <p>Treinos por áreas, leitura contextualizada, simulados longos e integração natural com redação.</p>
+    <div class="v33-universe-tags"><span>Dia 1</span><span>Dia 2</span><span>45 por área</span></div>
+   </button>
+   <button class="v33-universe-card pism" id="v33UniversePism" onclick="setFocusExam('PISM')">
+    <div class="v33-universe-top"><span class="v33-universe-pill">Universo PISM</span><span class="v33-universe-state" id="v33PismState">Pronto</span></div>
+    <strong>Módulos, cadernos e precisão acadêmica</strong>
+    <p>Rotas por módulo, objetivos do dia, discursivas e estudo mais estruturado para a UFJF.</p>
+    <div class="v33-universe-tags"><span>Módulos</span><span>1º dia</span><span>2º dia</span></div>
+   </button>
+  </div>
+ </div>
+ <div class="v28-command-board">
+  <div class="card v28-command-hero">
+   <div class="v28-command-top"><span class="v28-command-kicker" id="v28CommandKicker">Modo aprovação ativado</span><span class="v28-command-pill" id="v28MomentumPill">Consistência em construção</span></div>
+   <h2 id="v28CommandTitle">Estude com direção, não no automático.</h2>
+   <p id="v28CommandText">O painel cruza erro, revisão, tempo e desempenho para escolher a próxima melhor ação do seu estudo.</p>
+   <div class="v28-command-reasons" id="v28CommandReasons"></div>
+   <div class="v28-command-actions"><button class="btn btn-primary" onclick="launchNow('mission')"><i data-lucide="rocket" class="icon"></i>Começar minha melhor ação</button><button class="btn btn-ghost" onclick="launchNow('review')"><i data-lucide="rotate-ccw" class="icon"></i>Revisar agora</button></div>
+   <div class="v28-command-grid">
+    <div class="v28-mini-card"><span>Foco crítico</span><strong id="v28Critical">—</strong><small id="v28CriticalNote">maior oportunidade de ganho</small></div>
+    <div class="v28-mini-card"><span>Execução de hoje</span><strong id="v28TodayGoal">0%</strong><small id="v28TodayGoalText">minutos e questões caminham juntos</small></div>
+    <div class="v28-mini-card"><span>Direção do estudo</span><strong id="v28FocusFlow">—</strong><small id="v28FocusFlowText">plano alinhado à prova em foco</small></div>
+   </div>
+  </div>
+ </div>
+ <div class="v28-action-rack">
+  <button class="v28-action-card" onclick="startSmartDrill(20,'approval')"><div class="top"><div class="ico"><i data-lucide="brain-circuit" class="icon"></i></div><span class="v28-action-badge">Treino guiado</span></div><strong>Questões inteligentes</strong><p>O app prioriza o que tem mais chance de virar acerto.</p><div class="v28-action-foot"><span>Ir agora</span><i data-lucide="arrow-right" class="icon"></i></div></button>
+  <button class="v28-action-card warn" onclick="launchNow('review')"><div class="top"><div class="ico"><i data-lucide="siren" class="icon"></i></div><span class="v28-action-badge">Recuperação</span></div><strong>Erros e revisões</strong><p>Limpe pendências, recupere memória e reduza reincidências.</p><div class="v28-action-foot"><span>Revisar</span><i data-lucide="arrow-right" class="icon"></i></div></button>
+  <button class="v28-action-card pism" onclick="launchNow('mock')"><div class="top"><div class="ico"><i data-lucide="book-check" class="icon"></i></div><span class="v28-action-badge">Formato real</span></div><strong>Simulado do momento</strong><p>ENEM por área ou PISM em bloco de dia com poucos cliques.</p><div class="v28-action-foot"><span>Iniciar</span><i data-lucide="arrow-right" class="icon"></i></div></button>
+  <button class="v28-action-card" onclick="launchNow('write')"><div class="top"><div class="ico"><i data-lucide="pen-tool" class="icon"></i></div><span class="v28-action-badge">Produção</span></div><strong>Redação ou discursiva</strong><p>Treino de escrita para manter repertório e argumentação vivos.</p><div class="v28-action-foot"><span>Treinar</span><i data-lucide="arrow-right" class="icon"></i></div></button>
+ </div>
+ <div class="v25-strip">
+  <div class="card v25-readiness"><div class="v25-mini-title">Índice de preparação</div><div class="v25-score" id="v25Readiness">0<small>/100</small></div><div class="v25-meter"><span id="v25ReadinessBar" style="width:0%"></span></div><div class="v25-mini-sub" id="v25ReadinessText">Comece respondendo questões para gerar diagnóstico.</div></div>
+  <div class="card v25-mission-mini"><div class="v25-mini-title">Missão do dia</div><div class="v25-mini-main" id="v25MissionMini">0% concluída</div><div class="v25-mini-sub" id="v25MissionMiniText">Seu plano diário se adapta aos seus dados.</div><button class="btn btn-sm btn-secondary" onclick="scrollToMission()" style="margin-top:10px">Ver missão</button></div>
+  <div class="card v25-review-mini"><div class="v25-mini-title">Revisões inteligentes</div><div class="v25-mini-main" id="v25ReviewMini">0 pendentes</div><div class="v25-mini-sub" id="v25ReviewMiniText">Erros entram automaticamente na fila.</div><button class="btn btn-sm btn-secondary" onclick="go('reviews')" style="margin-top:10px">Abrir revisões</button></div>
+ </div>
+ <div class="card card-pad v37-radar" id="approvalRadar">
+  <div class="v37-radar-head">
+   <div><p class="eyebrow">Decisão por dados</p><div class="section-title" style="margin:0"><i data-lucide="radar" class="icon"></i>Radar de Aprovação</div><p class="small muted" style="margin:6px 0 0">Transforma desempenho, cobertura, consistência e memória em uma próxima ação clara.</p></div>
+   <div class="v37-radar-scope" id="v37RadarScope">ENEM</div>
+  </div>
+  <div class="v37-radar-grid">
+   <div class="v37-score-wrap"><div class="v37-score-ring" id="v37RadarRing" style="--score:0"><div><strong id="v37RadarScore">0</strong><span>/100</span></div></div><div class="v37-score-copy"><strong id="v37RadarLevel">Diagnóstico inicial</strong><span id="v37RadarLevelText">Responda questões e registre sessões para calibrar o radar.</span></div></div>
+   <div class="v37-radar-bars" id="v37RadarBars"></div>
+   <div class="v37-radar-action"><span class="v37-radar-label">Próxima decisão</span><strong id="v37RadarActionTitle">Construa uma amostra real.</strong><p id="v37RadarActionText">Comece com questões do vestibular em foco para o app separar falta de dados de dificuldade real.</p><button class="btn btn-primary" id="v37RadarActionBtn" onclick="runRadarAction()"><i data-lucide="arrow-up-right" class="icon"></i>Executar recomendação</button><small id="v37RadarHonesty">Indicador interno para organizar estudo; não prevê nota oficial.</small></div>
+  </div>
+ </div>
+ <div class="dashboard-grid">
+  <div class="stack">
+   <div class="card hero-card"><div class="kicker" id="heroKicker">Prioridade de hoje</div><h2 id="heroTitle">Construa consistência antes de buscar volume.</h2><p id="heroText">Seu plano será ajustado conforme você estuda e responde às questões.</p><div class="hero-actions"><button class="btn btn-secondary" onclick="go('plan')">Ver plano</button><button class="btn btn-ghost" onclick="go('performance')">Analisar desempenho</button></div><div class="hero-meta"><div><strong id="heroDays">—</strong><span>dias para a prova</span></div><div><strong id="heroAccuracy">0%</strong><span>aproveitamento</span></div><div><strong id="heroWeek">0 min</strong><span>estudo na semana</span></div></div></div>
+   <div class="grid grid-4"><div class="card stat"><div class="stat-icon"><i data-lucide="timer" class="icon"></i></div><div class="stat-label">Hoje</div><div class="stat-value" id="statToday">0m</div><div class="stat-note" id="statTodayNote">Meta: 60 min</div></div><div class="card stat"><div class="stat-icon"><i data-lucide="circle-check-big" class="icon"></i></div><div class="stat-label">Questões</div><div class="stat-value" id="statQuestions">0</div><div class="stat-note">respondidas</div></div><div class="card stat"><div class="stat-icon"><i data-lucide="flame" class="icon"></i></div><div class="stat-label">Sequência</div><div class="stat-value" id="statStreak">0</div><div class="stat-note">dias seguidos</div></div><div class="card stat pism-tone"><div class="stat-icon"><i data-lucide="target" class="icon"></i></div><div class="stat-label">Foco atual</div><div class="stat-value" id="statFocus">ENEM</div><div class="stat-note" id="statFocusNote">matriz por habilidades</div></div></div>
+   <div class="grid grid-2"><div class="card card-pad"><div class="section-title"><i data-lucide="chart-column" class="icon"></i>Últimos 7 dias</div><div class="week-bars" id="weekBars"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="sparkles" class="icon"></i>Leitura do seu desempenho</div><div class="notice" id="insightBox"><strong>Sem dados suficientes.</strong><br>Responda algumas questões para identificar seus pontos de maior retorno.</div></div></div>
+  </div>
+  <div class="stack">
+   <div class="card card-pad"><div class="section-title"><i data-lucide="list-checks" class="icon"></i>Plano de hoje</div><div id="todayPlan"></div><button class="btn btn-secondary" style="width:100%;margin-top:12px" onclick="go('plan')">Abrir plano completo</button></div>
+  </div>
+ </div>
+<div class="card card-pad" id="dailyMissionBoard" style="margin-top:16px">
+ <div class="mission-head"><div><p class="eyebrow">Execução diária</p><div class="section-title" style="margin:0"><i data-lucide="crosshair" class="icon"></i>Missão de aprovação</div><p class="small muted" style="margin:5px 0 0">A missão muda conforme erros, revisões, tempo estudado e prova em foco.</p></div><div class="mission-score" id="missionScore">0% <span>do dia</span></div></div>
+ <div class="mission-list" id="dailyMissionList"></div>
+</div>
+<div class="card card-pad v34-approval-routes" style="margin-top:16px">
+ <div class="v34-routes-head">
+  <div><p class="eyebrow">Estratégias por vestibular</p><div class="section-title" style="margin:0"><i data-lucide="route" class="icon"></i><span id="v34RoutesTitle">Rotas de Aprovação</span></div><p class="small muted" id="v34RoutesSub" style="margin:6px 0 0">Escolha ENEM ou um dos três módulos do PISM. Cada rota usa uma estratégia própria de preparação.</p></div>
+  <div class="v34-route-badge" id="v34RouteBadge">ENEM</div>
+ </div>
+ <div class="v34-track-grid" id="v34TrackGrid">
+  <button class="v34-track-card enem" data-track="ENEM" onclick="setQuickTrack('ENEM')"><span class="v34-track-code">ENEM</span><strong>Estratégia por áreas</strong><small>Interpretação, resistência, cadernos de 45 e redação.</small></button>
+  <button class="v34-track-card p1" data-track="PISM_I" onclick="setQuickTrack('PISM_I')"><span class="v34-track-code">PISM I</span><strong>Construção de base</strong><small>Conceito forte, cobertura equilibrada e resposta discursiva.</small></button>
+  <button class="v34-track-card p2" data-track="PISM_II" onclick="setQuickTrack('PISM_II')"><span class="v34-track-code">PISM II</span><strong>Consolidação</strong><small>Mais aplicação, conexão entre conteúdos e precisão.</small></button>
+  <button class="v34-track-card p3" data-track="PISM_III" onclick="setQuickTrack('PISM_III')"><span class="v34-track-code">PISM III</span><strong>Performance final</strong><small>Tempo de prova, cadernos e discursivas da área do curso.</small></button>
+ </div>
+ <div class="v34-strategy-banner" id="v34StrategyBanner"><div><span id="v34StrategyKicker">Estratégia</span><strong id="v34StrategyTitle">ENEM · performance por áreas</strong><p id="v34StrategyText"></p></div><div class="v34-strategy-metrics" id="v34StrategyMetrics"></div></div>
+ <div class="v34-route-panel">
+  <div><label class="label">Estratégia da sessão</label><select id="v34RouteSelect" class="select" onchange="setQuickRoute(this.value)"></select></div>
+  <div id="v34PismAreaWrap" style="display:none"><label class="label">Área do curso · PISM III</label><select id="v34PismCourseArea" class="select" onchange="setPismCourseAreaQuick(this.value)"><option value="">Selecione sua área</option><option>Economia e Administração</option><option>Exatas</option><option>Humanas</option><option>Saúde</option></select></div>
+  <div class="v34-route-info" id="v34RouteInfo"></div>
+ </div>
+ <div class="v34-time-groups">
+  <div><span class="v34-time-label">Sessão rápida</span><div class="v27-time-buttons"><button class="btn btn-secondary" onclick="buildQuickPlan(15)">15 min</button><button class="btn btn-secondary" onclick="buildQuickPlan(30)">30 min</button><button class="btn btn-primary" onclick="buildQuickPlan(60)">60 min</button><button class="btn btn-secondary" onclick="buildQuickPlan(90)">90 min</button></div></div>
+  <div><span class="v34-time-label">Estudo profundo</span><div class="v27-time-buttons"><button class="btn btn-secondary" onclick="buildQuickPlan(120)">2h</button><button class="btn btn-secondary" onclick="buildQuickPlan(180)">3h</button><button class="btn btn-secondary" onclick="buildQuickPlan(240)">4h</button><button class="btn btn-secondary" onclick="buildQuickPlan(300)">5h</button><button class="btn btn-secondary" id="v34OfficialTimeBtn" onclick="buildOfficialExamPlan()">5h30</button></div></div>
+ </div>
+ <div id="v34GeneratedRoute" class="v34-generated-route"><div class="empty">Escolha uma estratégia e um tempo para gerar uma rota prática de estudo.</div></div>
+</div>
+</section>
+
+<section class="page" id="page-questions">
+ <div class="header-row"><div><p class="eyebrow">Banco de questões</p><h1 id="questionModeTitle">ENEM</h1><p class="sub" id="questionModeSub">Filtre e pratique.</p></div><div class="header-actions"><button class="btn btn-secondary" data-qmode="ENEM" onclick="openQuestionMode('ENEM')">ENEM</button><button class="btn btn-pism" data-qmode="PISM" onclick="openQuestionMode('PISM')">PISM</button><button class="btn btn-secondary" onclick="toggleQuestionFocus()"><i data-lucide="maximize-2" class="icon"></i>Foco</button><button class="btn btn-primary" onclick="pickQuestion(false)"><i data-lucide="shuffle" class="icon"></i>Nova</button></div></div>
+ <div class="question-mode-banner v421-question-banner" id="questionModeBanner"><div><strong id="v42QuestionScope">ENEM</strong><p>Área, matéria e assunto.</p></div><div class="v421-exam-tabs" aria-label="Trocar banco de questões"><button type="button" class="v421-exam-tab" data-qexam-switch="ENEM" onclick="openQuestionMode('ENEM')">ENEM</button><button type="button" class="v421-exam-tab" data-qexam-switch="PISM" onclick="openQuestionMode('PISM')">PISM</button></div></div>
+ <div class="card filter-panel"><div class="filters v3"><select id="qExam" class="select" style="display:none"><option>ENEM</option><option>PISM</option></select><select id="qModule" class="select"><option value="ALL">Todos os módulos</option><option value="I">PISM I</option><option value="II">PISM II</option><option value="III">PISM III</option></select><select id="qArea" class="select"><option value="ALL">Todas as áreas</option></select><select id="qSubject" class="select"><option value="ALL">Todas as matérias</option></select><select id="qDifficulty" class="select"><option value="ALL">Todas as dificuldades</option><option>Fácil</option><option>Médio</option><option>Difícil</option></select><select id="qTopic" class="select"><option value="ALL">Todos os assuntos</option></select><select id="qStatus" class="select"><option value="ALL">Qualquer status</option><option value="UNSEEN">Não respondidas</option><option value="WRONG">Caderno de erros</option><option value="FAV">Favoritas</option></select><input id="qSearch" class="field filter-search" placeholder="Buscar por assunto, habilidade ou palavra-chave"></div></div>
+ <div class="q-layout"><div class="card question-card" id="questionCard"></div><aside class="q-sidebar"><div class="card"><div class="section-title"><i data-lucide="gauge" class="icon"></i>Seu desempenho</div><div class="metric-line"><span>Acertos</span><b id="qCorrect">0</b></div><div class="metric-line"><span>Respondidas</span><b id="qAnswered">0</b></div><div class="metric-line"><span>Aproveitamento</span><b id="qAccuracy">0%</b></div></div><div class="card"><div class="section-title"><i data-lucide="filter" class="icon"></i>Recorte atual</div><div class="metric-line"><span>Disponíveis</span><b id="qFiltered">0</b></div><div class="metric-line"><span>Favoritas</span><b id="qFavCount">0</b></div><div class="metric-line"><span>Erros ativos</span><b id="qWrongCount">0</b></div></div><div class="card"><div class="section-title"><i data-lucide="brain" class="icon"></i>Revisão espaçada</div><div class="metric-line"><span>Vencidas/hoje</span><b id="qDueReviews">0</b></div><div class="metric-line"><span>Próximas</span><b id="qUpcomingReviews">0</b></div><button class="btn btn-secondary" onclick="startDueReview()" style="width:100%;margin-top:9px">Revisar agora</button></div><div class="card v42-q-help"><div class="section-title"><i data-lucide="keyboard" class="icon"></i>Atalhos</div><div class="tiny muted">N · nova questão<br>F · favoritar<br>Esc · sair do modo foco</div></div></aside></div>
+</section>
+
+<section class="page" id="page-mocks">
+ <div class="header-row"><div><p class="eyebrow">Treino sob pressão</p><h1>Simulados</h1><p class="sub">Configurações rápidas para praticar blocos realistas sem transformar o app em uma tela complicada.</p></div></div>
+ <div class="mock-cards v37-mock-cards"><div class="card mock-card"><div class="mock-icon"><i data-lucide="zap" class="icon"></i></div><h3>Diagnóstico rápido</h3><p>10 questões com feedback para alimentar o diagnóstico sem exigir uma sessão longa.</p><button class="btn btn-secondary" onclick="startMockPreset('QUICK')">Começar diagnóstico</button></div><div class="card mock-card"><div class="mock-icon"><i data-lucide="layers-3" class="icon"></i></div><h3>ENEM por área</h3><p>Configure até 45 itens por área e use o modo prova para treinar navegação e tempo.</p><button class="btn btn-primary" onclick="openMockConfig('ENEM')">Configurar ENEM</button></div><div class="card mock-card pism"><div class="mock-icon"><i data-lucide="milestone" class="icon"></i></div><h3>PISM objetivo</h3><p>Monte blocos por módulo e disciplina, preservando o recorte do vestibular seriado.</p><button class="btn btn-pism" onclick="openMockConfig('PISM')">Configurar PISM</button></div><div class="card mock-card v37-premium-card"><div class="mock-icon"><i data-lucide="shield-check" class="icon"></i></div><span class="v37-premium-badge">Modo prova</span><h3>Modo Prova Premium</h3><p>Sem gabarito durante a prova, navegação livre, marcação para revisar, cronômetro e autópsia pós-simulado.</p><button class="btn btn-primary" onclick="startPremiumPreset()">Entrar em modo prova</button></div></div>
+ <div class="card card-pad" id="mockConfig" style="margin-top:16px;display:none"><div class="section-title">Configurar simulado</div><div class="grid grid-4"><div><label class="label">Prova</label><select id="mockExam" class="select"><option>ENEM</option><option>PISM</option></select></div><div><label class="label">Módulo PISM</label><select id="mockModule" class="select"><option value="ALL">Todos</option><option>I</option><option>II</option><option>III</option></select></div><div><label class="label">Matéria</label><select id="mockSubject" class="select"><option value="ALL">Todas</option></select></div><div><label class="label">Quantidade</label><select id="mockSize" class="select"><option value="10">10</option><option value="20">20</option><option value="40">40</option><option value="45">45</option></select></div></div><div class="grid grid-3" style="margin-top:10px"><div><label class="label">Dificuldade</label><select class="select" id="mockDifficulty"><option value="ALL">Misturada</option><option>Fácil</option><option>Médio</option><option>Difícil</option></select></div><div><label class="label">Estratégia</label><select class="select" id="mockStrategy"><option value="BALANCED">Equilibrado</option><option value="WEAK">Pontos fracos</option><option value="UNSEEN">Somente inéditas</option><option value="ERRORS">Caderno de erros</option></select></div><div><label class="label">Tempo limite</label><select class="select" id="mockTime"><option value="0">Sem limite</option><option value="15">15 min</option><option value="30">30 min</option><option value="60">60 min</option><option value="90">90 min</option></select></div></div><div class="v37-premium-switch"><label><input type="checkbox" id="mockPremium" checked><span><b>Modo Prova Premium</b><small>Oculta feedback e gabarito até finalizar; libera navegação, marcação e autópsia.</small></span></label></div><button class="btn btn-primary" style="margin-top:13px" onclick="startCustomMock()">Iniciar simulado</button></div>
+ <div class="card card-pad" id="mockActive" style="margin-top:16px;display:none"></div>
+ <div class="card card-pad" id="mockResult" style="margin-top:16px;display:none"></div>
+ <div class="card card-pad" style="margin-top:16px"><div class="section-title"><i data-lucide="history" class="icon"></i>Histórico de simulados</div><div id="mockHistory"></div></div>
+ <div class="header-row" style="margin-top:30px;margin-bottom:14px"><div><p class="eyebrow">Treino discursivo</p><h1 style="font-size:24px">Discursivas PISM</h1><p class="sub">Prompts autorais com critérios de autocorreção para praticar resposta aberta.</p></div><div class="header-actions"><select id="discModule" class="select" onchange="renderDiscursive()"><option value="ALL">Todos os módulos</option><option>I</option><option>II</option><option>III</option></select></div></div><div id="discursiveList"></div>
+</section>
+
+<section class="page" id="page-essay">
+ <div class="header-row"><div><p class="eyebrow">ENEM</p><h1>Central de redação</h1><p class="sub">Ambiente limpo para produzir texto, revisar pelas cinco competências e construir histórico.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="newEssayTheme()"><i data-lucide="refresh-cw" class="icon"></i>Novo tema</button><button class="btn btn-primary" onclick="saveEssay()"><i data-lucide="save" class="icon"></i>Salvar redação</button></div></div>
+ <div class="essay-layout"><div><div class="essay-theme"><span>Tema autoral para treino</span><b id="essayTheme"></b></div><input id="essayTitle" class="field" placeholder="Título opcional" style="margin-bottom:9px"><textarea id="essayText" class="textarea" placeholder="Comece sua redação aqui..."></textarea><div class="small muted" style="margin-top:8px"><span id="essayWords">0</span> palavras · <span id="essayChars">0</span> caracteres · rascunho salvo automaticamente</div></div><aside class="stack"><div class="card card-pad"><div class="section-title"><i data-lucide="list-checks" class="icon"></i>Revisão por competências</div><label class="check"><input type="checkbox"> <span><b>C1 — Norma-padrão</b><br><span class="muted">Revise desvios gramaticais e construção sintática.</span></span></label><label class="check"><input type="checkbox"> <span><b>C2 — Tema e repertório</b><br><span class="muted">Atenda ao recorte e articule repertório pertinente.</span></span></label><label class="check"><input type="checkbox"> <span><b>C3 — Argumentação</b><br><span class="muted">Selecione e organize argumentos que sustentem a tese.</span></span></label><label class="check"><input type="checkbox"> <span><b>C4 — Coesão</b><br><span class="muted">Garanta conexão lógica entre frases e parágrafos.</span></span></label><label class="check"><input type="checkbox"> <span><b>C5 — Intervenção</b><br><span class="muted">Apresente proposta detalhada e compatível com direitos humanos.</span></span></label></div><div class="card card-pad"><div class="section-title"><i data-lucide="badge-check" class="icon"></i>Registrar correção</div><p class="tiny muted" style="line-height:1.5;margin:0 0 10px">Depois de corrigir a redação, registre 0–200 em cada competência para acompanhar evolução.</p><div class="essay-score-grid"><label>C1<input class="field essay-score-input" id="essayC1" type="number" min="0" max="200" step="20" value="0" oninput="updateEssayScoreTotal()"></label><label>C2<input class="field essay-score-input" id="essayC2" type="number" min="0" max="200" step="20" value="0" oninput="updateEssayScoreTotal()"></label><label>C3<input class="field essay-score-input" id="essayC3" type="number" min="0" max="200" step="20" value="0" oninput="updateEssayScoreTotal()"></label><label>C4<input class="field essay-score-input" id="essayC4" type="number" min="0" max="200" step="20" value="0" oninput="updateEssayScoreTotal()"></label><label>C5<input class="field essay-score-input" id="essayC5" type="number" min="0" max="200" step="20" value="0" oninput="updateEssayScoreTotal()"></label></div><div class="essay-total"><span>Nota registrada</span><b id="essayScoreTotal">0/1000</b></div></div><div class="ai-correction-card"><div class="ai-correction-head"><div><h3>Correção automática por IA</h3><p>Estimativa pedagógica das cinco competências do ENEM. A IA não substitui corretor oficial ou professor.</p></div><button class="btn btn-primary" id="aiCorrectBtn" onclick="correctEssayWithAI()"><i data-lucide="sparkles" class="icon"></i>Corrigir com IA</button></div><div class="ai-status" id="aiCorrectionStatus">Correção opcional disponível quando a API estiver configurada.</div><div id="aiCorrectionResult"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="archive" class="icon"></i>Histórico</div><div id="essayHistory"></div></div></aside></div>
+</section>
+
+<section class="page" id="page-plan">
+ <div class="header-row"><div><p class="eyebrow">Prioridade dinâmica</p><h1>Plano</h1><p class="sub">O plano combina desempenho em questões, tempo já estudado, erros recorrentes e proximidade da prova.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="generatePlan()"><i data-lucide="refresh-cw" class="icon"></i>Recalcular</button><button class="btn btn-primary" onclick="go('home')"><i data-lucide="timer" class="icon"></i>Fazer sessão</button></div></div>
+ <div class="v33-plan-banner" id="v33PlanBanner">
+   <div class="v33-plan-banner-main">
+     <span class="v33-plan-banner-kicker" id="v33PlanBadge">Plano com identidade de prova</span>
+     <strong id="v33PlanTitle">Cada vestibular exige um ritmo diferente de estudo.</strong>
+     <p id="v33PlanText">No ENEM, a lógica favorece áreas, resistência e interpretação. No PISM, o planejamento gira em torno do módulo, do dia e das disciplinas do caderno.</p>
+   </div>
+   <div class="v33-plan-bullets" id="v33PlanPoints"></div>
+ </div>
+ <div class="grid grid-3" style="margin-bottom:16px"><div class="card stat"><div class="stat-label">Meta diária</div><div class="stat-value" id="planDaily">60 min</div><div class="stat-note">ajustável em configurações</div></div><div class="card stat"><div class="stat-label">Matéria prioritária</div><div class="stat-value" style="font-size:20px" id="planPriority">—</div><div class="stat-note">menor retorno atual</div></div><div class="card stat"><div class="stat-label">Reta final</div><div class="stat-value" id="planCountdown">—</div><div class="stat-note">dias até a prova em foco</div></div></div>
+ <div class="grid grid-2"><div class="card card-pad"><div class="section-title"><i data-lucide="calendar-check-2" class="icon"></i>Próximos 7 dias</div><div id="weeklyPlan"></div></div><div class="stack"><div class="card card-pad"><div class="section-title"><i data-lucide="target" class="icon"></i>Estratégia da fase</div><div class="notice" id="phaseStrategy"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="rotate-ccw" class="icon"></i>Revisão inteligente</div><div id="reviewSuggestions"></div></div></div></div>
+</section>
+
+<section class="page" id="page-performance">
+ <div class="header-row"><div><p class="eyebrow">Decisão por dados</p><h1>Desempenho</h1><p class="sub">Veja onde o estudo está convertendo em acertos e onde ainda existe perda de pontos.</p></div></div>
+ <div class="grid grid-4" style="margin-bottom:16px"><div class="card stat"><div class="stat-label">Aproveitamento</div><div class="stat-value" id="perfAccuracy">0%</div></div><div class="card stat"><div class="stat-label">Acertos</div><div class="stat-value" id="perfCorrect">0</div></div><div class="card stat"><div class="stat-label">Questões</div><div class="stat-value" id="perfAnswered">0</div></div><div class="card stat"><div class="stat-label">Tempo estudado</div><div class="stat-value" id="perfTime">0m</div></div></div>
+ <div class="card card-pad evolution-card"><div class="evolution-head"><div><div class="section-title"><i data-lucide="chart-no-axes-combined" class="icon"></i>Estatísticas e evolução</div><p class="small muted">Barras mostram minutos estudados; a linha mostra o aproveitamento diário nas questões.</p></div><div class="evolution-ranges" aria-label="Período do gráfico"><button type="button" data-evolution-range="7" onclick="setEvolutionRange(7)">7 dias</button><button type="button" data-evolution-range="30" onclick="setEvolutionRange(30)">30 dias</button><button type="button" data-evolution-range="90" onclick="setEvolutionRange(90)">90 dias</button></div></div><div class="evolution-kpis" id="evolutionKpis"></div><div class="evolution-chart" id="evolutionChart" role="img" aria-label="Gráfico de evolução do estudo"></div><div class="evolution-legend"><span><i class="legend-study"></i>Tempo estudado</span><span><i class="legend-accuracy"></i>Aproveitamento</span></div><div class="evolution-insight" id="evolutionInsight"></div></div>
+ <div class="grid grid-2 performance-details"><div class="card card-pad"><div class="section-title"><i data-lucide="chart-bar-big" class="icon"></i>Por matéria</div><div id="subjectPerformance"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="history" class="icon"></i>Sessões recentes</div><div id="focusSessionHistory"></div></div></div>
+ <div class="grid grid-2 performance-details"><div class="card card-pad"><div class="section-title"><i data-lucide="notebook-tabs" class="icon"></i>Caderno de erros</div><div id="errorNotebook"></div><button class="btn btn-secondary" style="width:100%;margin-top:8px" onclick="openWrongQuestions()">Treinar somente erros</button></div><div class="card card-pad"><div class="section-title"><i data-lucide="lightbulb" class="icon"></i>Como ler sua evolução</div><div class="notice"><strong>Consistência antes de volume.</strong><br>Compare períodos semelhantes. Procure mais dias ativos, tempo sustentável e aproveitamento crescente — não apenas um pico isolado.</div></div></div>
+</section>
+
+<section class="page" id="page-reviews">
+ <div class="header-row"><div><p class="eyebrow">Memória de longo prazo</p><h1>Revisões inteligentes</h1><p class="sub">Questões erradas voltam no momento certo. Acertos nas revisões aumentam o intervalo; novos erros encurtam o ciclo.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="startErrorDrill()"><i data-lucide="notebook-tabs" class="icon"></i>Treinar erros</button><button class="btn btn-primary" onclick="startDueReview()"><i data-lucide="brain" class="icon"></i>Revisar pendentes</button></div></div>
+ <div class="review-summary-grid"><div class="card review-stat"><b id="reviewDue">0</b><span>para hoje</span></div><div class="card review-stat"><b id="reviewOverdue">0</b><span>atrasadas</span></div><div class="card review-stat"><b id="reviewUpcoming">0</b><span>próximos 7 dias</span></div><div class="card review-stat"><b id="reviewRecovered">0</b><span>erros recuperados</span></div></div>
+ <div class="grid grid-2"><div class="card card-pad"><div class="section-title"><i data-lucide="calendar-clock" class="icon"></i>Fila de revisão</div><div class="review-list" id="reviewQueueList"></div></div><div class="stack"><div class="card card-pad"><div class="section-title"><i data-lucide="scan-search" class="icon"></i>Por que você está errando?</div><div class="reason-chart" id="errorReasonChart"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="shield-check" class="icon"></i>Regra de recuperação</div><div class="notice"><strong>Erro não é assunto encerrado.</strong><br>Uma questão sai da zona crítica somente depois de ser acertada novamente em revisão. O objetivo é transformar erro em evidência de aprendizado.</div></div></div></div>
+</section>
+
+<section class="page" id="page-mastery">
+ <div class="header-row"><div><p class="eyebrow">Cobertura + precisão</p><h1>Domínio</h1><p class="sub">Estimativa interna baseada em acertos, cobertura do banco e repetição. Serve para priorizar estudo; não prevê nota oficial.</p></div><div class="header-actions"><button class="btn btn-primary" onclick="trainWeakestTopic()"><i data-lucide="target" class="icon"></i>Treinar ponto mais fraco</button></div></div>
+ <div class="mastery-toolbar"><select class="select" id="masteryExam" onchange="renderMasteryPage()"><option>ENEM</option><option>PISM</option></select><select class="select" id="masteryModule" onchange="renderMasteryPage()"><option value="ALL">Todos os módulos</option><option>I</option><option>II</option><option>III</option></select><select class="select" id="masteryView" onchange="renderMasteryPage()"><option value="ALL">Todos os assuntos</option><option value="WEAK">Somente críticos</option><option value="STUDIED">Já estudados</option></select></div>
+ <div class="mastery-summary"><div class="card review-stat"><b id="masteryOverall">0%</b><span>domínio médio estimado</span></div><div class="card review-stat"><b id="masteryCovered">0%</b><span>cobertura do banco</span></div><div class="card review-stat"><b id="masteryStrong">0</b><span>assuntos fortes</span></div><div class="card review-stat"><b id="masteryCritical">0</b><span>assuntos críticos</span></div></div>
+ <div id="masterySubjects"></div>
+</section>
+
+<section class="page" id="page-strategy">
+ <div class="header-row"><div><p class="eyebrow">Inteligência pedagógica</p><h1>Estratégia</h1><p class="sub">Transforme dados em decisões: confiança por assunto, erros reincidentes, recuperação e treino no formato da prova.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="startSmartDrill(20,'approval')"><i data-lucide="brain-circuit" class="icon"></i>Treino inteligente</button><button class="btn btn-primary" onclick="startSmartDrill(30,'approval')"><i data-lucide="crosshair" class="icon"></i>Recuperar pontos</button></div></div>
+ <div class="grid grid-4 v27-strategy-kpis" style="margin-bottom:16px"><div class="card stat"><div class="stat-label">Confiança média</div><div class="stat-value" id="v27Confidence">0%</div><div class="stat-note">corrige efeito de amostra pequena</div></div><div class="card stat"><div class="stat-label">Recuperação de erros</div><div class="stat-value" id="v27Recovery">0%</div><div class="stat-note">erros já acertados novamente</div></div><div class="card stat"><div class="stat-label">Erros reincidentes</div><div class="stat-value" id="v27Recurring">0</div><div class="stat-note">tópicos com repetição</div></div><div class="card stat"><div class="stat-label">Tendência</div><div class="stat-value" id="v27Trend">—</div><div class="stat-note">últimas tentativas vs. anteriores</div></div></div>
+ <div class="grid grid-2">
+  <div class="card card-pad"><div class="section-title"><i data-lucide="shield-check" class="icon"></i>Assuntos: domínio + confiança</div><div class="notice" style="margin-bottom:12px"><strong>Por que confiança?</strong><br>90% em 3 questões não vale o mesmo que 80% em 30. O indicador usa precisão, cobertura e tamanho da amostra para evitar falsa sensação de domínio.</div><div id="v27ConfidenceList"></div></div>
+  <div class="stack"><div class="card card-pad"><div class="section-title"><i data-lucide="repeat-2" class="icon"></i>Erros reincidentes</div><div id="v27RecurringList"></div></div><div class="card card-pad"><div class="section-title"><i data-lucide="trending-up" class="icon"></i>Próximo ganho de pontos</div><div id="v27NextGain" class="notice"></div><button class="btn btn-primary" style="width:100%;margin-top:10px" onclick="startSmartDrill(30,'approval')">Iniciar treino inteligente</button></div></div>
+ </div>
+ <div class="card card-pad" style="margin-top:16px"><div class="section-title"><i data-lucide="brain-circuit" class="icon"></i>Matriz de habilidades — ENEM</div><p class="small muted">Os itens autorais são agrupados internamente pelos cinco eixos cognitivos usados pelo Inep. O agrupamento é uma aproximação pedagógica do aplicativo, não uma classificação oficial de cada item.</p><div id="v27SkillMatrix" class="v27-skill-grid"></div></div>
+ <div class="card card-pad" style="margin-top:16px"><div class="section-title"><i data-lucide="clipboard-list" class="icon"></i>PISM · treino no formato dos dias</div><div class="notice" style="margin-bottom:12px"><strong>PISM 2027.</strong><br>Módulos I e II: cada dia tem 20 objetivas, com 5 questões de cada uma de quatro disciplinas. O Módulo III também distribui 20 objetivas por dia em quatro disciplinas. O treino abaixo replica essa distribuição objetiva com itens autorais do app.</div><div class="v27-blueprint-grid"><div class="v27-blueprint"><b>1º dia</b><span id="v27PismDay1Subjects"></span><button class="btn btn-pism" onclick="startPismDayMock(1)">Simular 1º dia · 20 objetivas</button></div><div class="v27-blueprint"><b>2º dia</b><span id="v27PismDay2Subjects"></span><button class="btn btn-pism" onclick="startPismDayMock(2)">Simular 2º dia · 20 objetivas</button></div></div><div class="tiny muted" style="margin-top:10px">A prova oficial também possui questões discursivas; use a seção de discursivas em Simulados para treinar produção de resposta.</div></div>
+</section>
+
+<section class="page" id="page-calendar">
+ <div class="header-row"><div><p class="eyebrow">Consistência</p><h1>Calendário de estudos</h1><p class="sub">Uma visão simples dos dias em que o plano realmente saiu do papel.</p></div><div class="header-actions"><button class="btn btn-secondary" onclick="changeMonth(-1)"><i data-lucide="chevron-left" class="icon"></i></button><button class="btn btn-secondary" onclick="changeMonth(1)"><i data-lucide="chevron-right" class="icon"></i></button></div></div>
+ <div class="card card-pad"><div class="calendar-head"><div class="section-title" style="margin:0" id="calendarTitle"></div><div class="tiny muted">Verde = sessão registrada</div></div><div class="calendar-grid" id="calendarGrid"></div></div>
+</section>
+
+<section class="page" id="page-settings">
+ <div class="header-row"><div><p class="eyebrow">Personalização</p><h1>Ajustes</h1><p class="sub">Configure metas, prova, timer e faça backup do progresso.</p></div></div>
+ <div class="settings-list"><div class="card setting"><div><h3>Nome exibido</h3><p>Usado apenas na saudação do painel.</p></div><div class="setting-control"><input id="setName" class="field" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Meta diária de estudo</h3><p>Tempo usado para medir o progresso de cada dia.</p></div><div class="setting-control"><input id="setDailyGoal" class="field" type="number" min="10" max="600" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Meta diária de questões</h3><p>Usada pela Missão do Dia para garantir prática ativa.</p></div><div class="setting-control"><input id="setDailyQuestions" class="field" type="number" min="5" max="100" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Duração do foco</h3><p>Tempo padrão do cronômetro regressivo.</p></div><div class="setting-control"><input id="setFocusMinutes" class="field" type="number" min="5" max="120" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Data do ENEM</h3><p>Defina a data principal que você quer usar no contador.</p></div><div class="setting-control"><input id="setEnemDate" class="field" type="date" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Data do PISM</h3><p>Para 2027, a UFJF marcou as provas em 5 e 6 de dezembro de 2026; confirme o edital da sua edição.</p></div><div class="setting-control"><input id="setPismDate" class="field" type="date" onchange="saveSettings()"></div></div><div class="card setting"><div><h3>Módulo PISM</h3><p>Prioriza questões e recomendações do módulo selecionado.</p></div><div class="setting-control"><select id="setPismModule" class="select" onchange="saveSettings()"><option>I</option><option>II</option><option>III</option></select></div></div><div class="card setting" id="pismCourseAreaSetting"><div><h3>Área do curso · PISM III</h3><p>No módulo III, as questões discursivas variam conforme a área do curso escolhida no PISM.</p></div><div class="setting-control"><select id="setPismCourseArea" class="select" onchange="saveSettings()"><option value="">Selecione</option><option>Economia e Administração</option><option>Exatas</option><option>Humanas</option><option>Saúde</option></select></div></div><div class="card setting"><div><h3>Personalização inicial</h3><p>Refaça o onboarding para ajustar vestibular, módulo, meta diária e prioridade de estudo.</p></div><div class="setting-control"><button class="btn btn-secondary" onclick="openOnboarding(true)"><i data-lucide="wand-sparkles" class="icon"></i>Refazer onboarding</button></div></div><div class="card setting"><div><h3>Backup de dados</h3><p>Exporte sessões, respostas, redações e preferências em um arquivo JSON.</p></div><div class="setting-control backup-actions"><button class="btn btn-secondary" onclick="exportBackup()"><i data-lucide="download" class="icon"></i>Exportar</button><button class="btn btn-secondary" onclick="document.getElementById('backupInput').click()"><i data-lucide="upload" class="icon"></i>Importar</button><input id="backupInput" class="sr-only" type="file" accept="application/json" onchange="importBackup(this)"></div></div><div class="card setting"><div><h3>Limpar progresso</h3><p>Apaga apenas os dados deste aplicativo no navegador atual.</p></div><div class="setting-control"><button class="btn btn-ghost" onclick="clearProgress()">Limpar dados</button></div></div></div>
+</section>
+</main>
+</div>
+<nav class="bottom-nav"><button data-page="home" onclick="go('home')"><i data-lucide="house" class="icon"></i>Início</button><button data-page="questions" onclick="go('questions')"><i data-lucide="library-big" class="icon"></i>Questões</button><button data-page="mocks" onclick="go('mocks')"><i data-lucide="clipboard-check" class="icon"></i>Simulados</button><button data-page="plan" onclick="go('plan')"><i data-lucide="calendar-range" class="icon"></i>Plano</button><button data-page="performance" onclick="go('performance')"><i data-lucide="chart-no-axes-combined" class="icon"></i>Dados</button></nav>
+
+<div class="v37-onboarding" id="v37Onboarding" aria-hidden="true">
+ <div class="v37-onboarding-backdrop"></div>
+ <div class="v37-onboarding-shell" role="dialog" aria-modal="true" aria-labelledby="v37OnboardingTitle">
+  <div class="v37-onboarding-brand"><div class="brand-mark"><i data-lucide="book-open-check" class="icon"></i></div><div><b>Gabarito+</b><span>Nuvem, sincronização e banco Supabase</span></div></div>
+  <div class="v37-onboarding-progress"><span class="active" data-onstep="1"></span><span data-onstep="2"></span><span data-onstep="3"></span></div>
+  <div class="v37-onstep active" data-step="1"><span class="v37-step-kicker">Etapa 1 de 3</span><h2 id="v37OnboardingTitle">Qual aprovação você está buscando?</h2><p>Isso muda o banco, a linguagem do dashboard e a estratégia recomendada.</p><label class="label">Como quer ser chamado(a)?</label><input class="field" id="onName" placeholder="Seu nome"><div class="v37-choice-grid"><button type="button" data-onexam="ENEM" onclick="selectOnboardingExam('ENEM')"><i data-lucide="book-open-check" class="icon"></i><strong>ENEM</strong><span>Áreas, resistência, interpretação e redação.</span></button><button type="button" data-onexam="PISM" onclick="selectOnboardingExam('PISM')"><i data-lucide="milestone" class="icon"></i><strong>PISM</strong><span>Módulo, caderno do dia, objetivas e discursivas.</span></button></div></div>
+  <div class="v37-onstep" data-step="2"><span class="v37-step-kicker">Etapa 2 de 3</span><h2>Monte uma rotina que você consegue cumprir.</h2><p>Metas sustentáveis geram dados melhores do que metas enormes abandonadas.</p><div class="grid grid-2"><div><label class="label">Minutos por dia</label><select class="select" id="onDailyGoal"><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>60 min</option><option value="90">90 min</option><option value="120">2 horas</option><option value="180">3 horas</option></select></div><div><label class="label">Questões por dia</label><select class="select" id="onDailyQuestions"><option value="5">5</option><option value="10" selected>10</option><option value="15">15</option><option value="20">20</option><option value="30">30</option></select></div></div><div class="grid grid-2" style="margin-top:10px"><div id="onPismModuleWrap"><label class="label">Módulo PISM</label><select class="select" id="onPismModule" onchange="syncOnboardingPismArea()"><option>I</option><option>II</option><option>III</option></select></div><div id="onPismAreaWrap" style="display:none"><label class="label">Área do curso · PISM III</label><select class="select" id="onPismArea"><option value="">Selecione</option><option>Economia e Administração</option><option>Exatas</option><option>Humanas</option><option>Saúde</option></select></div></div></div>
+  <div class="v37-onstep" data-step="3"><span class="v37-step-kicker">Etapa 3 de 3</span><h2>Defina o primeiro ponto de atenção.</h2><p>Essa escolha só inicia o diagnóstico. Depois, o Radar de Aprovação passa a usar seus resultados reais.</p><label class="label">Matéria que merece atenção agora</label><select class="select" id="onPrioritySubject"></select><div class="v37-onboarding-summary" id="onSummary"></div></div>
+  <div class="v37-onboarding-actions"><button class="btn btn-ghost" id="onBackBtn" onclick="onboardingBack()" style="visibility:hidden">Voltar</button><button class="btn btn-ghost" id="onSkipBtn" onclick="skipOnboarding()">Agora não</button><button class="btn btn-primary" id="onNextBtn" onclick="onboardingNext()">Continuar</button></div>
+ </div>
+</div>
+
+<div class="v5-account-modal" id="v5AccountModal" aria-hidden="true">
+ <button class="v5-account-backdrop" onclick="closeV5Account()" aria-label="Fechar"></button>
+ <section class="v5-account-card" role="dialog" aria-modal="true" aria-labelledby="v5AccountTitle">
+  <div class="v5-account-head"><div><span>Gabarito+</span><h2 id="v5AccountTitle">Conta Supabase</h2></div><button class="icon-btn" onclick="closeV5Account()"><i data-lucide="x" class="icon"></i></button></div>
+  <div id="v5AuthLoggedOut">
+   <div class="v5-auth-tabs"><button class="active" data-v5tab="login" onclick="v5AuthTab('login')">Entrar</button><button data-v5tab="register" onclick="v5AuthTab('register')">Criar conta</button></div>
+   <form id="v5LoginForm" onsubmit="v5Login(event)"><label class="label">E-mail</label><input class="field" id="v5LoginEmail" type="email" autocomplete="email" required><label class="label">Senha</label><input class="field" id="v5LoginPassword" type="password" autocomplete="current-password" required><button class="btn btn-primary" id="v5LoginBtn">Entrar</button><button class="link-btn v7-reset" type="button" onclick="v7ResetPassword()">Esqueci minha senha</button></form>
+   <form id="v5RegisterForm" class="hidden" onsubmit="v5Register(event)"><label class="label">Nome</label><input class="field" id="v5RegisterName" maxlength="80" required><label class="label">E-mail</label><input class="field" id="v5RegisterEmail" type="email" autocomplete="email" required><label class="label">Senha</label><input class="field" id="v5RegisterPassword" type="password" minlength="10" autocomplete="new-password" required><small>Use pelo menos 10 caracteres.</small><button class="btn btn-primary" id="v5RegisterBtn">Criar conta</button></form>
+   <p class="v5-auth-error" id="v5AuthError"></p>
+  </div>
+  <div id="v5AuthLoggedIn" class="hidden">
+   <div class="v5-user-card"><div class="v5-avatar"><i data-lucide="user" class="icon"></i></div><div><strong id="v5UserName">—</strong><span id="v5UserEmail">—</span><small id="v5UserRole">Estudante</small></div><div class="v6-network"><span id="v6NetworkStatus" data-state="ok">Online</span></div></div>
+   <div class="v5-sync-row"><div><span>Sincronização</span><strong id="v5SyncStatus" data-state="idle">Local</strong></div><button class="btn btn-secondary btn-sm" onclick="v5SyncNow()"><i data-lucide="cloud-upload" class="icon"></i>Sincronizar</button></div>
+   <div class="v5-conflict hidden" id="v5Conflict"><strong>Qual progresso você quer manter?</strong><p>Há dados neste dispositivo e também no servidor.</p><div><button class="btn btn-secondary" onclick="v5UseCloud()">Usar servidor</button><button class="btn btn-primary" onclick="v5UseDevice()">Usar este dispositivo</button></div></div>
+
+   <div class="v6-account-actions">
+    <button onclick="v6ToggleAccountSection('v6SecuritySection')"><i data-lucide="shield-check" class="icon"></i><span><strong>Segurança</strong><small>Senha e dispositivos</small></span><i data-lucide="chevron-right" class="icon"></i></button>
+    <button onclick="v6ToggleAccountSection('v6PrivacySection')"><i data-lucide="file-lock-2" class="icon"></i><span><strong>Privacidade</strong><small>Exportar ou excluir dados</small></span><i data-lucide="chevron-right" class="icon"></i></button>
+    <button id="v6InstallBtn" class="hidden" onclick="v6InstallApp()"><i data-lucide="download" class="icon"></i><span><strong>Instalar aplicativo</strong><small>Adicionar ao dispositivo</small></span><i data-lucide="chevron-right" class="icon"></i></button>
+   </div>
+
+   <div class="v6-account-section hidden" id="v6SecuritySection">
+    <div class="v6-section-head"><strong>Segurança da conta</strong><button class="link-btn" onclick="v6ToggleAccountSection('v6SecuritySection')">Fechar</button></div>
+    <form class="v6-password-form" onsubmit="v6ChangePassword(event)"><label class="label">Senha atual</label><input class="field" id="v6CurrentPassword" type="password" autocomplete="current-password" required><label class="label">Nova senha</label><input class="field" id="v6NewPassword" type="password" minlength="10" autocomplete="new-password" required><label class="label">Confirmar nova senha</label><input class="field" id="v6ConfirmPassword" type="password" minlength="10" autocomplete="new-password" required><button class="btn btn-primary" id="v6ChangePasswordBtn">Alterar senha</button><p class="v6-message" id="v6SecurityMessage"></p></form>
+    <div class="v6-section-head sessions"><strong>Outros dispositivos</strong><button class="btn btn-secondary btn-sm" type="button" onclick="v6RevokeOtherSessions()">Encerrar outras sessões</button></div><p class="small muted">Mantém este dispositivo conectado e encerra os outros logins da conta.</p>
+   </div>
+
+   <div class="v6-account-section hidden" id="v6PrivacySection">
+    <div class="v6-section-head"><strong>Seus dados</strong><button class="link-btn" onclick="v6ToggleAccountSection('v6PrivacySection')">Fechar</button></div>
+    <p class="small muted">Você pode baixar uma cópia dos dados salvos no servidor ou excluir sua conta.</p>
+    <button class="btn btn-secondary v6-wide" onclick="v6ExportAccount()"><i data-lucide="download" class="icon"></i>Exportar meus dados</button>
+    <a class="v6-privacy-link" href="/privacy.html" target="_blank" rel="noopener">Ler informações de privacidade</a>
+    <div class="v6-danger-zone"><strong>Excluir conta</strong><p>Remove a conta e os dados associados no Supabase. Confirme com sua senha.</p><input class="field" id="v6DeletePassword" type="password" autocomplete="current-password" placeholder="Senha atual"><button class="btn btn-ghost v6-wide" onclick="v6DeleteAccount()">Excluir conta e dados</button><p class="v6-message" id="v6DeleteMessage"></p></div>
+   </div>
+   <p class="v6-install-message" id="v6InstallMessage"></p>
+   <button class="btn btn-ghost v5-logout" onclick="v5Logout()"><i data-lucide="log-out" class="icon"></i>Sair da conta</button>
+  </div>
+ </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

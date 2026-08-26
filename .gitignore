@@ -1,0 +1,7 @@
+.env
+.env.supabase
+node_modules/
+.runtime/
+*.log
+.DS_Store
+Thumbs.db

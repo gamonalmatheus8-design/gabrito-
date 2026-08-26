@@ -1,0 +1,10 @@
+GABARITO+
+
+1. Extraia todo o ZIP em uma pasta nova.
+2. Execute ABRIR_GABARITO_MAIS.bat.
+3. Mantenha a janela do servidor aberta.
+
+Com internet e uma sessão autorizada, as questões e discursivas vêm primeiro do Supabase.
+Se a nuvem estiver indisponível, lenta, sem permissão ou incompleta, o banco local entra automaticamente como fallback de emergência.
+
+O aplicativo nunca inclui nem solicita uma chave service_role no navegador.

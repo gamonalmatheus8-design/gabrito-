@@ -1,0 +1,19 @@
+-- Gabarito+ — projeto Supabase configurado com segurança
+-- NÃO execute um schema antigo sobre o projeto atual.
+-- O projeto conectado já recebeu migrations aplicadas via Supabase:
+--   estudos_julia_v7_secure_core
+--   estudos_julia_v7_security_hardening
+--   estudos_julia_v7_rls_performance
+--   estudos_julia_v7_app_rpcs
+--
+-- Modelo ativo:
+-- * RLS em todas as tabelas públicas
+-- * nenhuma permissão SELECT para anon
+-- * administradores em private.app_admins
+-- * perfis públicos não possuem coluna de papel/role
+-- * save_progress() valida auth.uid e revision
+-- * is_current_user_admin() expõe somente um booleano ao usuário autenticado
+-- * admin_question_analytics() exige administrador
+--
+-- Para recriar o banco em OUTRO projeto, use as migrations documentadas
+-- em docs/SUPABASE_SETUP.md em vez de reutilizar versões antigas deste arquivo.

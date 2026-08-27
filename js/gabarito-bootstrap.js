@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='1.1.0';
+const VERSION='1.2.0';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured'};
@@ -17,18 +17,18 @@ function loadScript(src,timeoutMs=0){
   });
 }
 function show(text){const el=document.getElementById('v7BootStatus');if(el)el.textContent=text}
-function cloudMessage(text){const el=document.getElementById('v5AuthError');if(el)el.textContent=text}
+function accountMessage(text){const el=document.getElementById('v5AuthError');if(el)el.textContent=text}
 function installCloudPlaceholders(){
-  window.openV5Account=window.openV5Account||function(){const m=document.getElementById('v5AccountModal');m?.classList.add('open');m?.setAttribute('aria-hidden','false');if(configured)cloudMessage('Conectando ao Supabase…')};
+  window.openV5Account=window.openV5Account||function(){const m=document.getElementById('v5AccountModal');m?.classList.add('open');m?.setAttribute('aria-hidden','false');if(configured)accountMessage('Conectando sua conta…')};
   window.closeV5Account=window.closeV5Account||function(){const m=document.getElementById('v5AccountModal');m?.classList.remove('open');m?.setAttribute('aria-hidden','true')};
   window.v5AuthTab=window.v5AuthTab||function(tab){document.querySelectorAll('[data-v5tab]').forEach(b=>b.classList.toggle('active',b.dataset.v5tab===tab));document.getElementById('v5LoginForm')?.classList.toggle('hidden',tab!=='login');document.getElementById('v5RegisterForm')?.classList.toggle('hidden',tab!=='register')};
-  const wait=ev=>{ev?.preventDefault?.();cloudMessage(configured?'A conexão com o Supabase ainda está iniciando. Tente novamente em alguns segundos.':'Supabase não configurado; o estudo local continua disponível.')};
+  const wait=ev=>{ev?.preventDefault?.();accountMessage(configured?'Sua conta ainda está conectando. Tente novamente em alguns segundos.':'O estudo neste dispositivo continua disponível.')};
   for(const n of ['v5Login','v5Register','v7ResetPassword','v5SyncNow','v5UseCloud','v5UseDevice','v5Logout','v6ChangePassword','v6RevokeOtherSessions','v6ExportAccount','v6DeleteAccount'])if(typeof window[n]!=='function')window[n]=wait;
   window.v6ToggleAccountSection=window.v6ToggleAccountSection||function(id){document.getElementById(id)?.classList.toggle('hidden')};
 }
 
 async function loadLocalBank(){
-  show('Abrindo banco local…');
+  show('Preparando questões…');
   await loadScript('data/enem-questions.js');
   await loadScript('data/pism-questions.js');
   await loadScript('data/pism-discursives.js');
@@ -37,10 +37,10 @@ async function loadLocalBank(){
 
 async function preparePrimaryBank(){
   try{
-    if(!configured)throw new Error('Supabase não configurado.');
-    show('Conectando ao banco de questões…');
+    if(!configured)throw new Error('Banco online não configurado.');
+    show('Carregando banco de questões…');
     await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',4500);
-    if(!window.supabase?.createClient)throw new Error('SDK do Supabase indisponível.');
+    if(!window.supabase?.createClient)throw new Error('Conexão indisponível.');
     window.estudosSupabase=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     await loadScript('js/gabarito-question-source.js');
     const result=await window.GabaritoQuestionSource.load(window.estudosSupabase,{timeoutMs:9000});
@@ -54,7 +54,7 @@ async function preparePrimaryBank(){
   }catch(e){
     window.GABARITO_APP.cloudStatus='offline';
     window.GABARITO_APP.cloudError=e.message;
-    console.warn('[Gabarito+] Banco Supabase indisponível; ativando fallback local:',e.message);
+    console.warn('[Gabarito+] Banco online indisponível; ativando fallback local:',e.message);
     await loadLocalBank();
     return false;
   }

@@ -11,6 +11,12 @@ try{
   assert.equal(await page.title(),'Gabarito+ — ENEM & PISM');
   assert.equal(await page.evaluate(()=>window.GABARITO_ARCHIVED_QUESTION_IDS?.length),71);
   await page.waitForFunction(()=>window.GABARITO_APP?.qualityLayer==='2.2.0',{timeout:7000});
+  const onboarding=page.locator('#v37Onboarding.open');
+  if(await onboarding.count()){
+    assert.doesNotMatch(await onboarding.innerText(),/Supabase|banco Supabase/i);
+    await page.locator('#onSkipBtn').click();
+    await page.waitForFunction(()=>!document.getElementById('v37Onboarding')?.classList.contains('open'),{timeout:3000});
+  }
   await page.evaluate(()=>window.go('questions'));
   await page.waitForSelector('#page-questions.active',{timeout:5000});
   await page.waitForSelector('#questionCard .q-text',{timeout:5000});

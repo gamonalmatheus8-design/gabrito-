@@ -1,19 +1,26 @@
--- Gabarito+ — projeto Supabase configurado com segurança
--- NÃO execute um schema antigo sobre o projeto atual.
--- O projeto conectado já recebeu migrations aplicadas via Supabase:
---   estudos_julia_v7_secure_core
---   estudos_julia_v7_security_hardening
---   estudos_julia_v7_rls_performance
---   estudos_julia_v7_app_rpcs
+-- Gabarito+ 2.0 — estado do projeto Supabase
+-- Este arquivo documenta o modelo ativo. NÃO aplique schemas antigos sobre o projeto atual.
+-- Para recriar o banco em outro projeto, siga docs/SUPABASE_SETUP.md e as migrations correspondentes.
 --
--- Modelo ativo:
--- * RLS em todas as tabelas públicas
--- * nenhuma permissão SELECT para anon
--- * administradores em private.app_admins
--- * perfis públicos não possuem coluna de papel/role
--- * save_progress() valida auth.uid e revision
--- * is_current_user_admin() expõe somente um booleano ao usuário autenticado
--- * admin_question_analytics() exige administrador
+-- Segurança e acesso atuais:
+-- * RLS habilitado nas tabelas públicas.
+-- * questions e pism_discursives permitem SELECT anônimo somente para itens publicados.
+-- * app_meta permite leitura pública das versões necessárias ao carregamento/cache.
+-- * profiles, progress_state, question_attempts e demais dados pessoais não possuem leitura anônima.
+-- * administradores ficam em private.app_admins; profiles não expõe papel editável pelo estudante.
+-- * save_progress() valida auth.uid e revisão para detectar conflitos de sincronização.
+-- * is_current_user_admin() expõe somente um booleano ao usuário autenticado.
+-- * admin_question_analytics() exige administrador.
+-- * product_events aceita somente INSERT público controlado; leitura é restrita a admin.
+-- * question_reports aceita somente INSERT público com status inicial novo; leitura/alteração é restrita a admin.
+-- * endpoints públicos da V2 possuem validações de tamanho e limites horários básicos.
 --
--- Para recriar o banco em OUTRO projeto, use as migrations documentadas
--- em docs/SUPABASE_SETUP.md em vez de reutilizar versões antigas deste arquivo.
+-- Conteúdo atual em produção em 27/08/2026:
+-- * 3.665 questões objetivas publicadas (2.400 ENEM + 1.265 PISM).
+-- * 52 discursivas PISM publicadas.
+-- * question_bank_version: v7-priority-curation-3665-2026-08-27
+-- * app_version: 2.0.0
+--
+-- Migrations relevantes já aplicadas no projeto conectado incluem o núcleo seguro V7,
+-- endurecimento de RLS/RPCs e a migration harden_commercial_v2_public_intake.
+-- O frontend utiliza somente a chave pública/publishable key. Nunca inclua service_role no cliente.

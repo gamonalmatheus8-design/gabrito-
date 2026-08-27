@@ -5,25 +5,31 @@ const browser=await chromium.launch({headless:true});
 try{
   const page=await browser.newPage();
   const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
+  async function dismissOnboarding(){
+    try{await page.waitForSelector('#v37Onboarding.open',{timeout:1200})}catch{}
+    const open=page.locator('#v37Onboarding.open');
+    if(await open.count()){
+      assert.doesNotMatch(await open.innerText(),/Supabase|banco Supabase/i);
+      await page.locator('#onSkipBtn').click();
+      await page.waitForFunction(()=>!document.getElementById('v37Onboarding')?.classList.contains('open'),{timeout:3000});
+    }
+  }
   await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
   assert.equal(await page.locator('#v7Boot').count(),0,'overlay de boot permaneceu na tela');
   assert.equal(await page.title(),'Gabarito+ — ENEM & PISM');
   assert.equal(await page.evaluate(()=>window.GABARITO_ARCHIVED_QUESTION_IDS?.length),71);
   await page.waitForFunction(()=>window.GABARITO_APP?.qualityLayer==='2.2.0',{timeout:7000});
-  const onboarding=page.locator('#v37Onboarding.open');
-  if(await onboarding.count()){
-    assert.doesNotMatch(await onboarding.innerText(),/Supabase|banco Supabase/i);
-    await page.locator('#onSkipBtn').click();
-    await page.waitForFunction(()=>!document.getElementById('v37Onboarding')?.classList.contains('open'),{timeout:3000});
-  }
+  await dismissOnboarding();
   await page.evaluate(()=>window.go('questions'));
   await page.waitForSelector('#page-questions.active',{timeout:5000});
   await page.waitForSelector('#questionCard .q-text',{timeout:5000});
   await page.waitForSelector('#questionCard .v22-question-trust',{timeout:5000});
+  await dismissOnboarding();
   await page.evaluate(()=>window.go('mocks'));
   await page.waitForSelector('#discursiveList .card.discursive textarea',{timeout:5000});
   await page.waitForSelector('#v22DiscSummary',{timeout:5000});
+  await dismissOnboarding();
   const input=page.locator('#discursiveList .card.discursive textarea').first();await input.fill('Resposta de teste automatizado.');
   const save=page.locator('#discursiveList .card.discursive [data-save]').first();await save.click();
   assert.match(await page.evaluate(()=>localStorage.getItem('gplus_discursive_progress_v22')||''),/Resposta de teste automatizado/);

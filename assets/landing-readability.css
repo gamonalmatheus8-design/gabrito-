@@ -1,0 +1,4 @@
+/* Readability pass: keep supporting copy comfortable on phones and low-density screens. */
+.links{font-size:14px}.btn{font-size:13px}.mini-note{font-size:14px;line-height:1.5}.trust-item{font-size:13px;text-align:center;padding:0 10px}.section-head p,.card p,.exam-copy p,.evidence-callout{font-size:15px}.exam-btn p,.point,.step p,.review-card p,details p{font-size:14px;line-height:1.55}.faq details p{font-size:14px}.footer{font-size:12px}.sync-clarity{font-size:13px}.steps{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.links{font-size:15px}.btn{font-size:14px}.trust-item{font-size:13px}.section-head p,.card p,.exam-copy p,.exam-btn p,.point,.step p,.review-card p,details p,.evidence-callout{font-size:15px}.steps{grid-template-columns:1fr}}

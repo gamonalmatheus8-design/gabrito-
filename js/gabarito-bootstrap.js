@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='1.2.0';
+const VERSION='1.2.1';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured'};
@@ -35,21 +35,22 @@ async function loadLocalBank(){
   window.GABARITO_APP.bankSource='local-fallback';
 }
 
+function applyBank(result){
+  window.ENEM_QUESTIONS=result.questions.filter(q=>q.exam==='ENEM');
+  window.PISM_QUESTIONS=result.questions.filter(q=>q.exam==='PISM');
+  window.PISM_DISCURSIVE=result.discursives;
+  window.GABARITO_APP.bankSource='supabase-primary';
+  window.GABARITO_APP.cloudStatus='ready';
+  window.GABARITO_APP.bankVersion=result.version||VERSION;
+}
+
 async function preparePrimaryBank(){
   try{
     if(!configured)throw new Error('Banco online não configurado.');
     show('Carregando banco de questões…');
-    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',4500);
-    if(!window.supabase?.createClient)throw new Error('Conexão indisponível.');
-    window.estudosSupabase=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
     await loadScript('js/gabarito-question-source.js');
-    const result=await window.GabaritoQuestionSource.load(window.estudosSupabase,{timeoutMs:9000});
-    window.ENEM_QUESTIONS=result.questions.filter(q=>q.exam==='ENEM');
-    window.PISM_QUESTIONS=result.questions.filter(q=>q.exam==='PISM');
-    window.PISM_DISCURSIVE=result.discursives;
-    window.GABARITO_APP.bankSource='supabase-primary';
-    window.GABARITO_APP.cloudStatus='ready';
-    window.GABARITO_APP.bankVersion=result.version||VERSION;
+    const result=await window.GabaritoQuestionSource.loadDirect(cfg,{timeoutMs:8000});
+    applyBank(result);
     return true;
   }catch(e){
     window.GABARITO_APP.cloudStatus='offline';
@@ -61,7 +62,16 @@ async function preparePrimaryBank(){
 }
 
 async function connectAccountLayer(){
-  try{await loadScript('js/gabarito-supabase.js')}catch(e){console.warn('[Gabarito+] Camada de conta indisponível:',e.message)}
+  try{
+    if(!configured)return;
+    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',4500);
+    if(!window.supabase?.createClient)throw new Error('Biblioteca de conta indisponível.');
+    window.estudosSupabase=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+    await loadScript('js/gabarito-supabase.js');
+  }catch(e){
+    console.warn('[Gabarito+] Camada de conta indisponível:',e.message);
+    window.GABARITO_APP.cloudStatus=window.GABARITO_APP.bankSource==='supabase-primary'?'bank-ready-account-offline':'offline';
+  }
 }
 
 async function boot(){

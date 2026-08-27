@@ -27,9 +27,9 @@ async function boot(){try{
  await loadScript('js/gabarito-ui.js',5000);
  await loadScript('js/v6-release.js',5000);
  try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}
- await loadQualityLayer();
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();
  window.GABARITO_APP.ready=true;
+ setTimeout(loadQualityLayer,0);
  setTimeout(connectAccountLayer,50);
 }catch(e){console.error('[Gabarito+] Falha de inicialização:',e);window.GABARITO_APP.bootError=e.message;show('Falha ao iniciar. Recarregue a página.')}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();

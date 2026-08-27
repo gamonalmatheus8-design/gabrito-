@@ -1,0 +1,25 @@
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const menu=$('#lpMenu'),links=$('#lpLinks');
+if(menu&&links){menu.addEventListener('click',()=>{const open=!links.classList.contains('open');links.classList.toggle('open',open);menu.setAttribute('aria-expanded',String(open));menu.textContent=open?'×':'☰'});$$('a',links).forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.textContent='☰'}))}
+
+const demoTabs=$$('.lp-demo-tab');
+demoTabs.forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.demo;demoTabs.forEach(b=>{const active=b===btn;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active))});$$('.lp-demo-panel').forEach(p=>p.classList.toggle('active',p.dataset.panel===id))}));
+
+const examBtns=$$('.lp-exam-btn');
+examBtns.forEach(btn=>btn.addEventListener('click',()=>{const id=btn.dataset.exam;examBtns.forEach(b=>b.classList.toggle('active',b===btn));$$('.lp-exam-panel').forEach(p=>p.classList.toggle('active',p.dataset.examPanel===id))}));
+
+if('IntersectionObserver' in window&& !matchMedia('(prefers-reduced-motion: reduce)').matches){const ob=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');ob.unobserve(e.target)}}),{threshold:.12});$$('.lp-reveal').forEach(el=>ob.observe(el))}else{$$('.lp-reveal').forEach(el=>el.classList.add('visible'))}
+
+const fallback={id:'landing-fallback',exam:'ENEM',subject:'Matemática',topic:'Probabilidade',difficulty:'Médio',text:'Uma caixa contém 3 cartões verdes e 2 cartões azuis. Um cartão é retirado ao acaso. Qual é a probabilidade de ele ser azul?',options:['1/5','2/5','1/2','3/5','4/5'],answer:1,explanation:'Há 2 cartões azuis em um total de 5 cartões. Portanto, a probabilidade é 2/5.',source:'Demonstração Gabarito+'};
+let current=fallback;
+
+function renderQuestion(q,live=false){current=q||fallback;const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};set('lpQuestionStatus',live?'Questão carregada do banco publicado':'Demonstração local disponível');set('lpQuestionExamTag',current.exam||'ENEM');set('lpQuestionExam',current.exam||'ENEM');set('lpQuestionSubject',current.subject||'—');set('lpQuestionTopic',current.topic||'—');set('lpQuestionDifficulty',current.difficulty||'—');set('lpQuestionText',current.text||fallback.text);set('lpQuestionSource',current.source||'Banco Gabarito+');set('lpQuestionSubjectSide',`${current.subject||'—'} · ${current.topic||'—'}`);
+ const host=$('#lpOptions'),fb=$('#lpFeedback');if(!host)return;host.innerHTML='';if(fb){fb.textContent='';fb.className='lp-feedback'};(Array.isArray(current.options)?current.options:fallback.options).slice(0,5).forEach((opt,i)=>{const b=document.createElement('button');b.type='button';b.className='lp-option';const letter=document.createElement('span');letter.className='lp-letter';letter.textContent=String.fromCharCode(65+i);const text=document.createElement('span');text.textContent=String(opt);b.append(letter,text);b.addEventListener('click',()=>answer(i));host.appendChild(b)})}
+function answer(index){const buttons=$$('.lp-option','#lpOptions');buttons.forEach((b,i)=>{b.disabled=true;if(i===Number(current.answer))b.classList.add('correct');else if(i===index)b.classList.add('wrong')});const fb=$('#lpFeedback');if(!fb)return;const ok=index===Number(current.answer);fb.classList.add('show');fb.innerHTML=`<strong>${ok?'Resposta correta.':'Quase. Veja o raciocínio.'}</strong><br>${escapeHtml(current.explanation||'Revise o conceito e tente aplicar o mesmo raciocínio em uma nova questão.')}`}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function loadLive(){renderQuestion(fallback,false);const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};if(!cfg.url||!cfg.publishableKey)return;try{const base=cfg.url.replace(/\/$/,'');const headers={apikey:cfg.publishableKey,authorization:`Bearer ${cfg.publishableKey}`,accept:'application/json'};const countRes=await fetch(`${base}/rest/v1/questions?select=id&editorial_status=eq.publicada`,{headers:{...headers,Prefer:'count=exact'},method:'HEAD'});const range=countRes.headers.get('content-range')||'';const total=range.includes('/')?Number(range.split('/')[1]):NaN;if(Number.isFinite(total)&&total>0){const el=$('#lpBankCount');if(el)el.textContent=total.toLocaleString('pt-BR')+'+'}
+ const r=await fetch(`${base}/rest/v1/questions?select=id,exam,module,subject,topic,difficulty,text,options,answer,explanation,source&editorial_status=eq.publicada&order=updated_at.desc&limit=1`,{headers,cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const rows=await r.json();if(Array.isArray(rows)&&rows[0]&&Array.isArray(rows[0].options)&&rows[0].options.length===5)renderQuestion(rows[0],true)}catch(e){console.warn('[Gabarito+ landing] demonstração online indisponível:',e.message)}}
+loadLive();
+})();

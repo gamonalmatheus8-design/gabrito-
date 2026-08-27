@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#0c1018">
+<meta name="description" content="Gabarito+ — estudos para ENEM e PISM com questões, simulados, revisão e desempenho em uma experiência simples e direta.">
+<meta property="og:title" content="Gabarito+ — Estude com direção">
+<meta property="og:description" content="ENEM e PISM com prática, revisão e acompanhamento em um só lugar.">
+<meta property="og:type" content="website">
+<link rel="icon" href="/assets/icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/landing-clean.css?v=1.0.0">
+<title>Gabarito+ — Estude com direção</title>
+</head>
+<body>
+<header class="top">
+  <nav class="wrap nav" aria-label="Navegação principal">
+    <a class="brand" href="/"><span class="mark">G+</span><span>Gabarito<span class="plus">+</span></span></a>
+    <button class="menu" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <div class="links" id="navLinks"><a href="#produto">Produto</a><a href="#enem-pism">ENEM × PISM</a><a href="#como-funciona">Como funciona</a><a href="#faq">FAQ</a></div>
+    <div class="actions"><a class="btn btn-secondary" href="/app">Entrar</a><a class="btn btn-primary" href="/app">Começar grátis</a></div>
+  </nav>
+</header>
+<main>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">ENEM + PISM</span>
+      <h1>Estude o que <span>importa.</span><br>Saiba o próximo passo.</h1>
+      <p class="lead">Questões, revisão, simulados e desempenho em uma plataforma feita para reduzir o ruído e deixar seu estudo mais claro.</p>
+      <div class="hero-actions"><a class="btn btn-primary" href="/app">Começar gratuitamente →</a><a class="btn btn-secondary" href="#produto">Ver como funciona</a></div>
+      <div class="mini-note">Sem excesso de informação. Abra, entenda e comece.</div>
+    </div>
+    <div class="product" aria-label="Prévia do aplicativo Gabarito+">
+      <div class="product-top"><i class="dot"></i><i class="dot"></i><i class="dot"></i><div class="address">gabarito-mais.vercel.app/app</div></div>
+      <div class="mock">
+        <aside class="side"><div class="side-title">Gabarito<span class="plus">+</span></div><div class="side-nav"><span class="active">Início</span><span>Plano</span><span>Questões</span><span>Revisões</span><span>Simulados</span><span>Desempenho</span></div></aside>
+        <div class="main-preview">
+          <div class="preview-head">Boa sessão, Estudante.</div>
+          <div class="focus-card"><div class="focus-row"><div><small>ENEM · foco atual</small><h3>Foque em Matemática.</h3><p>Probabilidade · prática direcionada</p></div><button class="focus-btn" type="button">Treinar agora</button></div></div>
+          <div class="metrics"><div class="metric"><span>Hoje</span><strong>42 min</strong></div><div class="metric"><span>Questões</span><strong>18</strong></div><div class="metric"><span>Revisões</span><strong>4</strong></div></div>
+          <div class="routes"><div class="route"><span>Próxima ação</span><div class="route-row"><b>10 questões</b><em>25 min</em></div><div class="bar"><i style="width:68%"></i></div></div><div class="route"><span>Preparação</span><div class="route-row"><b>72/100</b><em>+4 esta semana</em></div><div class="bar"><i style="width:72%"></i></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="trust"><div class="wrap trust-grid"><div class="trust-item"><span id="bankCount">3.600+</span>&nbsp; questões</div><div class="trust-item">ENEM + PISM</div><div class="trust-item">Revisão inteligente</div><div class="trust-item">Progresso sincronizado</div></div></section>
+
+<section class="section" id="produto">
+  <div class="wrap">
+    <div class="section-head reveal"><span class="eyebrow">Produto real</span><h2>Veja a plataforma sem precisar imaginar.</h2><p>Uma demonstração simples das partes que realmente importam no dia a dia.</p></div>
+    <div class="demo reveal">
+      <div class="tabs" role="tablist"><button class="tab active" type="button" data-tab="overview">Visão geral</button><button class="tab" type="button" data-tab="question">Questão ao vivo</button><button class="tab" type="button" data-tab="performance">Desempenho</button><button class="tab" type="button" data-tab="reviews">Revisões</button></div>
+      <div class="panel active" data-panel="overview"><div class="dash-grid"><div class="card"><span class="eyebrow">Próxima melhor ação</span><h3>Menos decisão. Mais estudo.</h3><p>O painel mostra o que fazer agora sem transformar sua rotina em mais uma tarefa para organizar.</p><div class="quick"><div><span>Foco</span><strong>Probabilidade</strong></div><div><span>Sessão</span><strong>25 min</strong></div><div><span>Depois</span><strong>5 revisões</strong></div></div></div><div class="card"><span class="eyebrow">Hoje</span><h3>Seu estudo em um olhar.</h3><div class="signal"><i class="on"></i>Questões concluídas</div><div class="signal"><i class="on"></i>Revisões em dia</div><div class="signal"><i></i>Simulado pendente</div></div></div></div>
+      <div class="panel" data-panel="question"><div class="question-grid"><div><div class="side-stat"><span>Status</span><strong id="qStatus">Carregando…</strong></div><div class="side-stat"><span>Prova</span><strong id="qExam">ENEM</strong></div><div class="side-stat"><span>Assunto</span><strong id="qTopic">Probabilidade</strong></div></div><div class="card"><div class="qmeta"><span class="tag primary" id="qSubject">Matemática</span><span class="tag" id="qDifficulty">Médio</span></div><p class="qtext" id="qText"></p><div class="options" id="qOptions"></div><div class="feedback" id="qFeedback" aria-live="polite"></div></div></div></div>
+      <div class="panel" data-panel="performance"><div class="perf-grid"><div class="card"><span class="eyebrow">Diagnóstico</span><h3>Veja onde seu ponto está escapando.</h3><p>O objetivo não é mostrar mais gráficos. É deixar evidente o que merece atenção.</p></div><div class="card"><div class="bars"><div class="bar-row"><span>Interpretação</span><div class="track"><div class="fill" style="width:84%"></div></div><strong>84%</strong></div><div class="bar-row"><span>Ecologia</span><div class="track"><div class="fill" style="width:73%"></div></div><strong>73%</strong></div><div class="bar-row"><span>Probabilidade</span><div class="track"><div class="fill" style="width:58%"></div></div><strong>58%</strong></div><div class="bar-row"><span>Eletroquímica</span><div class="track"><div class="fill" style="width:46%"></div></div><strong>46%</strong></div></div></div></div></div>
+      <div class="panel" data-panel="reviews"><div class="review-grid"><article class="review-card"><small>Hoje</small><h3>Probabilidade</h3><p>Reforce o erro mais recente.</p></article><article class="review-card"><small>Amanhã</small><h3>Ecologia</h3><p>Volte ao conceito no momento certo.</p></article><article class="review-card"><small>Esta semana</small><h3>Interpretação</h3><p>Mantenha um assunto forte ativo.</p></article></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section alt" id="enem-pism">
+  <div class="wrap">
+    <div class="section-head reveal"><span class="eyebrow">Duas rotas</span><h2>ENEM e PISM não são o mesmo treino.</h2><p>A interface muda de foco conforme a prova que você está preparando.</p></div>
+    <div class="exam-switch reveal"><button class="exam-btn active" type="button" data-exam="enem"><span>Rota nacional</span><strong>ENEM</strong><p>Áreas, contexto, resistência e redação.</p></button><button class="exam-btn" type="button" data-exam="pism"><span>Rota UFJF</span><strong>PISM I · II · III</strong><p>Conteúdo e treino organizados por módulo.</p></button></div>
+    <div class="exam-panel active" data-exam-panel="enem"><div class="exam-copy"><span class="eyebrow">ENEM</span><h3>Amplitude com direção.</h3><p>Treine as grandes áreas sem perder de vista os assuntos que mais precisam de atenção.</p><div class="points"><div class="point"><i>01</i><span>Matemática, Natureza, Humanas e Linguagens.</span></div><div class="point"><i>02</i><span>Questões contextualizadas e simulados.</span></div><div class="point"><i>03</i><span>Revisão conectada aos seus erros.</span></div></div></div><div class="exam-cards"><div class="exam-card"><small>Matemática</small><strong>Problemas e aplicações</strong></div><div class="exam-card"><small>Natureza</small><strong>Fenômenos e relações</strong></div><div class="exam-card"><small>Humanas</small><strong>Leitura crítica</strong></div><div class="exam-card"><small>Linguagens</small><strong>Interpretação e repertório</strong></div></div></div>
+    <div class="exam-panel pism-tone" data-exam-panel="pism"><div class="exam-copy"><span class="eyebrow" style="color:var(--pism)">PISM</span><h3>Módulo certo. Conteúdo certo.</h3><p>O aluno entra na rota correspondente ao seu momento no PISM e encontra uma preparação mais específica.</p><div class="points"><div class="point"><i>01</i><span>PISM I, II e III separados.</span></div><div class="point"><i>02</i><span>Objetivas e discursivas organizadas.</span></div><div class="point"><i>03</i><span>Conteúdos alinhados ao programa da UFJF.</span></div></div></div><div class="exam-cards"><div class="exam-card"><small>Módulo I</small><strong>Fundamentos</strong></div><div class="exam-card"><small>Módulo II</small><strong>Progressão</strong></div><div class="exam-card"><small>Módulo III</small><strong>Aprofundamento</strong></div><div class="exam-card"><small>Discursivas</small><strong>Treino específico</strong></div></div></div>
+  </div>
+</section>
+
+<section class="section" id="como-funciona"><div class="wrap"><div class="section-head reveal"><span class="eyebrow">Como funciona</span><h2>Três passos. Sem complicar.</h2></div><div class="steps reveal"><article class="step"><div class="step-num">01</div><h3>Descubra</h3><p>Veja o assunto que merece sua atenção agora.</p></article><article class="step"><div class="step-num">02</div><h3>Pratique</h3><p>Resolva questões e simulados alinhados ao seu foco.</p></article><article class="step"><div class="step-num">03</div><h3>Revise</h3><p>Transforme seus erros em próximas ações de estudo.</p></article></div></div></section>
+<section class="section alt"><div class="wrap"><div class="cta reveal"><div><h2>Abra. Entenda. Comece.</h2><p>O Gabarito+ foi feito para deixar o estudo mais claro, não mais complicado.</p></div><a class="btn btn-primary" href="/app">Começar gratuitamente →</a></div></div></section>
+<section class="section" id="faq"><div class="wrap faq"><div><span class="eyebrow">FAQ</span><h2>Perguntas rápidas.</h2></div><div class="faq-list"><details><summary>O Gabarito+ serve para ENEM e PISM?</summary><p>Sim. A plataforma possui rotas separadas para ENEM e para os módulos I, II e III do PISM.</p></details><details><summary>As questões são copiadas de provas?</summary><p>Não. O banco utiliza questões autorais e conteúdo curado, com referências de escopo nas matrizes e programas dos vestibulares.</p></details><details><summary>Posso testar antes?</summary><p>Sim. A landing possui uma questão interativa e o botão Começar grátis leva diretamente ao aplicativo.</p></details></div></div></section>
+</main>
+<footer class="footer"><div class="wrap footer-row"><div class="brand"><span class="mark">G+</span><span>Gabarito<span class="plus">+</span></span></div><div class="footer-links"><a href="/privacy.html">Privacidade</a><a href="/app">Entrar</a></div></div></footer>
+<script src="/js/supabase-config.js?v=1.0.0"></script>
+<script defer src="/js/landing-clean.js?v=1.0.0"></script>
+</body>
+</html>

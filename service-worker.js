@@ -6,6 +6,7 @@ const CORE=[
  ver('/assets/styles.css'),ver('/assets/product-polish.css'),ver('/assets/commercial-v2.css'),ver('/assets/trust-v3.css'),
  ver('/assets/landing-clean.css'),ver('/assets/landing-trust.css'),ver('/assets/landing-readability.css'),
  '/assets/icons/icon-192.png','/assets/icons/icon-512.png',
+ ver('/data/editorial-exclusions.js'),
  ver('/js/supabase-config.js'),ver('/js/gabarito-bootstrap.js'),ver('/js/gabarito-question-source.js'),
  ver('/js/gabarito-supabase.js'),ver('/js/gabarito-ui.js'),ver('/js/question-bank.js'),ver('/js/app.js'),
  ver('/js/gabarito-state-bridge.js'),ver('/js/v6-release.js'),ver('/js/product-polish.js'),ver('/js/commercial-v2.js'),

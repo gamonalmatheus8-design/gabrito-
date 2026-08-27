@@ -12,7 +12,8 @@ test('arquivos essenciais da release comercial existem',()=>{
   for(const f of [
     'supabase/schema.sql','js/supabase-config.js','js/gabarito-bootstrap.js','js/gabarito-question-source.js',
     'js/gabarito-supabase.js','js/gabarito-admin.js','js/admin-v2.js','js/commercial-v2.js',
-    'assets/commercial-v2.css','privacy.html','terms.html','service-worker.js','vercel.json'
+    'js/gabarito-state-bridge.js','js/trust-v3.js','assets/trust-v3.css','assets/commercial-v2.css',
+    'assets/landing-trust.css','assets/landing-readability.css','privacy.html','terms.html','service-worker.js','vercel.json'
   ]) assert.ok(fs.existsSync(path.join(root,f)),f);
 });
 
@@ -20,8 +21,8 @@ test('service role não está no config público',()=>{
   assert.ok(!/service_role/i.test(read('js/supabase-config.js')));
 });
 
-test('scripts novos da V2 possuem sintaxe JavaScript válida',()=>{
-  for(const f of ['js/gabarito-bootstrap.js','js/gabarito-question-source.js','js/commercial-v2.js','js/admin-v2.js','js/gabarito-admin.js']){
+test('scripts novos da release possuem sintaxe JavaScript válida',()=>{
+  for(const f of ['js/gabarito-bootstrap.js','js/gabarito-question-source.js','js/commercial-v2.js','js/admin-v2.js','js/gabarito-admin.js','js/gabarito-state-bridge.js','js/trust-v3.js','js/landing-clean.js']){
     assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}),f);
   }
 });
@@ -57,14 +58,14 @@ test('handlers inline principais possuem implementação',()=>{
   assert.deepEqual(missing,[]);
 });
 
-test('versões técnicas estão alinhadas em 2.0.0',()=>{
+test('versões técnicas estão alinhadas em 2.1.0',()=>{
   const pkg=JSON.parse(read('package.json'));
   const boot=read('js/gabarito-bootstrap.js');
   const sw=read('service-worker.js');
-  assert.equal(pkg.version,'2.0.0');
-  assert.match(boot,/const VERSION='2\.0\.0'/);
-  assert.match(sw,/gabarito-mais-2-0-0-app-shell/);
-  assert.match(sw,/const V='2\.0\.0'/);
+  assert.equal(pkg.version,'2.1.0');
+  assert.match(boot,/const VERSION='2\.1\.0'/);
+  assert.match(sw,/gabarito-mais-2-1-0-app-shell/);
+  assert.match(sw,/const V='2\.1\.0'/);
 });
 
 test('Supabase usa cache persistente e fallback local',()=>{
@@ -76,6 +77,17 @@ test('Supabase usa cache persistente e fallback local',()=>{
   assert.match(boot,/supabase-cache/);
   assert.match(boot,/supabase-primary/);
   assert.match(boot,/await loadLocalBank\(\)/);
+});
+
+test('camada de confiança explica recomendação e completa discursivas',()=>{
+  const trust=read('js/trust-v3.js');
+  const landing=read('landing-clean.html');
+  assert.match(trust,/Confiança da recomendação/);
+  assert.match(trust,/Ficha de confiança da questão/);
+  assert.match(trust,/Salvar resposta/);
+  assert.match(trust,/autoavaliação por critérios/i);
+  assert.match(landing,/Metodologia transparente/);
+  assert.match(landing,/Sincronização ao entrar na conta/);
 });
 
 test('V2 comercial contém diagnóstico, reporte e telemetria mínima',()=>{

@@ -1,6 +1,7 @@
 (()=>{
  'use strict';
  const root=document,cfg=window.ESTUDOS_SUPABASE_CONFIG;
+ const readability=root.createElement('link');readability.rel='stylesheet';readability.href='/assets/landing-readability.css?v=2.1.0';root.head.appendChild(readability);
  const ANON_KEY='gplus_v2_anon_id';
  function anonId(){let id=localStorage.getItem(ANON_KEY);if(id)return id;id='anon_'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem(ANON_KEY,id);return id}
  function track(eventName,metadata={}){if(!cfg?.url||!cfg?.publishableKey)return;const headers={apikey:cfg.publishableKey,authorization:`Bearer ${cfg.publishableKey}`,'content-type':'application/json',prefer:'return=minimal'};fetch(`${cfg.url}/rest/v1/product_events`,{method:'POST',headers,body:JSON.stringify({anonymous_id:anonId(),event_name:eventName,page:'landing',metadata}),keepalive:true}).catch(()=>{})}

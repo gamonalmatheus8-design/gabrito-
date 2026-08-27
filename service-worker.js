@@ -1,7 +1,7 @@
-const CACHE='gabarito-mais-1-3-0-app-shell';
-const V='1.3.0';
+const CACHE='gabarito-mais-2-0-0-app-shell';
+const V='2.0.0';
 const ver=u=>`${u}${u.includes('?')?'&':'?'}v=${V}`;
-const CORE=['/app','/index.html','/offline.html','/privacy.html','/manifest.webmanifest',ver('/assets/styles.css'),ver('/assets/product-polish.css'),'/assets/icons/icon-192.png','/assets/icons/icon-512.png',ver('/js/supabase-config.js'),ver('/js/gabarito-bootstrap.js'),ver('/js/gabarito-question-source.js'),ver('/js/gabarito-supabase.js'),ver('/js/gabarito-ui.js'),ver('/js/question-bank.js'),ver('/js/app.js'),ver('/js/v6-release.js'),ver('/js/product-polish.js'),ver('/data/enem-questions.js'),ver('/data/pism-questions.js'),ver('/data/pism-discursives.js')];
+const CORE=['/app','/index.html','/offline.html','/privacy.html','/terms.html','/manifest.webmanifest',ver('/assets/styles.css'),ver('/assets/product-polish.css'),ver('/assets/commercial-v2.css'),'/assets/icons/icon-192.png','/assets/icons/icon-512.png',ver('/js/supabase-config.js'),ver('/js/gabarito-bootstrap.js'),ver('/js/gabarito-question-source.js'),ver('/js/gabarito-supabase.js'),ver('/js/gabarito-ui.js'),ver('/js/question-bank.js'),ver('/js/app.js'),ver('/js/v6-release.js'),ver('/js/product-polish.js'),ver('/js/commercial-v2.js'),ver('/data/enem-questions.js'),ver('/data/pism-questions.js'),ver('/data/pism-discursives.js')];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))));self.skipWaiting()});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))));self.clients.claim()});
 self.addEventListener('fetch',e=>{

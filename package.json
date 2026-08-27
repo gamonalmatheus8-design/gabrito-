@@ -1,10 +1,11 @@
 {
   "name": "gabarito-mais",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "check": "node --check js/gabarito-bootstrap.js && node --check js/gabarito-question-source.js && node --check js/commercial-v2.js && node --check js/admin-v2.js && node --check js/gabarito-admin.js",
+    "test": "npm run check && node --test tests/*.test.mjs"
   }
 }

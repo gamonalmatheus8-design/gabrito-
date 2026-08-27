@@ -9,7 +9,7 @@ try{
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
   assert.equal(await page.locator('#v7Boot').count(),0,'overlay de boot permaneceu na tela');
   assert.equal(await page.title(),'Gabarito+ — ENEM & PISM');
-  assert.equal(await page.evaluate(()=>window.GABARITO_ARCHIVED_QUESTION_IDS?.length),58);
+  assert.equal(await page.evaluate(()=>window.GABARITO_ARCHIVED_QUESTION_IDS?.length),71);
   await page.waitForFunction(()=>window.GABARITO_APP?.qualityLayer==='2.2.0',{timeout:7000});
   await page.evaluate(()=>window.go('questions'));
   await page.waitForSelector('#page-questions.active',{timeout:5000});

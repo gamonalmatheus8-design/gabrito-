@@ -15,12 +15,20 @@
       "dest": "/index.html",
       "headers": {
         "X-Content-Type-Options": "nosniff",
-        "Referrer-Policy": "strict-origin-when-cross-origin"
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
     {
       "src": "^/service-worker\\.js$",
       "dest": "/service-worker.js",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "^/(js|assets|data)/(.*)$",
+      "dest": "/$1/$2",
       "headers": {
         "Cache-Control": "public, max-age=0, must-revalidate"
       }

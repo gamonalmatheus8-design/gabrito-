@@ -1,5 +1,5 @@
-const CACHE='gabarito-mais-1-2-0-shell-1';
-const V='1.2.0';
+const CACHE='gabarito-mais-1-2-1-shell-1';
+const V='1.2.1';
 const ver=u=>`${u}${u.includes('?')?'&':'?'}v=${V}`;
 const CORE=['/','/index.html','/offline.html','/privacy.html','/manifest.webmanifest',ver('/assets/styles.css'),ver('/assets/product-polish.css'),'/assets/icons/icon-192.png','/assets/icons/icon-512.png',ver('/js/supabase-config.js'),ver('/js/gabarito-bootstrap.js'),ver('/js/gabarito-question-source.js'),ver('/js/gabarito-supabase.js'),ver('/js/gabarito-ui.js'),ver('/js/question-bank.js'),ver('/js/app.js'),ver('/js/v6-release.js'),ver('/js/product-polish.js'),ver('/data/enem-questions.js'),ver('/data/pism-questions.js'),ver('/data/pism-discursives.js')];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.allSettled(CORE.map(u=>c.add(u)))));self.skipWaiting()});

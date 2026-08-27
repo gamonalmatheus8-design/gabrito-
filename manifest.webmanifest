@@ -1,8 +1,8 @@
 {
   "name": "Gabarito+",
   "short_name": "Gabarito+",
-  "description": "Plataforma ENEM e PISM com sincronização Supabase.",
-  "start_url": "/",
+  "description": "Plataforma ENEM e PISM com questões, revisão, simulados e sincronização.",
+  "start_url": "/app",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f5f7fb",

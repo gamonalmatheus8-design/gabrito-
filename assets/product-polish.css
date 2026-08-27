@@ -1,0 +1,73 @@
+/* Gabarito+ 1.2 — acabamento de produto */
+#page-home.gplus-home-simplified > .v33-brand-stage,
+#page-home.gplus-home-simplified > .v28-command-board,
+#page-home.gplus-home-simplified > .v28-action-rack,
+#page-home.gplus-home-simplified > .v25-strip,
+#page-home.gplus-home-simplified > .dashboard-grid,
+#page-home.gplus-home-simplified > #dailyMissionBoard,
+#page-home.gplus-home-simplified .v39-panels {
+  display: none !important;
+}
+
+#page-home.gplus-home-simplified .header-actions {
+  display: none;
+}
+
+#page-home.gplus-home-simplified .v39-home {
+  margin-bottom: 0;
+}
+
+#page-home.gplus-home-simplified #approvalRadar {
+  margin-top: 16px;
+}
+
+#page-home.gplus-home-simplified .v39-hero {
+  align-items: center;
+}
+
+#page-home.gplus-home-simplified .v39-hero-copy h2 {
+  max-width: 720px;
+}
+
+#page-home.gplus-home-simplified .v39-hero-copy p {
+  max-width: 660px;
+}
+
+#page-home.gplus-home-simplified .v39-actions {
+  margin-bottom: 0;
+}
+
+#page-home.gplus-home-simplified .gplus-zero-state .v39-metrics {
+  display: none;
+}
+
+#page-home.gplus-home-simplified .gplus-zero-state .v39-hero {
+  padding-top: 28px;
+  padding-bottom: 28px;
+}
+
+.gplus-unavailable-feature {
+  display: none !important;
+}
+
+.sidebar-foot.gplus-status strong {
+  display: block;
+}
+
+.sidebar-foot.gplus-status p {
+  margin-top: 4px;
+}
+
+@media (max-width: 760px) {
+  #page-home.gplus-home-simplified .header-row .sub {
+    max-width: 36ch;
+  }
+
+  #page-home.gplus-home-simplified .v39-hero-actions {
+    width: 100%;
+  }
+
+  #page-home.gplus-home-simplified .v39-hero-actions .btn {
+    flex: 1;
+  }
+}

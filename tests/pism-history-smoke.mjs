@@ -3,7 +3,8 @@ import {chromium} from 'playwright';
 const base=process.env.BASE_URL||'http://127.0.0.1:3090';
 const browser=await chromium.launch({headless:true});
 try{
- const page=await browser.newPage({viewport:{width:390,height:844}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.route('**/api/pism-official**',async route=>{const u=new URL(route.request().url()),kind=u.searchParams.get('kind'),source='https://www2.ufjf.br/copese/pism/mock-source/';await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(kind==='key'?{url:'https://www2.ufjf.br/copese/pism/mock-key.pdf',source}:{url:'https://www2.ufjf.br/copese/pism/mock-exam.pdf',source,legacySplit:false})})});
  await page.route('https://www2.ufjf.br/**',route=>route.abort());
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});

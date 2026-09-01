@@ -1,6 +1,12 @@
 import {Readable} from 'node:stream';
 
 const ALLOWED_HOSTS=new Set(['download.inep.gov.br','riep.inep.gov.br']);
+const EDGE_ALIASES=new Map([
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D1_CD2.pdf','/official/enem/2024/d1.pdf'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_GB_impresso_D1_CD2.pdf','/official/enem/2024/gabarito-d1.pdf'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D2_CD5.pdf','/official/enem/2024/d2.pdf'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_GB_impresso_D2_CD5.pdf','/official/enem/2024/gabarito-d2.pdf']
+]);
 const RIEP_FALLBACKS=new Map([
  ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D1_CD2.pdf','https://riep.inep.gov.br/bitstreams/71aaf57d-a5b7-4300-bd8b-fcf2ec490570/download'],
  ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_GB_impresso_D1_CD2.pdf','https://riep.inep.gov.br/bitstreams/01f19cf0-4be9-48df-9a29-f5fe33bbae07/download'],
@@ -30,8 +36,16 @@ async function requestPdf(target,headers){
 export default async function handler(req,res){
  const url=validSource(req.query?.url);
  if(!url)return res.status(400).json({error:'Fonte inválida.'});
+ const edgeAlias=EDGE_ALIASES.get(url.href);
+ if(edgeAlias){
+  res.statusCode=307;
+  res.setHeader('Location',edgeAlias);
+  res.setHeader('Cache-Control','public, max-age=3600');
+  res.setHeader('X-Gabarito-Pdf-Source','vercel-edge-riep');
+  return res.end();
+ }
  const headers={
-  'user-agent':'Mozilla/5.0 (compatible; GabaritoPlus/3.3; +https://gabarito-mais.vercel.app/)',
+  'user-agent':'Mozilla/5.0 (compatible; GabaritoPlus/3.4; +https://gabarito-mais.vercel.app/)',
   'accept':'application/pdf,application/octet-stream;q=0.9,*/*;q=0.5'
  };
  if(req.headers.range)headers.range=req.headers.range;

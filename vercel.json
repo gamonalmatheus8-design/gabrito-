@@ -33,7 +33,22 @@
         "Cache-Control": "public, max-age=0, must-revalidate"
       }
     },
+    {
+      "src": "^/official/enem/2024/d1\\.pdf$",
+      "dest": "https://riep.inep.gov.br/bitstreams/71aaf57d-a5b7-4300-bd8b-fcf2ec490570/download"
+    },
+    {
+      "src": "^/official/enem/2024/gabarito-d1\\.pdf$",
+      "dest": "https://riep.inep.gov.br/bitstreams/01f19cf0-4be9-48df-9a29-f5fe33bbae07/download"
+    },
+    {
+      "src": "^/official/enem/2024/d2\\.pdf$",
+      "dest": "https://riep.inep.gov.br/bitstreams/00b05856-bf94-4bfb-b209-65758a35b81b/download"
+    },
+    {
+      "src": "^/official/enem/2024/gabarito-d2\\.pdf$",
+      "dest": "https://riep.inep.gov.br/bitstreams/109a33f5-e556-4e51-b9e3-8e0bdf3353d8/download"
+    },
     { "handle": "filesystem" }
   ]
 }
-

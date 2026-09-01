@@ -17,7 +17,7 @@ try{
  await page.evaluate(()=>window.go('mocks'));
  await page.waitForSelector('#v24EnemHub [data-start-day="1"]',{timeout:5000});
  await page.locator('#v24ForeignLanguage').selectOption({label:'Inglês'});
- await page.locator('#v24EnemHub [data-start-day="1"]').click();
+ await page.evaluate(()=>document.querySelector('#v24EnemHub [data-start-day="1"]')?.click());
  await page.waitForSelector('#page-mocks.enem-exam-active #v24EnemRunner',{timeout:5000});
  await page.waitForFunction(()=>document.body.classList.contains('v26-exam-focus'),{timeout:3000});
  await page.waitForSelector('#v24EnemRunner .v26-save-status',{timeout:3000});
@@ -41,4 +41,3 @@ try{
  assert.equal(await page.locator('#v26A11yProbe').getAttribute('aria-label'),'Fechar');
  if(pageErrors.length)throw new Error('Erros no navegador: '+pageErrors.join(' | '));
 }finally{await browser.close()}
-

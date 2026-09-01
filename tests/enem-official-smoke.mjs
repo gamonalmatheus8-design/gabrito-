@@ -9,13 +9,15 @@ try{
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>window.go('mocks'));
- await page.waitForSelector('#v27OfficialBlock',{timeout:5000});
- assert.match(await page.locator('#v27OfficialBlock').innerText(),/ENEM OFICIAL/i);
+ await page.waitForSelector('#v28HistoryLibrary',{timeout:5000});
+ assert.match(await page.locator('#v28HistoryLibrary').innerText(),/ENEM 2016–2025/i);
  assert.match(await page.locator('#v24EnemHub .v24-enem-head').innerText(),/Treino estilo ENEM/i);
- await page.locator('#v27OfficialBlock [data-v27-start="1"]').click();
+ await page.locator('#v28Lang2025').selectOption('Inglês');
+ await page.locator('#v28HistoryLibrary [data-v28-year="2025"][data-v28-day="1"]').click();
  await page.waitForSelector('#v27OfficialRunner iframe',{timeout:5000});
  assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('v27-official-active')),true);
  const src=await page.locator('#v27OfficialRunner iframe').getAttribute('src');

@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='2.7.0';
-const RECOVERY='20260901g';
+const VERSION='3.0.1';
+const RECOVERY='20260901h';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,version:VERSION,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured',recovery:RECOVERY};
@@ -42,3 +42,4 @@ async function boot(){try{
 }catch(e){console.error('[Gabarito+] Falha de inicialização:',e);window.GABARITO_APP.bootError=e.message;show('Falha ao iniciar. Recarregue a página.')}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+

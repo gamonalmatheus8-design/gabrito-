@@ -1,12 +1,12 @@
 {
   "name": "gabarito-mais",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check js/gabarito-bootstrap.js && node --check js/gabarito-question-source.js && node --check js/commercial-v2.js && node --check js/admin-v2.js && node --check js/gabarito-admin.js && node --check js/quality-v22.js && node --check js/landing-clean.js && node --check js/enem-simulator-v24.js && node --check js/pism-simulator-v25.js && node --check data/pism-questions-v25.js && node --check data/pism-discursives-v25.js && node --check data/editorial-exclusions.js",
+    "check": "node --check js/gabarito-bootstrap.js && node --check js/gabarito-question-source.js && node --check js/commercial-v2.js && node --check js/admin-v2.js && node --check js/gabarito-admin.js && node --check js/quality-v22.js && node --check js/landing-clean.js && node --check js/enem-simulator-v24.js && node --check js/pism-simulator-v25.js && node --check js/premium-v26.js && node --check data/pism-questions-v25.js && node --check data/pism-discursives-v25.js && node --check data/editorial-exclusions.js",
     "test": "npm run check && node --test tests/*.test.mjs",
-    "smoke": "node tests/browser-smoke.mjs"
+    "smoke": "node tests/browser-smoke.mjs && node tests/premium-smoke.mjs"
   }
 }

@@ -1,0 +1,72 @@
+/* Gabarito+ 2.6 — acabamento premium, foco de prova e pós-simulado */
+html[data-gplus-version="2.6.0"]{scroll-behavior:smooth}
+.v26-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid color-mix(in srgb,var(--primary) 70%,white);outline-offset:3px}
+.btn,.v24-option,.v25p-option,.v24-palette button,.v25p-palette button,.v25p-disc-palette button{min-height:44px}
+.v24-day-card,.v25p-day-card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+.v24-day-card:hover,.v25p-day-card:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,23,42,.06)}
+.v24-day-card h3,.v25p-day-card h3{letter-spacing:-.025em}
+.v24-enem-hub,.v25p-hub{scroll-margin-top:90px}
+
+.v26-exam-focus{background:var(--bg)}
+.v26-exam-focus #page-mocks{max-width:1480px;margin-inline:auto}
+.v26-exam-focus .v24-runner,.v26-exam-focus .v25p-runner{border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.08)}
+.v26-exam-focus .v24-exam-top,.v26-exam-focus .v25p-top{box-shadow:0 8px 24px rgba(15,23,42,.05)}
+.v26-exam-focus .v24-paper,.v26-exam-focus .v25p-paper{max-width:940px;margin-inline:auto;width:100%}
+.v26-exam-focus .v24-question-text,.v26-exam-focus .v25p-question,.v26-exam-focus .v25p-disc-prompt{font-size:1.04rem;line-height:1.75}
+.v26-exam-focus .v24-option,.v26-exam-focus .v25p-option{border-radius:14px;padding:14px 15px;transition:border-color .15s ease,background .15s ease,transform .15s ease}
+.v26-exam-focus .v24-option:hover,.v26-exam-focus .v25p-option:hover{transform:translateX(2px)}
+.v26-exam-focus .v24-sheet,.v26-exam-focus .v25p-sheet{background:color-mix(in srgb,var(--surface-2) 78%,var(--surface))}
+.v26-save-status{display:block;margin-top:4px;font-size:.62rem!important;line-height:1.2;color:var(--muted);font-weight:700;white-space:nowrap}
+.v26-save-status.saving{opacity:.7}
+
+.v26-post-plan{margin:20px 0 4px;padding:20px;border:1px solid color-mix(in srgb,var(--primary) 26%,var(--border));border-radius:16px;background:linear-gradient(145deg,color-mix(in srgb,var(--primary) 5%,var(--surface)),var(--surface))}
+.v25p-result .v26-post-plan{border-color:color-mix(in srgb,#0f766e 28%,var(--border));background:linear-gradient(145deg,color-mix(in srgb,#0f766e 5%,var(--surface)),var(--surface))}
+.v26-post-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.v26-kicker{display:block;font-size:.69rem;font-weight:900;letter-spacing:.11em;color:var(--primary)}
+.v25p-result .v26-kicker{color:#0f766e}
+.v26-post-head h3{margin:5px 0 5px;font-size:1.22rem;letter-spacing:-.025em}
+.v26-post-head p{margin:0;color:var(--muted);font-size:.84rem;line-height:1.5;max-width:660px}
+.v26-plan-badge{flex:0 0 auto;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);font-size:.72rem;font-weight:800;color:var(--muted)}
+.v26-plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+.v26-plan-card{padding:14px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}
+.v26-plan-card.priority{border-color:color-mix(in srgb,var(--primary) 40%,var(--border));box-shadow:inset 3px 0 0 var(--primary)}
+.v25p-result .v26-plan-card.priority{border-color:color-mix(in srgb,#0f766e 40%,var(--border));box-shadow:inset 3px 0 0 #0f766e}
+.v26-plan-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.v26-plan-card-top strong{font-size:.88rem;line-height:1.35}
+.v26-plan-card-top b{font-size:.84rem;white-space:nowrap}
+.v26-tier{display:inline-flex;margin-top:10px;padding:4px 7px;border-radius:999px;background:var(--surface-2);font-size:.66rem;font-weight:800;color:var(--muted)}
+.v26-plan-card p{margin:9px 0 0;color:var(--muted);font-size:.77rem;line-height:1.5}
+.v26-plan-note{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface-2);color:var(--muted);font-size:.77rem;line-height:1.45}
+.v26-plan-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+.v24-result,.v25p-result{max-width:1180px;margin-inline:auto}
+.v24-result-grid>*,.v25p-result-grid>*{min-height:88px}
+.v24-area-result,.v25p-subject-results>div{transition:border-color .15s ease,transform .15s ease}
+.v24-area-result:hover,.v25p-subject-results>div:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--primary) 30%,var(--border))}
+
+@media(max-width:1000px){
+ .v26-plan-grid{grid-template-columns:1fr 1fr}
+ .v26-plan-card:nth-child(3){grid-column:1/-1}
+}
+@media(max-width:760px){
+ .v26-exam-focus .v24-runner,.v26-exam-focus .v25p-runner{border-radius:0;box-shadow:none}
+ .v26-exam-focus .v24-paper,.v26-exam-focus .v25p-paper{padding-bottom:88px}
+ .v26-exam-focus .v24-exam-controls,.v26-exam-focus .v25p-controls{position:sticky;bottom:0;z-index:11;margin-inline:-16px;padding:12px 16px;background:color-mix(in srgb,var(--surface) 95%,transparent);backdrop-filter:blur(12px);box-shadow:0 -10px 28px rgba(15,23,42,.06)}
+ .v26-exam-focus .v24-option,.v26-exam-focus .v25p-option{min-height:58px}
+ .v26-post-head{flex-direction:column}
+ .v26-plan-grid{grid-template-columns:1fr}
+ .v26-plan-card:nth-child(3){grid-column:auto}
+ .v26-plan-badge{align-self:flex-start}
+ .v26-plan-actions .btn{flex:1 1 190px}
+}
+@media(max-width:480px){
+ .v26-post-plan{padding:15px;margin-inline:-2px}
+ .v26-exam-focus .v24-exam-top,.v26-exam-focus .v25p-top{padding-inline:12px}
+ .v26-exam-focus .v24-question-text,.v26-exam-focus .v25p-question,.v26-exam-focus .v25p-disc-prompt{font-size:1rem;line-height:1.68}
+ .v26-plan-actions{display:grid;grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gplus-version="2.6.0"]{scroll-behavior:auto}
+ .v24-day-card,.v25p-day-card,.v24-option,.v25p-option,.v24-area-result,.v25p-subject-results>div{transition:none!important;transform:none!important}
+}

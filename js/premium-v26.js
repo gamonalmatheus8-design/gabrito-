@@ -140,7 +140,10 @@ function scheduleEnhance(){clearTimeout(enhanceTimer);enhanceTimer=setTimeout(en
 
 function installInteractionHooks(){
  document.addEventListener('input',event=>{if(event.target.matches('#v24EssayText,#v25PismDiscAnswer'))markSaved()},{passive:true});
- document.addEventListener('click',event=>{if(event.target.closest('.v24-option,.v25p-option,[data-mark],[data-obj-jump],[data-disc-jump]'))markSaved()},{passive:true});
+ document.addEventListener('click',event=>{
+  if(event.target.closest('.v24-option,.v25p-option,[data-mark],[data-obj-jump],[data-disc-jump]'))markSaved();
+  if(event.target.closest('[data-start-day],[data-start],[data-resume],[data-v27-start],[data-v27-resume],[data-v28-year],[data-v28-resume]'))setTimeout(enhance,180);
+ },{passive:true});
 }
 function boot(){
  ensureLiveRegion();installUnloadGuard();installInteractionHooks();enhance();
@@ -149,3 +152,4 @@ function boot(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
+

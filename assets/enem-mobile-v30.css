@@ -20,21 +20,21 @@
  body.v30-enem-mobile-active .v24-clock span{font-size:.57rem}
  body.v30-enem-mobile-active .v24-clock b{font-size:1rem}
 
- body.v30-enem-mobile-active #v27OfficialRunner{padding-bottom:calc(128px + env(safe-area-inset-bottom))}
- body.v30-enem-mobile-active .v27-workspace{display:block}
- body.v30-enem-mobile-active .v27-workspace>.v27-sheet{display:none!important}
- body.v30-enem-mobile-active .v27-top{position:sticky;top:60px;z-index:15;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;margin:0 -4px 8px;padding:9px 8px;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px)}
- body.v30-enem-mobile-active .v27-top h2{font-size:1rem;margin:2px 0}
- body.v30-enem-mobile-active .v27-top p{font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- body.v30-enem-mobile-active .v27-kicker{font-size:.62rem}
- body.v30-enem-mobile-active .v27-clock{min-width:104px;padding:8px 10px;text-align:right}
- body.v30-enem-mobile-active .v27-clock span{font-size:.56rem}
- body.v30-enem-mobile-active .v27-clock b{font-size:1rem}
- body.v30-enem-mobile-active .v27-source-note{font-size:.7rem;margin-bottom:8px}
- body.v30-enem-mobile-active .v27-paper{border-radius:14px}
- body.v30-enem-mobile-active .v27-paper iframe{height:calc(100dvh - 290px);min-height:390px;max-height:720px}
- body.v30-enem-mobile-active .v27-paper-toolbar{padding:9px 11px;font-size:.75rem}
- body.v30-enem-mobile-active .v27-pdf-fallback{font-size:.68rem}
+ body.v30-enem-mobile-active :is(#v27OfficialRunner,#v28Runner){padding-bottom:calc(128px + env(safe-area-inset-bottom))}
+ body.v30-enem-mobile-active :is(.v27-workspace,.v28-workspace){display:block}
+ body.v30-enem-mobile-active :is(.v27-workspace>.v27-sheet,.v28-workspace>.v28-sheet){display:none!important}
+ body.v30-enem-mobile-active :is(.v27-top,.v28-top){position:sticky;top:60px;z-index:15;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;margin:0 -4px 8px;padding:9px 8px;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(12px)}
+ body.v30-enem-mobile-active :is(.v27-top,.v28-top) h2{font-size:1rem;margin:2px 0}
+ body.v30-enem-mobile-active :is(.v27-top,.v28-top) p{font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ body.v30-enem-mobile-active :is(.v27-kicker,.v28-kicker){font-size:.62rem}
+ body.v30-enem-mobile-active :is(.v27-clock,.v28-clock){min-width:104px;padding:8px 10px;text-align:right}
+ body.v30-enem-mobile-active :is(.v27-clock,.v28-clock) span{font-size:.56rem}
+ body.v30-enem-mobile-active :is(.v27-clock,.v28-clock) b{font-size:1rem}
+ body.v30-enem-mobile-active :is(.v27-source-note,.v28-source-note){font-size:.7rem;margin-bottom:8px}
+ body.v30-enem-mobile-active :is(.v27-paper,.v28-paper){border-radius:14px}
+ body.v30-enem-mobile-active :is(.v27-paper,.v28-paper) iframe{height:calc(100dvh - 290px);min-height:390px;max-height:720px}
+ body.v30-enem-mobile-active :is(.v27-paper-toolbar,.v28-paper-toolbar){padding:9px 11px;font-size:.75rem}
+ body.v30-enem-mobile-active :is(.v27-pdf-fallback,.v28-pdf-fallback){font-size:.68rem}
 
  .v30-dock{position:fixed;left:0;right:0;bottom:0;z-index:230;display:none;padding:8px max(10px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-right));background:color-mix(in srgb,var(--surface) 96%,transparent);backdrop-filter:blur(18px);border-top:1px solid var(--border);box-shadow:0 -14px 36px rgba(15,23,42,.12)}
  .v30-dock.show{display:block}
@@ -105,7 +105,7 @@
  .v30-panel-picker{align-items:stretch;flex-direction:column}
  .v30-panel-picker>div{grid-template-columns:repeat(5,1fr)}
  .v30-panel-actions{grid-template-columns:1fr 1fr}
- body.v30-enem-mobile-active .v27-paper iframe{height:calc(100dvh - 300px);min-height:350px}
+ body.v30-enem-mobile-active :is(.v27-paper,.v28-paper) iframe{height:calc(100dvh - 300px);min-height:350px}
 }
 @media(max-width:390px){
  .v30-nav-row{grid-template-columns:44px minmax(0,1fr) 44px 44px;gap:5px}
@@ -118,3 +118,4 @@
 @media(prefers-reduced-motion:reduce){
  .v30-panel,.v30-backdrop{transition:none!important}
 }
+

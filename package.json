@@ -1,6 +1,6 @@
 {
   "name": "gabarito-mais",
-  "version": "2.7.0",
+  "version": "3.0.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,3 +10,4 @@
     "smoke": "node tests/browser-smoke.mjs && node tests/premium-smoke.mjs && node tests/enem-official-smoke.mjs && node tests/enem-history-smoke.mjs && node tests/enem-mobile-smoke.mjs && node tests/pism-history-smoke.mjs"
   }
 }
+

@@ -59,6 +59,7 @@ function clearShell(){
  const {dock,backdrop,panel}=ensureShell();
  dock.classList.remove('show','official');dock.innerHTML='';
  backdrop.classList.remove('show');panel.classList.remove('show');panel.innerHTML='';
+ delete dock.dataset.signature;delete panel.dataset.signature;
  document.body.classList.remove('v30-sheet-open','v30-enem-mobile-active');
  panelOpen=false;
 }
@@ -131,6 +132,9 @@ function panelQuestions(kind,s){
 function renderPanel(kind,s){
  const {panel}=ensureShell();
  const answered=answeredCount(kind,s),marked=markedCount(kind,s),q=currentNumber(kind,s),selected=selectedLetter(kind,s);
+ const signature=[kind,s.year||'',s.day,q,selected,answered,marked,range].join('|');
+ if(panel.dataset.signature===signature)return;
+ panel.dataset.signature=signature;
  const base=isOfficialKind(kind)&&s.day===2?90:0;
  const firstLabel=`${base+1}–${base+45}`,secondLabel=`${base+46}–${base+90}`;
  const area1=s.day===1?'Linguagens':'Natureza',area2=s.day===1?'Humanas':'Matemática';
@@ -149,6 +153,9 @@ function renderDock(kind,s){
  const q=currentNumber(kind,s),selected=selectedLetter(kind,s),answered=answeredCount(kind,s),marked=kind==='authorial'&&isMarked(s,q);
  const min=isOfficialKind(kind)&&s.day===2?91:1,max=isOfficialKind(kind)&&s.day===2?180:90;
  dock.classList.toggle('official',isOfficialKind(kind));dock.classList.add('show');
+ const signature=[kind,s.year||'',s.day,q,selected,answered,marked].join('|');
+ if(dock.dataset.signature===signature)return;
+ dock.dataset.signature=signature;
  const quick=isOfficialKind(kind)?`<div class="v30-quick-row"><div class="v30-quick-label"><span>Q${q}</span><b>${selected||'—'}</b></div><div class="v30-quick-letters">${['A','B','C','D','E'].map(l=>letterButton(kind,l,selected)).join('')}</div></div>`:'';
  dock.innerHTML=`${quick}<div class="v30-nav-row"><button type="button" class="v30-nav-icon" data-v30-prev aria-label="Questão anterior" ${q<=min?'disabled':''}>‹</button><button type="button" class="v30-card-status" data-v30-open><span>Questão ${q}</span><b>${answered}/90 no cartão${selected?` · ${selected}`:''}</b></button>${kind==='authorial'?`<button type="button" class="v30-review ${marked?'active':''}" data-v30-review aria-label="${marked?'Remover marcação de revisão':'Marcar para revisão'}">${marked?'★':'☆'}</button>`:''}<button type="button" class="v30-nav-icon" data-v30-next aria-label="Próxima questão" ${q>=max?'disabled':''}>›</button></div>`;
  $('[data-v30-prev]',dock)?.addEventListener('click',()=>previous(kind));

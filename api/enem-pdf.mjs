@@ -1,6 +1,12 @@
 import {Readable} from 'node:stream';
 
 const ALLOWED_HOSTS=new Set(['download.inep.gov.br','riep.inep.gov.br']);
+const RIEP_FALLBACKS=new Map([
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D1_CD2.pdf','https://riep.inep.gov.br/bitstreams/71aaf57d-a5b7-4300-bd8b-fcf2ec490570/download'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_GB_impresso_D1_CD2.pdf','https://riep.inep.gov.br/bitstreams/01f19cf0-4be9-48df-9a29-f5fe33bbae07/download'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D2_CD5.pdf','https://riep.inep.gov.br/bitstreams/00b05856-bf94-4bfb-b209-65758a35b81b/download'],
+ ['https://download.inep.gov.br/enem/provas_e_gabaritos/2024_GB_impresso_D2_CD5.pdf','https://riep.inep.gov.br/bitstreams/109a33f5-e556-4e51-b9e3-8e0bdf3353d8/download']
+]);
 
 function validSource(raw){
  try{
@@ -9,25 +15,46 @@ function validSource(raw){
   return url;
  }catch{return null}
 }
+function candidates(url){
+ const primary=url.href;
+ const fallback=RIEP_FALLBACKS.get(primary);
+ return fallback?[primary,fallback]:[primary];
+}
+async function requestPdf(target,headers){
+ const controller=new AbortController();
+ const timeout=setTimeout(()=>controller.abort(),12000);
+ try{return await fetch(target,{headers,redirect:'follow',signal:controller.signal})}
+ finally{clearTimeout(timeout)}
+}
 
 export default async function handler(req,res){
  const url=validSource(req.query?.url);
  if(!url)return res.status(400).json({error:'Fonte inválida.'});
- try{
-  const headers={'user-agent':'GabaritoPlus/3.2 (+https://gabarito-mais.vercel.app/)'};
-  if(req.headers.range)headers.range=req.headers.range;
-  const response=await fetch(url,{headers,redirect:'follow'});
-  if(!response.ok&&response.status!==206)return res.status(response.status).end();
-  res.statusCode=response.status;
-  for(const name of ['content-type','content-length','content-range','accept-ranges','etag','last-modified']){
-   const value=response.headers.get(name);if(value)res.setHeader(name,value);
-  }
-  res.setHeader('Cache-Control','public, s-maxage=86400, stale-while-revalidate=604800');
-  res.setHeader('X-Content-Type-Options','nosniff');
-  if(!response.body)return res.end();
-  Readable.fromWeb(response.body).pipe(res);
- }catch(error){
-  console.error('[Gabarito+] Falha ao transmitir PDF oficial:',error?.message||error);
+ const headers={
+  'user-agent':'Mozilla/5.0 (compatible; GabaritoPlus/3.3; +https://gabarito-mais.vercel.app/)',
+  'accept':'application/pdf,application/octet-stream;q=0.9,*/*;q=0.5'
+ };
+ if(req.headers.range)headers.range=req.headers.range;
+ let response=null,used=null,lastError=null;
+ for(const target of candidates(url)){
+  try{
+   const attempt=await requestPdf(target,headers);
+   if(attempt.ok||attempt.status===206){response=attempt;used=target;break}
+   lastError=new Error(`Inep respondeu ${attempt.status} em ${new URL(target).hostname}`);
+   try{await attempt.body?.cancel()}catch{}
+  }catch(error){lastError=error}
+ }
+ if(!response){
+  console.error('[Gabarito+] Falha ao transmitir PDF oficial:',lastError?.message||lastError);
   return res.status(502).json({error:'Não foi possível carregar o caderno oficial agora.'});
  }
+ res.statusCode=response.status;
+ for(const name of ['content-type','content-length','content-range','accept-ranges','etag','last-modified']){
+  const value=response.headers.get(name);if(value)res.setHeader(name,value);
+ }
+ res.setHeader('Cache-Control','public, s-maxage=86400, stale-while-revalidate=604800');
+ res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('X-Gabarito-Pdf-Source',new URL(used).hostname==='riep.inep.gov.br'?'riep-fallback':'inep-download');
+ if(!response.body)return res.end();
+ Readable.fromWeb(response.body).pipe(res);
 }

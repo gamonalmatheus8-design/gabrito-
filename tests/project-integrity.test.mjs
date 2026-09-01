@@ -12,13 +12,14 @@ test('arquivos essenciais da release comercial existem',()=>{
   for(const f of [
     'supabase/schema.sql','js/supabase-config.js','js/gabarito-bootstrap.js','js/gabarito-question-source.js',
     'js/gabarito-supabase.js','js/gabarito-admin.js','js/admin-v2.js','js/commercial-v2.js','js/quality-v22.js',
+    'js/enem-simulator-v24.js','assets/enem-simulator-v24.css',
     'assets/commercial-v2.css','assets/quality-v22.css','data/editorial-exclusions.js','privacy.html','terms.html','service-worker.js','vercel.json'
   ]) assert.ok(fs.existsSync(path.join(root,f)),f);
 });
 
 test('service role não está no config público',()=>{assert.ok(!/service_role/i.test(read('js/supabase-config.js')))});
 
-test('scripts críticos possuem sintaxe JavaScript válida',()=>{for(const f of ['js/gabarito-bootstrap.js','js/gabarito-question-source.js','js/commercial-v2.js','js/admin-v2.js','js/gabarito-admin.js','js/quality-v22.js','js/landing-clean.js','data/editorial-exclusions.js'])assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}),f)});
+test('scripts críticos possuem sintaxe JavaScript válida',()=>{for(const f of ['js/gabarito-bootstrap.js','js/gabarito-question-source.js','js/commercial-v2.js','js/admin-v2.js','js/gabarito-admin.js','js/quality-v22.js','js/landing-clean.js','js/enem-simulator-v24.js','data/editorial-exclusions.js'])assert.doesNotThrow(()=>new vm.Script(read(f),{filename:f}),f)});
 
 test('menu Mais continua funcional',()=>{const s=read('js/gabarito-ui.js');assert.match(s,/aria-expanded/);assert.match(s,/nav\.hidden/)});
 
@@ -28,9 +29,11 @@ test('helpers adaptativos usados entre camadas estão exportados',()=>{const s=r
 
 test('atalho legado de questões possui compatibilidade',()=>{assert.match(read('js/app.js'),/window\.v40OpenFocusedQuestions/)});
 
-test('handlers inline principais possuem implementação',()=>{const html=read('index.html');const js=['app.js','v6-release.js','gabarito-ui.js','gabarito-supabase.js','gabarito-bootstrap.js','commercial-v2.js'].map(f=>read('js/'+f)).join('\n');const names=[...html.matchAll(/on(?:click|submit|change|input)="\s*([A-Za-z_$][\w$]*)\s*\(/g)].map(m=>m[1]);const missing=[...new Set(names)].filter(name=>!new RegExp(`(?:function\\s+${name}\\s*\\(|window\\.${name}\\s*=|window\\[.{0,20}${name})`).test(js));assert.deepEqual(missing,[])});
+test('handlers inline principais possuem implementação',()=>{const html=read('index.html');const js=['app.js','v6-release.js','gabarito-ui.js','gabarito-supabase.js','gabarito-bootstrap.js','commercial-v2.js','enem-simulator-v24.js'].map(f=>read('js/'+f)).join('\n');const names=[...html.matchAll(/on(?:click|submit|change|input)="\s*([A-Za-z_$][\w$]*)\s*\(/g)].map(m=>m[1]);const missing=[...new Set(names)].filter(name=>!new RegExp(`(?:function\\s+${name}\\s*\\(|window\\.${name}\\s*=|window\\[.{0,20}${name})`).test(js));assert.deepEqual(missing,[])});
 
-test('versões técnicas estão alinhadas em 2.2.0',()=>{const pkg=JSON.parse(read('package.json'));const boot=read('js/gabarito-bootstrap.js');const sw=read('service-worker.js');assert.equal(pkg.version,'2.2.0');assert.match(boot,/const VERSION='2\.2\.0'/);assert.match(sw,/gabarito-mais-2-2-0-app-shell/);assert.match(sw,/const V='2\.2\.0'/)});
+test('versões técnicas estão alinhadas em 2.4.0',()=>{const pkg=JSON.parse(read('package.json'));const boot=read('js/gabarito-bootstrap.js');const sw=read('service-worker.js');assert.equal(pkg.version,'2.4.0');assert.match(boot,/const VERSION='2\.4\.0'/);assert.match(sw,/gabarito-mais-2-4-0-app-shell/);assert.match(sw,/const V='2\.4\.0'/)});
+
+test('simulador ENEM replica os dois dias e mantém resultado bruto sem falsa TRI',()=>{const s=read('js/enem-simulator-v24.js'),boot=read('js/gabarito-bootstrap.js');assert.match(s,/DAY_MINUTES=\{1:330,2:300\}/);assert.match(s,/DAY_AREAS=\{1:\['Linguagens','Ciências Humanas'\],2:\['Ciências da Natureza','Matemática'\]\}/);assert.match(s,/buildLinguagens/);assert.match(s,/45/);assert.match(s,/Redação/);assert.match(s,/Rascunho/);assert.match(s,/Folha final/);assert.match(s,/cartão-resposta/i);assert.match(s,/não são convertidos aqui em uma nota oficial/i);assert.match(boot,/assets\/enem-simulator-v24\.css/);assert.match(boot,/js\/enem-simulator-v24\.js/)});
 
 test('boot usa fallback local sem bloquear e aplica exclusões editoriais',()=>{const boot=read('js/gabarito-bootstrap.js');assert.match(boot,/await loadLocalBank\(\)/);assert.match(boot,/data\/editorial-exclusions\.js/);assert.match(boot,/applyEditorialExclusions\(\)/);assert.match(boot,/loadQualityLayer/);assert.match(boot,/Camada de qualidade indisponível/)});
 

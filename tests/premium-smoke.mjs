@@ -29,6 +29,7 @@ try{
   localStorage.removeItem('gplus_enem_exam_v24');
   const runner=document.getElementById('v24EnemRunner');
   runner.innerHTML='<section class="v24-result"><h2>Resultado do teste</h2><div class="v24-area-results"><div class="v24-area-result">Linguagens\n18/45</div><div class="v24-area-result">Ciências Humanas\n34/45</div></div><div class="v24-result-actions"></div></section>';
+  window.GABARITO_PREMIUM?.enhance?.();
  });
  await page.waitForSelector('.v24-result [data-v26-plan]',{timeout:4000});
  const planText=await page.locator('.v24-result [data-v26-plan]').innerText();

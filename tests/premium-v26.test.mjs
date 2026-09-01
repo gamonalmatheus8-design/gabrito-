@@ -37,10 +37,11 @@ test('acabamento premium cobre mobile, foco visível e movimento reduzido',()=>{
 
 test('release atual preserva a camada premium 2.6',()=>{
  const boot=read('js/gabarito-bootstrap.js'),pkg=JSON.parse(read('package.json')),sw=read('service-worker.js');
- assert.equal(pkg.version,'2.7.0');
- assert.match(boot,/const VERSION='2\.7\.0'/);
+ assert.equal(pkg.version,'3.0.1');
+ assert.match(boot,/const VERSION='3\.0\.1'/);
  assert.match(boot,/assets\/premium-v26\.css/);
  assert.match(boot,/js\/premium-v26\.js/);
- assert.match(sw,/gabarito-mais-2-7-0-app-shell/);
- assert.match(sw,/const V='2\.7\.0'/);
+ assert.match(sw,/gabarito-mais-3-0-1-app-shell/);
+ assert.match(sw,/const V='3\.0\.1'/);
 });
+

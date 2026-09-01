@@ -17,7 +17,7 @@ try{
  await page.evaluate(()=>window.go('mocks'));
  await page.waitForSelector('#v24EnemHub [data-start-day="1"]',{timeout:5000});
  await page.locator('#v24ForeignLanguage').selectOption({label:'Inglês'});
- await page.locator('#v24EnemHub [data-start-day="1"]').click();
+ await page.evaluate(()=>document.querySelector('#v24EnemHub [data-start-day="1"]')?.click());
  await page.waitForSelector('#page-mocks.enem-exam-active #v24EnemRunner',{timeout:5000});
  await page.waitForFunction(()=>document.body.classList.contains('v26-exam-focus'),{timeout:3000});
  await page.waitForSelector('#v24EnemRunner .v26-save-status',{timeout:3000});
@@ -29,6 +29,7 @@ try{
   localStorage.removeItem('gplus_enem_exam_v24');
   const runner=document.getElementById('v24EnemRunner');
   runner.innerHTML='<section class="v24-result"><h2>Resultado do teste</h2><div class="v24-area-results"><div class="v24-area-result">Linguagens\n18/45</div><div class="v24-area-result">Ciências Humanas\n34/45</div></div><div class="v24-result-actions"></div></section>';
+  window.GABARITO_PREMIUM?.enhance?.();
  });
  await page.waitForSelector('.v24-result [data-v26-plan]',{timeout:4000});
  const planText=await page.locator('.v24-result [data-v26-plan]').innerText();
@@ -41,4 +42,3 @@ try{
  assert.equal(await page.locator('#v26A11yProbe').getAttribute('aria-label'),'Fechar');
  if(pageErrors.length)throw new Error('Erros no navegador: '+pageErrors.join(' | '));
 }finally{await browser.close()}
-

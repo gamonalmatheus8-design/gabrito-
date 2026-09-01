@@ -5,25 +5,34 @@ const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EX
 try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
- await page.route('https://riep.inep.gov.br/**',route=>route.abort());
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
- await page.evaluate(()=>window.go('mocks'));
+ await page.evaluate(()=>{
+  window.pdfjsLib={
+   GlobalWorkerOptions:{workerSrc:''},
+   getDocument(){return{promise:Promise.resolve({numPages:34,async getPage(n){return{getViewport:({scale})=>({width:760*scale,height:1080*scale}),getTextContent:async()=>({items:n===2?[{str:'QUESTÃO 1'}]:[]}),render:()=>({promise:Promise.resolve(),cancel(){}})}}})}}
+  };
+  window.go('mocks');
+ });
  await page.waitForSelector('#v28HistoryLibrary',{timeout:5000});
  assert.match(await page.locator('#v28HistoryLibrary').innerText(),/ENEM 2016–2025/i);
  assert.match(await page.locator('#v24EnemHub .v24-enem-head').innerText(),/Treino estilo ENEM/i);
  await page.locator('#v28Lang2025').selectOption('Inglês');
  await page.locator('#v28HistoryLibrary [data-v28-year="2025"][data-v28-day="1"]').click();
- await page.waitForSelector('#v27OfficialRunner iframe',{timeout:5000});
+ await page.waitForSelector('#v27OfficialRunner .v32-reader',{timeout:5000});
  await page.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
  assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('v27-official-active')),true);
- const src=await page.locator('#v27OfficialRunner iframe').getAttribute('src');
- assert.match(src,/a11f89c6-3693-49f0-8164-2794b5dac372/);
+ assert.equal(await page.locator('#v27OfficialRunner iframe').count(),0);
+ assert.match(await page.locator('#v27OfficialRunner .v32-reader').innerText(),/LEITOR GABARITO\+/i);
+ const original=await page.locator('#v27OfficialRunner .v32-reader-foot a').getAttribute('href');
+ assert.match(original,/a11f89c6-3693-49f0-8164-2794b5dac372/);
+ await page.waitForFunction(()=>document.querySelector('#v27OfficialRunner .v32-page-label')?.textContent?.includes('Página 2'),{timeout:4000});
  assert.equal(await page.locator('#v27Sheet [data-q]').count(),90);
  assert.equal(await page.locator('#v27Sheet [data-letter]').count(),5);
  assert.equal(await page.locator('#v27Sheet').evaluate(el=>getComputedStyle(el).display),'none');
@@ -35,4 +44,3 @@ try{
  assert.deepEqual(keys,{en:'A',es:'D',ann:null});
  if(pageErrors.length)throw new Error('Erros no navegador: '+pageErrors.join(' | '));
 }finally{await browser.close()}
-

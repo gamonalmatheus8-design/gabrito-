@@ -25,6 +25,12 @@ function proxy(url){return `/api/enem-pdf?url=${encodeURIComponent(url)}`}
 function session(kind){return parse(localStorage.getItem(kind==='v27'?V27_KEY:V28_KEY),null)}
 function findSource(iframe){const raw=iframe?.getAttribute('src')||'';return raw.split('#')[0]}
 function current(kind){return Number(session(kind)?.current||1)}
+function structuredNativeReady(kind){
+ if(kind!=='v27')return false;
+ const s=session(kind),api=window.GABARITO_ENEM_NATIVE;
+ if(!s||!api?.validateAttempt)return false;
+ try{return Boolean(api.validateAttempt({year:s.year,day:s.day,language:s.language}).complete)}catch{return false}
+}
 function readerMarkup(source){return `<section class="v32-reader" data-source="${source}"><div class="v32-reader-top"><div><span class="v32-kicker">CADERNO OFICIAL · LEITOR GABARITO+</span><b class="v32-question-label">Questão</b></div><div class="v32-page-actions"><button type="button" class="v32-page-btn" data-v32-prev aria-label="Página anterior">‹</button><span class="v32-page-label">Carregando…</span><button type="button" class="v32-page-btn" data-v32-next aria-label="Próxima página">›</button></div></div><div class="v32-stage"><div class="v32-loading"><span></span><b>Preparando caderno oficial…</b><small>Sem barra de PDF e sem sair do Gabarito+.</small></div><canvas class="v32-canvas" hidden></canvas></div><div class="v32-reader-foot"><span>Conteúdo oficial do Inep renderizado dentro do aplicativo.</span><a href="${source}" target="_blank" rel="noopener">Abrir original</a></div></section>`}
 async function buildQuestionMap(doc){
  const map=new Map();
@@ -55,6 +61,7 @@ async function syncQuestion(state){
  const target=state.qmap?.get(q);if(target&&target!==state.page)await renderPage(state,target);
 }
 async function mount(iframe,kind){
+ if(structuredNativeReady(kind)){window.GABARITO_ENEM_NATIVE_INTEGRATION?.enhance?.();return}
  const source=findSource(iframe);if(!source)return;
  const paper=iframe.closest(kind==='v27'?'.v27-paper':'.v28-paper');if(!paper)return;
  if(readers.has(paper)){await syncQuestion(readers.get(paper));return}
@@ -71,7 +78,11 @@ async function mount(iframe,kind){
 }
 async function enhance(){
  for(const [paper,state] of readers)if(!state.host.isConnected)readers.delete(paper);
- const v27=$('#v27OfficialRunner .v27-paper iframe');if(v27)await mount(v27,'v27');
+ const v27=$('#v27OfficialRunner .v27-paper iframe');
+ if(v27){
+  if(structuredNativeReady('v27'))window.GABARITO_ENEM_NATIVE_INTEGRATION?.enhance?.();
+  else await mount(v27,'v27');
+ }
  const v28=$('#v28Runner .v28-paper iframe');if(v28)await mount(v28,'v28');
  for(const state of readers.values())if(state.host.isConnected)syncQuestion(state);
  window.GABARITO_APP=window.GABARITO_APP||{};window.GABARITO_APP.enemDocument=VERSION;

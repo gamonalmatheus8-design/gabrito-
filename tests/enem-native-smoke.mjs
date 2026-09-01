@@ -10,6 +10,7 @@ try{
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE?.version==='3.1.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE_INTEGRATION?.version==='3.1.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_OFFICIAL?.version==='2.7.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>{
@@ -25,10 +26,10 @@ try{
   });
   window.GABARITO_ENEM_NATIVE.register(rows);
   window.go('mocks');
+  const lang=document.querySelector('#v27Language');
+  if(lang)lang.value='Inglês';
+  window.GABARITO_ENEM_OFFICIAL.start(1);
  });
- await page.waitForSelector('#v27OfficialBlock [data-v27-start="1"]',{timeout:5000});
- await page.locator('#v27Language').selectOption('Inglês');
- await page.locator('#v27OfficialBlock [data-v27-start="1"]').click();
  await page.waitForSelector('#v31NativeMount .v31-question',{timeout:6000});
  await page.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
  assert.equal(await page.locator('#v27OfficialRunner iframe').count(),0);

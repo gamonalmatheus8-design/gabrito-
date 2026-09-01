@@ -32,6 +32,7 @@ async function boot(){try{
  try{await loadStyle('assets/enem-official-v27.css');await loadScript('js/enem-official-v27.js',5000)}catch(e){console.warn('[Gabarito+] ENEM oficial indisponível:',e.message)}
  try{await loadScript('js/enem-native-integration-v31.js',3500)}catch(e){console.warn('[Gabarito+] Integração nativa do ENEM indisponível:',e.message)}
  try{await loadScript('data/enem-official-catalog-v28.js',3500);await loadStyle('assets/enem-history-v28.css');await loadScript('js/enem-history-v28.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do ENEM indisponível:',e.message)}
+ try{await loadStyle('assets/enem-document-v32.css');await loadScript('js/enem-document-v32.js',3500)}catch(e){console.warn('[Gabarito+] Leitor nativo do caderno oficial indisponível:',e.message)}
  try{await loadStyle('assets/pism-simulator-v25.css');await loadScript('js/pism-simulator-v25.js',5000)}catch(e){console.warn('[Gabarito+] Simulador PISM indisponível:',e.message)}
  try{await loadScript('data/pism-official-catalog-v29.js',3500);await loadStyle('assets/pism-history-v29.css');await loadScript('js/pism-history-v29.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do PISM indisponível:',e.message)}
  try{await loadStyle('assets/premium-v26.css');await loadScript('js/premium-v26.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento premium indisponível:',e.message)}

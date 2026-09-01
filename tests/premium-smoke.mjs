@@ -19,7 +19,7 @@ try{
  await page.locator('#v24ForeignLanguage').selectOption({label:'Inglês'});
  await page.locator('#v24EnemHub [data-start-day="1"]').click();
  await page.waitForSelector('#page-mocks.enem-exam-active #v24EnemRunner',{timeout:5000});
- assert.equal(await page.evaluate(()=>document.body.classList.contains('v26-exam-focus')),true);
+ await page.waitForFunction(()=>document.body.classList.contains('v26-exam-focus'),{timeout:3000});
  await page.waitForSelector('#v24EnemRunner .v26-save-status',{timeout:3000});
  const minHeight=await page.locator('#v24EnemRunner .v24-option').first().evaluate(el=>parseFloat(getComputedStyle(el).minHeight));
  assert.ok(minHeight>=44,`área de toque abaixo de 44px: ${minHeight}`);

@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='2.2.0';
-const RECOVERY='20260827c';
+const VERSION='2.4.0';
+const RECOVERY='20260901a';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,version:VERSION,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured',recovery:RECOVERY};
@@ -27,6 +27,7 @@ async function boot(){try{
  await loadScript('js/gabarito-ui.js',5000);
  await loadScript('js/v6-release.js',5000);
  try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}
+ try{await loadStyle('assets/enem-simulator-v24.css');await loadScript('js/enem-simulator-v24.js',5000)}catch(e){console.warn('[Gabarito+] Simulador ENEM indisponível:',e.message)}
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();
  window.GABARITO_APP.ready=true;
  setTimeout(loadQualityLayer,0);

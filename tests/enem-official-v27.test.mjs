@@ -46,5 +46,6 @@ test('boot carrega a camada oficial 2.7',()=>{
  const boot=read('js/gabarito-bootstrap.js');
  assert.match(boot,/assets\/enem-official-v27\.css/);
  assert.match(boot,/js\/enem-official-v27\.js/);
- assert.match(boot,/const VERSION='2\.7\.0'/);
+ assert.match(boot,/const VERSION='3\.0\.1'/);
 });
+

@@ -2,18 +2,18 @@ import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 
 const base=process.env.BASE_URL||'http://127.0.0.1:3090';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
 
 async function ready(page){
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>window.go('mocks'));
 }
 
-let authorialContext=null,officialContext=null;
+let authorialContext=null,officialContext=null,historicalContext=null;
 try{
  authorialContext=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
  const authorial=await authorialContext.newPage(),errors=[];authorial.on('pageerror',e=>errors.push(e.message));
@@ -67,8 +67,34 @@ try{
  assert.match(await official.locator('#v30EnemSheetPanel [data-v30-q="1"]').innerText(),/C/);
  assert.equal(await official.locator('#v30EnemSheetPanel .v30-panel-picker [data-v30-letter]').count(),5);
  if(officialErrors.length)throw new Error('Erros na prova oficial ENEM mobile: '+officialErrors.join(' | '));
+ await officialContext.close();officialContext=null;
+
+ historicalContext=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+ const historical=await historicalContext.newPage(),historicalErrors=[];historical.on('pageerror',e=>historicalErrors.push(e.message));
+ await historical.route('https://riep.inep.gov.br/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>INEP mock</title>'}));
+ await ready(historical);
+ await historical.waitForSelector('#v28HistoryLibrary',{timeout:5000});
+ await historical.locator('#v28HistoryLibrary [data-v28-year="2024"][data-v28-day="1"]').click();
+ await historical.waitForSelector('#v28Runner',{timeout:5000});
+ await historical.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
+ assert.equal(await historical.locator('#v28Runner .v28-sheet').evaluate(el=>getComputedStyle(el).display),'none');
+ assert.equal(await historical.locator('#v30EnemDock .v30-quick-letters [data-v30-letter]').count(),5);
+ await historical.locator('#v30EnemDock .v30-quick-letters [data-v30-letter="D"]').click();
+ await historical.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_enem_history_exam_v28')||'{}').answers?.['1']==='D',{timeout:3000});
+ assert.ok(await historical.locator('#v30EnemDock .v30-quick-letters [data-v30-letter="D"]').evaluate(el=>el.classList.contains('selected')));
+ assert.match(await historical.locator('#v30EnemDock').innerText(),/1\/90 no cartão/i);
+ await historical.locator('#v30EnemDock [data-v30-next]').click();
+ await historical.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_enem_history_exam_v28')||'{}').current===2,{timeout:3000});
+ await historical.locator('#v30EnemDock [data-v30-open]').click();
+ await historical.waitForSelector('#v30EnemSheetPanel.show',{timeout:3000});
+ assert.equal(await historical.locator('#v30EnemSheetPanel [data-v30-q]').count(),45);
+ assert.match(await historical.locator('#v30EnemSheetPanel [data-v30-q="1"]').innerText(),/D/);
+ assert.equal(await historical.locator('#v30EnemSheetPanel .v30-panel-picker [data-v30-letter]').count(),5);
+ if(historicalErrors.length)throw new Error('Erros na prova histórica ENEM mobile: '+historicalErrors.join(' | '));
 }finally{
  if(authorialContext)await authorialContext.close();
  if(officialContext)await officialContext.close();
+ if(historicalContext)await historicalContext.close();
  await browser.close();
 }
+

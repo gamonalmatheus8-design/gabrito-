@@ -59,6 +59,19 @@ try{
   await page.waitForSelector('#v25PismHub [data-start="1"]',{timeout:5000});
   await page.locator('#v25PismModule').selectOption('I');
   await page.locator('#v25PismHub [data-start="1"]').click();
+  await page.waitForTimeout(250);
+  const pismStartState=await page.evaluate(()=>({
+    session:localStorage.getItem('gplus_pism_exam_v25'),
+    pageClass:document.getElementById('page-mocks')?.className||'',
+    runner:Boolean(document.getElementById('v25PismRunner')),
+    runnerText:document.getElementById('v25PismRunner')?.innerText?.slice(0,240)||'',
+    notices:Array.from(document.querySelectorAll('.toast,.notice,[role="alert"]')).map(x=>x.textContent?.trim()).filter(Boolean).slice(-5),
+    pismQuestions:(window.PISM_QUESTIONS||[]).length,
+    pismDiscursives:(window.PISM_DISCURSIVE||[]).length,
+    pageErrors:window.GABARITO_APP?.pismSimulatorError||null
+  }));
+  console.log('PISM_START_STATE',JSON.stringify(pismStartState));
+  assert.ok(pismStartState.session,`PISM não criou sessão: ${JSON.stringify(pismStartState)}`);
   await page.waitForSelector('#page-mocks.pism-exam-active #v25PismRunner',{timeout:5000});
   assert.equal(await page.locator('#v25PismRunner .v25p-palette button').count(),20);
   assert.equal(await page.locator('#v25PismRunner .v25p-disc-palette button').count(),8);

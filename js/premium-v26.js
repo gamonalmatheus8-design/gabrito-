@@ -82,7 +82,9 @@ function parsePerformanceCard(node){
  if(!match)return null;
  const correct=Number(match[1]),total=Number(match[2]);if(!total)return null;
  const lines=String(node.innerText||'').split(/\n+/).map(clean).filter(Boolean);
- const name=lines.find(line=>!line.includes(match[0])&&!/^\d+[.,]?\d*%?$/.test(line)&&!/acerto|quest/i.test(line.toLowerCase()))||'Desempenho';
+ const fromLines=lines.find(line=>!line.includes(match[0])&&!/^\d+[.,]?\d*%?$/.test(line)&&!/acerto|quest/i.test(line.toLowerCase()));
+ const fallbackName=clean(text.replace(match[0],' ').replace(/\b\d+(?:[.,]\d+)?%\b/g,' ').replace(/\b(acertos?|questões?|objetivas?|respondidas?)\b/gi,' '));
+ const name=fromLines||fallbackName||'Desempenho';
  return{name:name.slice(0,60),correct,total,percent:Math.round(correct/total*100)};
 }
 function performanceItems(root,kind){

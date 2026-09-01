@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='2.5.0';
-const RECOVERY='20260901b';
+const VERSION='2.6.0';
+const RECOVERY='20260901c';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,version:VERSION,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured',recovery:RECOVERY};
@@ -29,6 +29,7 @@ async function boot(){try{
  try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}
  try{await loadStyle('assets/enem-simulator-v24.css');await loadScript('js/enem-simulator-v24.js',5000)}catch(e){console.warn('[Gabarito+] Simulador ENEM indisponível:',e.message)}
  try{await loadStyle('assets/pism-simulator-v25.css');await loadScript('js/pism-simulator-v25.js',5000)}catch(e){console.warn('[Gabarito+] Simulador PISM indisponível:',e.message)}
+ try{await loadStyle('assets/premium-v26.css');await loadScript('js/premium-v26.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento premium indisponível:',e.message)}
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();
  window.GABARITO_APP.ready=true;
  setTimeout(loadQualityLayer,0);

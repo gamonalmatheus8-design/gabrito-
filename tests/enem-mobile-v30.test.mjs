@@ -70,5 +70,7 @@ test('cartão mobile mantém 45 questões por área e ações essenciais',()=>{
  for(const action of ['data-v30-mark','data-v30-essay','data-v30-exit','data-v30-finish'])assert.match(js,new RegExp(action));
  assert.match(js,/90-answered/);
  assert.match(js,/markedCount/);
+ assert.match(js,/dock\.dataset\.signature===signature/);
+ assert.match(js,/panel\.dataset\.signature===signature/);
 });
 

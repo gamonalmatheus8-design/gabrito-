@@ -70,12 +70,18 @@ async function mount(iframe,kind){
  }
 }
 async function enhance(){
+ for(const [paper,state] of readers)if(!state.host.isConnected)readers.delete(paper);
  const v27=$('#v27OfficialRunner .v27-paper iframe');if(v27)await mount(v27,'v27');
  const v28=$('#v28Runner .v28-paper iframe');if(v28)await mount(v28,'v28');
  for(const state of readers.values())if(state.host.isConnected)syncQuestion(state);
  window.GABARITO_APP=window.GABARITO_APP||{};window.GABARITO_APP.enemDocument=VERSION;
 }
-function schedule(){clearTimeout(timer);timer=setTimeout(enhance,40)}
-function boot(){new MutationObserver(schedule).observe(document.body,{subtree:true,childList:true});window.addEventListener('resize',schedule,{passive:true});setTimeout(enhance,400);window.GABARITO_ENEM_DOCUMENT={version:VERSION,enhance}}
+function activeReaderOrIframe(){if($('#v27OfficialRunner .v27-paper iframe,#v28Runner .v28-paper iframe'))return true;for(const state of readers.values())if(state.host.isConnected)return true;return false}
+function schedule(){if(!activeReaderOrIframe())return;clearTimeout(timer);timer=setTimeout(enhance,40)}
+function boot(){
+ const root=$('#page-mocks')||document.body;new MutationObserver(schedule).observe(root,{subtree:true,childList:true});
+ window.addEventListener('resize',()=>{if(activeReaderOrIframe())schedule()},{passive:true});
+ setTimeout(enhance,400);window.GABARITO_ENEM_DOCUMENT={version:VERSION,enhance}
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();

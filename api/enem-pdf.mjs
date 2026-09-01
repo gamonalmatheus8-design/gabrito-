@@ -28,7 +28,7 @@ function candidates(url){
 }
 async function requestPdf(target,headers){
  const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),8000);
+ const timeout=setTimeout(()=>controller.abort(),12000);
  try{return await fetch(target,{headers,redirect:'follow',signal:controller.signal})}
  finally{clearTimeout(timeout)}
 }

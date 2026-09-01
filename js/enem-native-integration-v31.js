@@ -11,20 +11,23 @@ function session(){return parse(localStorage.getItem(SESSION_KEY),null)}
 function persist(s){localStorage.setItem(SESSION_KEY,JSON.stringify(s))}
 function native(){return window.GABARITO_ENEM_NATIVE}
 function signature(s){return s?[s.year,s.day,s.language||'',s.current,JSON.stringify(s.answers||{}),JSON.stringify(s.marked||[])].join('|'):''}
+function refreshMobile(){window.GABARITO_ENEM_MOBILE?.enhance?.()}
 function clickQuestion(q){const b=$(`#v27Sheet [data-q="${Number(q)}"]`);if(!b)return false;b.click();return true}
 function choose(q,letter){
  const s=session();if(!s)return;
  if(Number(s.current)!==Number(q))clickQuestion(q);
  const b=$(`#v27Sheet [data-letter="${String(letter)}"]`);if(b)b.click();
- schedule();
+ lastSignature='';enhance();refreshMobile();schedule();
 }
-function navigate(q){if(clickQuestion(q))schedule()}
+function navigate(q){
+ if(!clickQuestion(q))return;
+ lastSignature='';enhance();refreshMobile();schedule();
+}
 function toggleReview(q){
  const s=session();if(!s)return;
  const current=new Set((s.marked||[]).map(Number)),n=Number(q);
  current.has(n)?current.delete(n):current.add(n);
- s.marked=Array.from(current).sort((a,b)=>a-b);persist(s);lastSignature='';schedule();
- window.GABARITO_ENEM_MOBILE?.enhance?.();
+ s.marked=Array.from(current).sort((a,b)=>a-b);persist(s);lastSignature='';enhance();refreshMobile();schedule();
 }
 function decorateMarked(s){
  const marks=new Set((s?.marked||[]).map(Number));

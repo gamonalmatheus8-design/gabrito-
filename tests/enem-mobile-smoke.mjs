@@ -48,8 +48,9 @@ try{
  const official=await officialContext.newPage(),officialErrors=[];official.on('pageerror',e=>officialErrors.push(e.message));
  await official.route('https://riep.inep.gov.br/**',route=>route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>INEP mock</title>'}));
  await ready(official);
- await official.waitForSelector('#v27OfficialBlock [data-v27-start="1"]',{timeout:5000});
- await official.locator('#v27OfficialBlock [data-v27-start="1"]').click();
+ await official.waitForSelector('#v28HistoryLibrary',{timeout:5000});
+ await official.locator('#v28Lang2025').selectOption('Inglês');
+ await official.locator('#v28HistoryLibrary [data-v28-year="2025"][data-v28-day="1"]').click();
  await official.waitForSelector('#v27OfficialRunner',{timeout:5000});
  await official.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
  assert.equal(await official.locator('#v27OfficialRunner .v27-sheet').evaluate(el=>getComputedStyle(el).display),'none');

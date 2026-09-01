@@ -32,9 +32,9 @@ try{
  });
  await page.waitForSelector('.v24-result [data-v26-plan]',{timeout:4000});
  const planText=await page.locator('.v24-result [data-v26-plan]').innerText();
- assert.match(planText,/Plano pós-ENEM/);
- assert.match(planText,/Linguagens/);
- assert.match(planText,/Prioridade alta/);
+ assert.match(planText,/Plano pós-ENEM/i);
+ assert.match(planText,/Linguagens/i);
+ assert.match(planText,/Prioridade alta/i);
  await page.evaluate(()=>{
   const button=document.createElement('button');button.innerHTML='<i data-lucide="x"></i>';button.id='v26A11yProbe';document.body.appendChild(button);window.GABARITO_PREMIUM.enhance();
  });

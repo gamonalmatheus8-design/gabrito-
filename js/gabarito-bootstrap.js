@@ -28,7 +28,9 @@ async function boot(){try{
  await loadScript('js/v6-release.js',5000);
  try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}
  try{await loadStyle('assets/enem-simulator-v24.css');await loadScript('js/enem-simulator-v24.js',5000)}catch(e){console.warn('[Gabarito+] Simulador ENEM indisponível:',e.message)}
+ try{await loadScript('data/enem-official-native-v31.js',2500);await loadStyle('assets/enem-native-v31.css');await loadScript('js/enem-native-v31.js',3500)}catch(e){console.warn('[Gabarito+] Runner nativo do ENEM indisponível:',e.message)}
  try{await loadStyle('assets/enem-official-v27.css');await loadScript('js/enem-official-v27.js',5000)}catch(e){console.warn('[Gabarito+] ENEM oficial indisponível:',e.message)}
+ try{await loadScript('js/enem-native-integration-v31.js',3500)}catch(e){console.warn('[Gabarito+] Integração nativa do ENEM indisponível:',e.message)}
  try{await loadScript('data/enem-official-catalog-v28.js',3500);await loadStyle('assets/enem-history-v28.css');await loadScript('js/enem-history-v28.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do ENEM indisponível:',e.message)}
  try{await loadStyle('assets/pism-simulator-v25.css');await loadScript('js/pism-simulator-v25.js',5000)}catch(e){console.warn('[Gabarito+] Simulador PISM indisponível:',e.message)}
  try{await loadScript('data/pism-official-catalog-v29.js',3500);await loadStyle('assets/pism-history-v29.css');await loadScript('js/pism-history-v29.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do PISM indisponível:',e.message)}
@@ -42,4 +44,3 @@ async function boot(){try{
 }catch(e){console.error('[Gabarito+] Falha de inicialização:',e);window.GABARITO_APP.bootError=e.message;show('Falha ao iniciar. Recarregue a página.')}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
-

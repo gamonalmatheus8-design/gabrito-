@@ -23,6 +23,8 @@ test('2.6 protege prova ativa, melhora acessibilidade e cria plano pós-prova',(
  assert.match(js,/Plano pós-PISM/);
  assert.match(js,/Treinar ponto mais fraco/);
  assert.match(js,/Salvo neste dispositivo/);
+ assert.match(js,/data-start-day/);
+ assert.match(js,/setTimeout\(enhance,180\)/);
 });
 
 test('acabamento premium cobre mobile, foco visível e movimento reduzido',()=>{

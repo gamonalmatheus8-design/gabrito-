@@ -21,6 +21,8 @@ try{
   assert.equal(await page.evaluate(()=>window.GABARITO_ARCHIVED_QUESTION_IDS?.length),71);
   await page.waitForFunction(()=>window.GABARITO_APP?.qualityLayer==='2.2.0',{timeout:7000});
   await page.waitForFunction(()=>window.GABARITO_APP?.enemSimulator==='2.4.0',{timeout:7000});
+  await page.waitForFunction(()=>window.GABARITO_APP?.pismSimulator==='2.5.0',{timeout:7000});
+  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.pismDiscursiveExpansion),'2.5.0');
   await dismissOnboarding();
   await page.evaluate(()=>window.go('questions'));
   await page.waitForSelector('#page-questions.active',{timeout:5000});
@@ -52,6 +54,32 @@ try{
   await page.locator('#v24EssayText').fill('Texto final de teste automatizado para validar a redação integrada ao Dia 1.');
   assert.match(await page.evaluate(()=>JSON.parse(localStorage.getItem('gplus_enem_exam_v24')).essay.final),/Texto final de teste automatizado/);
   await page.evaluate(()=>{localStorage.removeItem('gplus_enem_exam_v24');document.getElementById('page-mocks')?.classList.remove('enem-exam-active')});
+
+  // PISM I: 20 objetivas + 8 discursivas no mesmo caderno de 4 horas.
+  await page.waitForSelector('#v25PismHub [data-start="1"]',{timeout:5000});
+  await page.locator('#v25PismModule').selectOption('I');
+  await page.locator('#v25PismHub [data-start="1"]').click();
+  await page.waitForSelector('#page-mocks.pism-exam-active #v25PismRunner',{timeout:5000});
+  assert.equal(await page.locator('#v25PismRunner .v25p-palette button').count(),20);
+  assert.equal(await page.locator('#v25PismRunner .v25p-disc-palette button').count(),8);
+  assert.deepEqual(await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('gplus_pism_exam_v25'));const qs=s.objectiveIds.map(id=>QUESTIONS.find(q=>String(q.id)===String(id)));return [s.module,s.day,s.deadline-s.startedAt,s.discursives.length,['Português','Geografia','Matemática','Química'].every(sub=>qs.filter(q=>q.subject===sub).length===5)]}),['I',1,14400000,8,true]);
+  await page.locator('#v25PismRunner .v25p-option').first().click();
+  await page.locator('#v25PismRunner [data-discursive]').click();
+  await page.waitForSelector('#v25PismDiscAnswer',{timeout:5000});
+  await page.locator('#v25PismDiscAnswer').fill('Resposta discursiva automatizada do PISM I.');
+  assert.match(await page.evaluate(()=>JSON.stringify(JSON.parse(localStorage.getItem('gplus_pism_exam_v25')).discursiveAnswers)),/Resposta discursiva automatizada/);
+  await page.evaluate(()=>{localStorage.removeItem('gplus_pism_exam_v25');document.getElementById('page-mocks')?.classList.remove('pism-exam-active');window.go('mocks')});
+
+  // PISM III Exatas: 20 objetivas + 10 discursivas específicas da área.
+  await page.waitForSelector('#v25PismHub [data-start="2"]',{timeout:5000});
+  await page.locator('#v25PismModule').selectOption('III');
+  await page.locator('#v25PismArea').selectOption({label:'Exatas'});
+  await page.locator('#v25PismHub [data-start="2"]').click();
+  await page.waitForSelector('#page-mocks.pism-exam-active #v25PismRunner',{timeout:5000});
+  assert.equal(await page.locator('#v25PismRunner .v25p-palette button').count(),20);
+  assert.equal(await page.locator('#v25PismRunner .v25p-disc-palette button').count(),10);
+  assert.deepEqual(await page.evaluate(()=>{const s=JSON.parse(localStorage.getItem('gplus_pism_exam_v25'));const qs=s.objectiveIds.map(id=>QUESTIONS.find(q=>String(q.id)===String(id)));const ds=s.discursives;return [s.module,s.day,s.area,['Física','Química','Geografia','História'].every(sub=>qs.filter(q=>q.subject===sub).length===5),ds.filter(d=>d.subject==='Física').length,ds.filter(d=>d.subject==='Química').length]}),['III',2,'Exatas',true,5,5]);
+  await page.evaluate(()=>{localStorage.removeItem('gplus_pism_exam_v25');document.getElementById('page-mocks')?.classList.remove('pism-exam-active')});
 
   await page.goto(base+'/landing-clean.html',{waitUntil:'domcontentloaded',timeout:10000});
   assert.match(await page.title(),/ENEM e PISM/);

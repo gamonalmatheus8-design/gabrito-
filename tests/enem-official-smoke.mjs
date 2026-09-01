@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 const base=process.env.BASE_URL||'http://127.0.0.1:3090';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
 try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
@@ -10,7 +10,7 @@ try{
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>window.go('mocks'));
@@ -35,3 +35,4 @@ try{
  assert.deepEqual(keys,{en:'A',es:'D',ann:null});
  if(pageErrors.length)throw new Error('Erros no navegador: '+pageErrors.join(' | '));
 }finally{await browser.close()}
+

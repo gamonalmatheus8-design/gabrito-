@@ -1,0 +1,42 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+const base=process.env.BASE_URL||'http://127.0.0.1:3090';
+const browser=await chromium.launch({headless:true});
+try{
+ const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.route('**/api/pism-official**',async route=>{const u=new URL(route.request().url()),kind=u.searchParams.get('kind'),source='https://www2.ufjf.br/copese/pism/mock-source/';await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(kind==='key'?{url:'https://www2.ufjf.br/copese/pism/mock-key.pdf',source}:{url:'https://www2.ufjf.br/copese/pism/mock-exam.pdf',source,legacySplit:false})})});
+ await page.route('https://www2.ufjf.br/**',route=>route.abort());
+ await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.pismHistory==='2.9.0',{timeout:7000});
+ try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
+ if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
+ await page.evaluate(()=>window.go('mocks'));
+ await page.waitForSelector('#v29PismOfficialHub',{timeout:5000});
+ assert.equal(await page.locator('#v29PismOfficialHub .v29-year-card').count(),10);
+ assert.match(await page.locator('#v29PismOfficialHub').innerText(),/PISM 2017–2026/i);
+ assert.match(await page.locator('#v25PismHub .v25p-head').innerText(),/TREINO AUTORAL/i);
+ await page.locator('#v29PismModule').selectOption('III');
+ await page.locator('#v29PismArea').selectOption({label:'Exatas'});
+ await page.locator('[data-v29-year="2024"][data-v29-day="1"]').click();
+ await page.waitForSelector('#v29PismOfficialRunner iframe',{timeout:5000});
+ assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/PISM 2024 · Módulo III · 1º dia/i);
+ assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/Exatas/i);
+ assert.equal(await page.locator('#v29Sheet [data-v29-q]').count(),20);
+ assert.equal(await page.locator('#v29Sheet [data-v29-letter]').count(),5);
+ await page.locator('#v29Sheet [data-v29-letter="A"]').click();
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_pism_official_session_v29')||'{}').answers?.['1']==='A',{timeout:3000});
+ page.once('dialog',d=>d.accept());
+ await page.locator('#v29Sheet [data-v29-finish]').click();
+ await page.waitForSelector('#v29ScoreForm',{timeout:5000});
+ await page.waitForSelector('#v29KeySlot a',{timeout:3000});
+ assert.match(await page.locator('#v29KeySlot a').first().getAttribute('href'),/mock-key\.pdf/);
+ await page.locator('#v29ScoreForm input[name="objective"]').fill('14');
+ await page.locator('#v29ScoreForm input[name="total"]').fill('49.5');
+ await page.locator('#v29ScoreForm button[type="submit"]').click();
+ await page.waitForSelector('#v29PismOfficialHub',{state:'visible',timeout:5000});
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('gplus_pism_official_history_v29')||'[]')[0]);
+ assert.equal(saved.year,2024);assert.equal(saved.module,'III');assert.equal(saved.area,'Exatas');assert.equal(saved.objectiveCorrect,14);assert.equal(saved.officialTotal,49.5);
+ if(errors.length)throw new Error('Erros no navegador: '+errors.join(' | '));
+}finally{await browser.close()}

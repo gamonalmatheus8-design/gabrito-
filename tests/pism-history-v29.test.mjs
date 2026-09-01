@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import {fileURLToPath} from 'node:url';
+import {resolveLinksFromHtml,sourceFor} from '../api/pism-official.mjs';
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const read=p=>fs.readFileSync(path.join(root,p),'utf8');
+function loadCatalog(){const ctx={window:{}};vm.createContext(ctx);vm.runInContext(read('data/pism-official-catalog-v29.js'),ctx);return ctx.window.GABARITO_PISM_CATALOG}
+
+test('catálogo oficial cobre as dez edições 2017–2026 e 60 dias canônicos',()=>{const c=loadCatalog();assert.deepEqual(Array.from(c.years,x=>x.year),[2017,2018,2019,2020,2021,2022,2023,2024,2025,2026]);assert.deepEqual(Array.from(c.modules),['I','II','III']);assert.deepEqual(Array.from(c.areas),['Economia e Administração','Exatas','Humanas','Saúde']);assert.equal(c.totalCanonicalDays,60);for(const y of c.years)for(const day of [1,2]){assert.match(y.days[day].source,/^https:\/\/www2\.ufjf\.br\/copese\//);assert.equal(y.days[day].minutes,240)}});
+
+test('resolvedor separa caderno, módulo, área e gabarito sem vazar outro módulo',()=>{const source='https://www2.ufjf.br/copese/pism/teste/';const html=`<a href="m1.pdf">Caderno de Provas do 1º Dia – Módulo I</a><a href="m2.pdf">Caderno de Provas do 1º Dia – Módulo II</a><a href="m3-exatas.pdf">Caderno de Provas do 1º Dia – Módulo III – EXATAS</a><a href="m3-saude.pdf">Caderno de Provas do 1º Dia – Módulo III – SAÚDE</a><a href="g1.pdf">Gabarito das Provas do 1º Dia – Módulo I – Após Recurso</a><a href="g3.pdf">Gabarito das Provas do 1º Dia – Módulo III – retificado</a>`;const one=resolveLinksFromHtml(html,{source,year:2026,module:'I',day:1,area:null});assert.equal(one.exam,'https://www2.ufjf.br/copese/pism/teste/m1.pdf');assert.equal(one.answerKey,'https://www2.ufjf.br/copese/pism/teste/g1.pdf');const three=resolveLinksFromHtml(html,{source,year:2026,module:'III',day:1,area:'Exatas'});assert.equal(three.exam,'https://www2.ufjf.br/copese/pism/teste/m3-exatas.pdf');assert.equal(three.answerKey,'https://www2.ufjf.br/copese/pism/teste/g3.pdf')});
+
+test('resolvedor preserva formato antigo com prova objetiva separada',()=>{const source=sourceFor(2017,1);const html=`<a href="obj.pdf">Provas Objetivas – PISM – 1º Dia – Módulo I</a><a href="obj2.pdf">Provas Objetivas – PISM – 2º Dia – Módulo I</a><a href="gab.pdf">Gabaritos das Provas do 1º Dia – PISM – Módulo I</a>`;const x=resolveLinksFromHtml(html,{source,year:2017,module:'I',day:1,area:null});assert.match(x.exam,/obj\.pdf$/);assert.match(x.answerKey,/gab\.pdf$/);assert.equal(x.legacySplit,true)});
+
+test('motor PISM oficial esconde gabarito durante a sessão e registra evolução objetiva',()=>{const s=read('js/pism-history-v29.js'),boot=read('js/gabarito-bootstrap.js');assert.match(s,/gplus_pism_official_session_v29/);assert.match(s,/status='awaiting-score'/);assert.match(s,/resolveOfficial\('key'/);assert.match(s,/objectiveCorrect/);assert.match(s,/60/);assert.match(s,/TREINO AUTORAL · ESTRUTURA PISM 2027/);assert.match(boot,/data\/pism-official-catalog-v29\.js/);assert.match(boot,/assets\/pism-history-v29\.css/);assert.match(boot,/js\/pism-history-v29\.js/)});
+
+test('paleta 2.9 mantém ENEM e PISM distintos em claro e escuro',()=>{const css=read('assets/theme-v29.css'),js=read('js/theme-v29.js'),boot=read('js/gabarito-bootstrap.js');assert.match(css,/--primary:#4b59cf/);assert.match(css,/--pism:#0b8875/);assert.match(css,/body\.dark/);assert.match(css,/--primary:#9b96ff/);assert.match(css,/--pism:#63d3c0/);assert.match(js,/#0e121b/);assert.match(js,/#f6f7fb/);assert.match(boot,/assets\/theme-v29\.css/);assert.match(boot,/js\/theme-v29\.js/)});

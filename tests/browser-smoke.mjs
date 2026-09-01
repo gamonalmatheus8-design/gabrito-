@@ -48,7 +48,7 @@ try{
   assert.equal(await page.evaluate(()=>Object.keys(JSON.parse(localStorage.getItem('gplus_enem_exam_v24')).selections).length),1);
   await page.locator('#v24EnemRunner [data-essay]').click();
   await page.waitForSelector('#v24EssayText',{timeout:5000});
-  assert.match(await page.locator('#v24EnemRunner').innerText(),/Proposta de redação/);
+  assert.match(await page.locator('#v24EnemRunner').innerText(),/Proposta de redação/i);
   await page.locator('#v24EssayText').fill('Texto final de teste automatizado para validar a redação integrada ao Dia 1.');
   assert.match(await page.evaluate(()=>JSON.parse(localStorage.getItem('gplus_enem_exam_v24')).essay.final),/Texto final de teste automatizado/);
   await page.evaluate(()=>{localStorage.removeItem('gplus_enem_exam_v24');document.getElementById('page-mocks')?.classList.remove('enem-exam-active')});

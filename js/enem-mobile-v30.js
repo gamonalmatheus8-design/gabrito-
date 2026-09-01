@@ -76,19 +76,19 @@ function goQuestion(kind,q){
 }
 function chooseOfficial(letter){
  const button=$(`#v27Sheet [data-letter="${letter}"]`);if(button)button.click();
- setTimeout(enhance,30);
+ enhance();
 }
 function previous(kind){
  const s=state(kind);if(!s)return;
  if(kind==='authorial'){trigger('[data-prev]',kind);setTimeout(()=>afterNav(kind),20);return}
- const q=Math.max(s.day===1?1:91,Number(s.current)-1);const button=$(`#v27Sheet [data-q="${q}"]`);button?.click();setTimeout(enhance,30);
+ const q=Math.max(s.day===1?1:91,Number(s.current)-1);const button=$(`#v27Sheet [data-q="${q}"]`);button?.click();enhance();
 }
 function next(kind){
  const s=state(kind);if(!s)return;
  if(kind==='authorial'){trigger('[data-next]',kind);setTimeout(()=>afterNav(kind),20);return}
- const q=Math.min(s.day===1?90:180,Number(s.current)+1);const button=$(`#v27Sheet [data-q="${q}"]`);button?.click();setTimeout(enhance,30);
+ const q=Math.min(s.day===1?90:180,Number(s.current)+1);const button=$(`#v27Sheet [data-q="${q}"]`);button?.click();enhance();
 }
-function toggleMark(){trigger('[data-mark]','authorial');setTimeout(enhance,30)}
+function toggleMark(){trigger('[data-mark]','authorial');enhance()}
 function openPanel(){
  const kind=mode(),s=state(kind);if(!kind||!s)return;
  lastFocus=document.activeElement;
@@ -129,8 +129,8 @@ function renderPanel(kind,s){
  $('[data-v30-close]',panel)?.addEventListener('click',closePanel);
  $$('[data-v30-range]',panel).forEach(b=>b.addEventListener('click',()=>{range=Number(b.dataset.v30Range);renderPanel(kind,state(kind)||s)}));
  $$('[data-v30-q]',panel).forEach(b=>b.addEventListener('click',()=>goQuestion(kind,Number(b.dataset.v30Q))));
- $$('[data-v30-letter]',panel).forEach(b=>b.addEventListener('click',()=>{chooseOfficial(b.dataset.v30Letter);setTimeout(()=>{const fresh=state(kind);if(fresh)renderPanel(kind,fresh)},40)}));
- $('[data-v30-mark]',panel)?.addEventListener('click',()=>{toggleMark();setTimeout(()=>{const fresh=state(kind);if(fresh)renderPanel(kind,fresh)},50)});
+ $$('[data-v30-letter]',panel).forEach(b=>b.addEventListener('click',()=>chooseOfficial(b.dataset.v30Letter)));
+ $('[data-v30-mark]',panel)?.addEventListener('click',()=>{toggleMark();const fresh=state(kind);if(fresh)renderPanel(kind,fresh)});
  $('[data-v30-essay]',panel)?.addEventListener('click',()=>{closePanel();trigger('[data-essay]','authorial')});
  $('[data-v30-exit]',panel)?.addEventListener('click',()=>{closePanel();trigger(kind==='official'?'[data-v27-exit]':'[data-exit]',kind)});
  $('[data-v30-finish]',panel)?.addEventListener('click',()=>{closePanel();trigger(kind==='official'?'[data-v27-finish]':'[data-finish]',kind)});

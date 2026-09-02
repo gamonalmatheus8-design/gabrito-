@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='3.2.1';
+const VERSION='3.2.2';
 const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
 const WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 const V27_KEY='gplus_enem_official_v27';
@@ -58,8 +58,11 @@ async function renderPage(state,pageNumber){
 }
 async function syncQuestion(state){
  const q=current(state.kind),label=$('.v32-question-label',state.host);if(label)label.textContent=`Questão ${q}`;
+ if(q!==state.lastQuestion){state.lastQuestion=q;state.followQuestion=true}
+ if(!state.followQuestion)return;
  const target=state.qmap?.get(q);if(target&&target!==state.page)await renderPage(state,target);
 }
+function browsePage(state,offset){state.followQuestion=false;return renderPage(state,state.page+offset)}
 function showFriendlyFailure(state){
  const loading=$('.v32-loading',state.host),label=$('.v32-page-label',state.host);
  if(label)label.textContent='Tente novamente';
@@ -74,8 +77,8 @@ async function mount(iframe,kind){
  const paper=iframe.closest(kind==='v27'?'.v27-paper':'.v28-paper');if(!paper)return;
  if(readers.has(paper)){await syncQuestion(readers.get(paper));return}
  const holder=document.createElement('div');holder.innerHTML=readerMarkup(source);const host=holder.firstElementChild;iframe.replaceWith(host);paper.classList.add('v32-native-document');
- const state={host,paper,kind,source,doc:null,page:1,qmap:null,task:null};readers.set(paper,state);
- $('[data-v32-prev]',host)?.addEventListener('click',()=>renderPage(state,state.page-1));$('[data-v32-next]',host)?.addEventListener('click',()=>renderPage(state,state.page+1));
+ const state={host,paper,kind,source,doc:null,page:1,qmap:null,task:null,lastQuestion:current(kind),followQuestion:true};readers.set(paper,state);
+ $('[data-v32-prev]',host)?.addEventListener('click',()=>browsePage(state,-1));$('[data-v32-next]',host)?.addEventListener('click',()=>browsePage(state,1));
  try{
   const pdfjs=await loadPdfJs(),task=pdfjs.getDocument({url:proxy(source),withCredentials:false,disableRange:true,disableStream:true,disableAutoFetch:true});state.doc=await task.promise;
   await renderPage(state,1);syncQuestion(state);

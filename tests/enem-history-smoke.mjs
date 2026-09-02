@@ -7,12 +7,12 @@ try{
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.1',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.2',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:800});if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click()}catch{}
  await page.evaluate(()=>{
   window.pdfjsLib={
    GlobalWorkerOptions:{workerSrc:''},
-   getDocument(){return{promise:Promise.resolve({numPages:32,async getPage(n){return{getViewport:({scale})=>({width:760*scale,height:1080*scale}),getTextContent:async()=>({items:n===2?[{str:'QUESTÃO 1'}]:[]}),render:()=>({promise:Promise.resolve(),cancel(){}})}}})}}
+   getDocument(){return{promise:Promise.resolve({numPages:32,async getPage(n){return{getViewport:({scale})=>({width:760*scale,height:1080*scale}),getTextContent:async()=>({items:n===2?[{str:'QUESTÃO 1'}]:n===4?[{str:'QUESTÃO 2'}]:[]}),render:()=>({promise:Promise.resolve(),cancel(){}})}}})}}
   };
   window.go('mocks');
  });
@@ -27,10 +27,15 @@ try{
  assert.match(await page.locator('#v28Runner').innerText(),/ENEM 2024 · Dia 1/);
  assert.match(await page.locator('#v28Runner .v32-reader').innerText(),/LEITOR GABARITO\+/i);
  await page.waitForFunction(()=>document.querySelector('#v28Runner .v32-page-label')?.textContent?.includes('Página 2'),{timeout:4000});
+ await page.locator('#v28Runner [data-v32-next]').click();
+ await page.waitForTimeout(250);
+ assert.match(await page.locator('#v28Runner .v32-page-label').innerText(),/Página 3/);
+ await page.evaluate(async()=>{const k='gplus_enem_history_exam_v28',s=JSON.parse(localStorage.getItem(k));s.current=2;localStorage.setItem(k,JSON.stringify(s));await window.GABARITO_ENEM_DOCUMENT.enhance()});
+ await page.waitForFunction(()=>document.querySelector('#v28Runner .v32-page-label')?.textContent?.includes('Página 4'),{timeout:4000});
  assert.equal(await page.locator('#v28Runner').getByText('Abrir gabarito oficial').count(),0);
  assert.equal(await page.locator('#v28Sheet').isVisible(),false);
  await page.locator('#v30EnemDock [data-v30-letter="A"]').click();
- const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('gplus_enem_history_exam_v28')));assert.equal(stored.answers['1'],'A');assert.equal(stored.year,2024);
+ const stored=await page.evaluate(()=>JSON.parse(localStorage.getItem('gplus_enem_history_exam_v28')));assert.equal(stored.answers['2'],'A');assert.equal(stored.year,2024);
  await page.evaluate(()=>{const k='gplus_enem_history_exam_v28',s=JSON.parse(localStorage.getItem(k));s.status='awaiting-score';s.deliveredAt=Date.now();localStorage.setItem(k,JSON.stringify(s));window.GABARITO_ENEM_HISTORY.resume()});
  await page.waitForSelector('#v28ScoreForm',{timeout:4000});
  const keyHref=await page.locator('a').filter({hasText:'Abrir gabarito oficial'}).getAttribute('href');assert.match(keyHref,/2024_GB_impresso_D1_CD2\.pdf$/);

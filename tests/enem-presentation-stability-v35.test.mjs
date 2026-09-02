@@ -9,11 +9,12 @@ const reader=fs.readFileSync(path.join(root,'js/enem-document-v32.js'),'utf8');
 const api=fs.readFileSync(path.join(root,'api/enem-pdf.mjs'),'utf8');
 
 test('leitor da apresentação evita requisições range e streaming do PDF.js',()=>{
- assert.match(reader,/VERSION='3\.2\.1'/);
+ assert.match(reader,/VERSION='3\.2\.2'/);
  assert.match(reader,/disableRange:true/);
  assert.match(reader,/disableStream:true/);
  assert.match(reader,/disableAutoFetch:true/);
  assert.match(api,/response\.arrayBuffer\(\)/);
+ assert.match(api,/Readable\.fromWeb\(response\.body\)/);
 });
 
 test('falha externa não expõe mensagem técnica ao usuário',()=>{

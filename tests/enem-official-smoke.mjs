@@ -10,7 +10,7 @@ try{
  await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.1',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.2',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>{

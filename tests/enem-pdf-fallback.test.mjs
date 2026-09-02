@@ -25,6 +25,7 @@ test('proxy mantém timeout, limite de tamanho e não vira proxy aberto',()=>{
  assert.match(api,/ALLOWED_HOSTS/);
  assert.match(api,/url\.protocol!==['"]https:['"]/);
  assert.match(api,/setTimeout\(\(\)=>controller\.abort\(\),20000\)/);
+ assert.match(api,/SOURCE_ATTEMPTS=2/);
  assert.match(api,/MAX_PDF_BYTES/);
  assert.match(api,/looksLikePdf/);
 });

@@ -37,6 +37,7 @@ const RIEP_FIRST=new Map([
  ['https://download.inep.gov.br/educacao_basica/enem/provas/2016/2016_PV_impresso_D2_CD5.pdf','https://riep.inep.gov.br/bitstreams/b2b444d8-dd24-4e19-89b6-7c629e4c40ff/download'],
  ['https://download.inep.gov.br/educacao_basica/enem/gabaritos/2016/GAB_ENEM_2016_DIA_2_05_AMARELO.pdf','https://riep.inep.gov.br/bitstreams/ea4f9461-71cb-4dbf-b5e8-a68d6e7e102b/download']
 ]);
+const SOURCE_ATTEMPTS=2;
 
 function parseSource(request){
  const raw=new URL(request.url).searchParams.get('url');
@@ -54,7 +55,16 @@ async function fetchPdf(target,request){
  });
  const range=request.headers.get('range');
  if(range)headers.set('range',range);
- return fetch(target,{headers,redirect:'follow'});
+ let lastError=null;
+ for(let attempt=1;attempt<=SOURCE_ATTEMPTS;attempt++){
+  try{
+   const response=await fetch(target,{headers,redirect:'follow'});
+   if(response.ok||response.status===206||(response.status<500&&response.status!==429)||attempt===SOURCE_ATTEMPTS)return response;
+   lastError=new Error(`Origem respondeu ${response.status}`);
+   try{await response.body?.cancel()}catch{}
+  }catch(error){lastError=error;if(attempt===SOURCE_ATTEMPTS)throw error}
+ }
+ throw lastError||new Error('Origem indisponível.');
 }
 
 export async function onRequestGet({request}){

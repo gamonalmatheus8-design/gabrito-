@@ -37,3 +37,15 @@ test('arquivo histórico pequeno continua validado antes da entrega',async()=>{
   assert.equal(res.body().toString(),pdf.toString());
  }finally{globalThis.fetch=originalFetch}
 });
+
+test('falha momentânea do Inep é repetida sem interromper o aluno',async()=>{
+ const originalFetch=globalThis.fetch,calls=[];
+ globalThis.fetch=async url=>{calls.push(String(url));if(calls.length===1)throw new TypeError('conexão encerrada');return new Response(pdf,{status:200,headers:{'content-type':'application/pdf','content-length':String(pdf.length)}})};
+ try{
+  const res=new MockResponse();
+  await handler({query:{url:'https://download.inep.gov.br/enem/provas_e_gabaritos/2024_PV_impresso_D1_CD2.pdf'}},res);
+  assert.equal(calls.length,2);
+  assert.equal(res.statusCode,200);
+  assert.equal(res.body().toString(),pdf.toString());
+ }finally{globalThis.fetch=originalFetch}
+});

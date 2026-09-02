@@ -41,6 +41,7 @@ const RIEP_FALLBACKS=new Map([
 ]);
 const MAX_PDF_BYTES=40*1024*1024;
 const STREAM_PDF_BYTES=4*1024*1024;
+const SOURCE_ATTEMPTS=2;
 
 function validSource(raw){
  try{
@@ -55,18 +56,26 @@ function candidates(url){
  return riep?[riep,primary]:[primary];
 }
 async function requestPdf(target){
- const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),20000);
- try{
-  return await fetch(target,{
-   redirect:'follow',
-   signal:controller.signal,
-   headers:{
-    'user-agent':'Mozilla/5.0 (compatible; GabaritoPlus/Presentation; +https://gabarito-mais.vercel.app/)',
-    'accept':'application/pdf,application/octet-stream;q=0.9,*/*;q=0.5'
-   }
-  });
- }finally{clearTimeout(timeout)}
+ let lastError=null;
+ for(let attempt=1;attempt<=SOURCE_ATTEMPTS;attempt++){
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),20000);
+  try{
+   const response=await fetch(target,{
+    redirect:'follow',
+    signal:controller.signal,
+    headers:{
+     'user-agent':'Mozilla/5.0 (compatible; GabaritoPlus/Presentation; +https://gabarito-mais.vercel.app/)',
+     'accept':'application/pdf,application/octet-stream;q=0.9,*/*;q=0.5'
+    }
+   });
+   if(response.ok||(response.status<500&&response.status!==429)||attempt===SOURCE_ATTEMPTS)return response;
+   lastError=new Error(`Origem respondeu ${response.status}`);
+   try{await response.body?.cancel()}catch{}
+  }catch(error){lastError=error;if(attempt===SOURCE_ATTEMPTS)throw error}
+  finally{clearTimeout(timeout)}
+ }
+ throw lastError||new Error('Origem indisponível.');
 }
 function looksLikePdf(bytes){
  return bytes.length>=5&&bytes[0]===0x25&&bytes[1]===0x50&&bytes[2]===0x44&&bytes[3]===0x46&&bytes[4]===0x2d;

@@ -8,6 +8,20 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .v24-day-card h3,.v25p-day-card h3{letter-spacing:-.025em}
 .v24-enem-hub,.v25p-hub{scroll-margin-top:90px}
 
+/* Simulados: mantém as bibliotecas/provas oficiais e retira da interface os treinos autorais antigos. */
+#page-mocks .header-row:has(#discModule),
+#page-mocks #discursiveList,
+#v24EnemHub > .v24-enem-head,
+#v24EnemHub > .v24-day-grid,
+#v24EnemHub > .v24-features,
+#v24EnemHub > .v24-resume,
+#v24EnemHub > .v24-history,
+#v25PismHub > .v25p-head,
+#v25PismHub > .v25p-resume,
+#v25PismHub > .v25p-day-grid,
+#v25PismHub > .v25p-features,
+#v25PismHub > .v25p-history{display:none!important}
+
 .v26-exam-focus{background:var(--bg)}
 .v26-exam-focus #page-mocks{max-width:1480px;margin-inline:auto}
 .v26-exam-focus .v24-runner,.v26-exam-focus .v25p-runner{border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.08)}

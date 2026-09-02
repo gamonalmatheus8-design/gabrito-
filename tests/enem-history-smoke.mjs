@@ -7,7 +7,7 @@ try{
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.2.1',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:800});if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click()}catch{}
  await page.evaluate(()=>{
   window.pdfjsLib={

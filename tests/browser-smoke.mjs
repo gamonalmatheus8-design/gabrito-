@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 const base=process.env.BASE_URL||'http://127.0.0.1:3090';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
 try{
   const page=await browser.newPage();
   const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));

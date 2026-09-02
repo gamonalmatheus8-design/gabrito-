@@ -9,6 +9,8 @@ test('Cloudflare Pages expõe proxy same-origin do ENEM',()=>{
  assert.match(fn,/export async function onRequestGet/);
  assert.match(fn,/RIEP_FIRST/);
  assert.match(fn,/71aaf57d-a5b7-4300-bd8b-fcf2ec490570/);
+ assert.match(fn,/6f6e6a08-9f0b-4365-9f52-a24c5e4ab2e7/);
+ assert.match(fn,/dcb0d85d-5da4-48ee-b49a-e34db65c9c8b/);
  assert.match(fn,/x-gabarito-pdf-source/);
  assert.doesNotMatch(fn,/res\.statusCode=307/);
 });

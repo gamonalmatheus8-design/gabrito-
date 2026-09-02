@@ -18,8 +18,18 @@ test('proxy ENEM aceita apenas hosts oficiais e possui fallback RIEP 2024',()=>{
  assert.match(api,/X-Gabarito-Pdf-Source/);
 });
 
-test('proxy mantém timeout e não vira proxy aberto',()=>{
+test('proxy mantém timeout, limite de tamanho e não vira proxy aberto',()=>{
  assert.match(api,/ALLOWED_HOSTS/);
  assert.match(api,/url\.protocol!==['"]https:['"]/);
- assert.match(api,/setTimeout\(\(\)=>controller\.abort\(\),12000\)/);
+ assert.match(api,/setTimeout\(\(\)=>controller\.abort\(\),20000\)/);
+ assert.match(api,/MAX_PDF_BYTES/);
+ assert.match(api,/looksLikePdf/);
+});
+
+test('proxy entrega PDF completo em resposta 200 sem streaming parcial',()=>{
+ assert.match(api,/response\.arrayBuffer\(\)/);
+ assert.match(api,/Content-Length/);
+ assert.match(api,/res\.statusCode=200/);
+ assert.doesNotMatch(api,/Readable\.fromWeb/);
+ assert.doesNotMatch(api,/headers\.range/);
 });

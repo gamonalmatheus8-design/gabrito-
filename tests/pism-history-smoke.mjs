@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 const base=process.env.BASE_URL||'http://127.0.0.1:3090';
-const browser=await chromium.launch({headless:true});
+const browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_EXECUTABLE_PATH?{executablePath:process.env.PLAYWRIGHT_EXECUTABLE_PATH}:{})});
 try{
  const context=await browser.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -10,6 +10,8 @@ try{
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  await page.waitForFunction(()=>window.GABARITO_APP?.pismHistory==='2.9.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_OFFICIAL_DOCUMENT?.version==='3.3.0',{timeout:7000});
+ await page.evaluate(()=>{window.pdfjsLib={GlobalWorkerOptions:{workerSrc:''},getDocument(){return{promise:Promise.resolve({numPages:24,async getPage(n){return{getViewport:({scale})=>({width:760*scale,height:1080*scale}),getTextContent:async()=>({items:n===2?[{str:'QUESTÃO 1'}]:n===4?[{str:'QUESTÃO 2'}]:[]}),render:()=>({promise:Promise.resolve(),cancel(){}})}}})}}}});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>window.go('mocks'));
@@ -20,13 +22,20 @@ try{
  await page.locator('#v29PismModule').selectOption('III');
  await page.locator('#v29PismArea').selectOption({label:'Exatas'});
  await page.locator('[data-v29-year="2024"][data-v29-day="1"]').click();
- await page.waitForSelector('#v29PismOfficialRunner iframe',{timeout:5000});
+ await page.waitForSelector('#v29PismOfficialRunner .v32-reader',{timeout:5000});
+ assert.equal(await page.locator('#v29PismOfficialRunner iframe').count(),0);
  assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/PISM 2024 · Módulo III · 1º dia/i);
  assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/Exatas/i);
  assert.equal(await page.locator('#v29Sheet [data-v29-q]').count(),20);
  assert.equal(await page.locator('#v29Sheet [data-v29-letter]').count(),5);
+ await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 2'),{timeout:4000});
+ await page.locator('#v29PismOfficialRunner [data-v32-next]').click();
+ await page.waitForTimeout(250);
+ assert.match(await page.locator('#v29PismOfficialRunner .v32-page-label').innerText(),/Página 3/);
+ await page.locator('#v29Sheet [data-v29-q="2"]').click();
+ await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 4'),{timeout:4000});
  await page.locator('#v29Sheet [data-v29-letter="A"]').click();
- await page.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_pism_official_session_v29')||'{}').answers?.['1']==='A',{timeout:3000});
+ await page.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_pism_official_session_v29')||'{}').answers?.['2']==='A',{timeout:3000});
  page.once('dialog',d=>d.accept());
  await page.locator('#v29Sheet [data-v29-finish]').click();
  await page.waitForSelector('#v29ScoreForm',{timeout:5000});

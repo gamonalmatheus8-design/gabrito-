@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='3.2.0';
+const VERSION='3.2.1';
 const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
 const WORKER='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 const V27_KEY='gplus_enem_official_v27';
@@ -60,6 +60,14 @@ async function syncQuestion(state){
  const q=current(state.kind),label=$('.v32-question-label',state.host);if(label)label.textContent=`Questão ${q}`;
  const target=state.qmap?.get(q);if(target&&target!==state.page)await renderPage(state,target);
 }
+function showFriendlyFailure(state){
+ const loading=$('.v32-loading',state.host),label=$('.v32-page-label',state.host);
+ if(label)label.textContent='Tente novamente';
+ if(!loading)return;
+ loading.removeAttribute('hidden');
+ loading.innerHTML=`<b>Caderno oficial temporariamente indisponível.</b><small>Seu cartão-resposta e seu progresso continuam salvos. Tente novamente ou abra a fonte oficial.</small><div class="v32-failure-actions"><button type="button" class="btn btn-primary" data-v32-retry>Tentar novamente</button><a class="btn btn-secondary" href="${state.source}" target="_blank" rel="noopener">Abrir no Inep</a></div>`;
+ $('[data-v32-retry]',loading)?.addEventListener('click',()=>window.location.reload());
+}
 async function mount(iframe,kind){
  if(structuredNativeReady(kind)){window.GABARITO_ENEM_NATIVE_INTEGRATION?.enhance?.();return}
  const source=findSource(iframe);if(!source)return;
@@ -69,11 +77,12 @@ async function mount(iframe,kind){
  const state={host,paper,kind,source,doc:null,page:1,qmap:null,task:null};readers.set(paper,state);
  $('[data-v32-prev]',host)?.addEventListener('click',()=>renderPage(state,state.page-1));$('[data-v32-next]',host)?.addEventListener('click',()=>renderPage(state,state.page+1));
  try{
-  const pdfjs=await loadPdfJs(),task=pdfjs.getDocument({url:proxy(source),withCredentials:false});state.doc=await task.promise;
+  const pdfjs=await loadPdfJs(),task=pdfjs.getDocument({url:proxy(source),withCredentials:false,disableRange:true,disableStream:true,disableAutoFetch:true});state.doc=await task.promise;
   await renderPage(state,1);syncQuestion(state);
   buildQuestionMap(state.doc).then(map=>{state.qmap=map;syncQuestion(state)});
  }catch(error){
-  const loading=$('.v32-loading',host);if(loading)loading.innerHTML=`<b>Não foi possível abrir o caderno aqui.</b><small>${String(error?.message||'Falha de carregamento.')}</small><a class="btn btn-secondary" href="${source}" target="_blank" rel="noopener">Abrir original do Inep</a>`;
+  console.warn('[Gabarito+] Caderno oficial não carregou:',error?.message||error);
+  showFriendlyFailure(state);
  }
 }
 async function enhance(){

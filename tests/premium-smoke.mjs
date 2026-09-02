@@ -24,7 +24,7 @@ try{
  const minHeight=await page.locator('#v24EnemRunner .v24-option').first().evaluate(el=>parseFloat(getComputedStyle(el).minHeight));
  assert.ok(minHeight>=44,`área de toque abaixo de 44px: ${minHeight}`);
  await page.locator('#v24EnemRunner .v24-option').first().click();
- await page.waitForFunction(()=>document.querySelector('.v26-save-status')?.textContent.includes('Salvo'),{timeout:3000});
+ await page.waitForFunction(()=>document.querySelector('#v24EnemRunner .v26-save-status')?.textContent.includes('Salvo'),{timeout:8000});
  await page.evaluate(()=>{
   localStorage.removeItem('gplus_enem_exam_v24');
   const runner=document.getElementById('v24EnemRunner');

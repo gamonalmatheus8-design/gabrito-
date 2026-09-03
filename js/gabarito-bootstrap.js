@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.1.0';
-const RECOVERY='20260902-cleanup1';
+const VERSION='3.2.0';
+const RECOVERY='20260902-lazy1';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 window.GABARITO_APP={configured,version:VERSION,bankSource:'starting',bankVersion:VERSION,cloudStatus:configured?'connecting':'not-configured',recovery:RECOVERY};
@@ -25,18 +25,12 @@ async function boot(){try{
  await loadScript('js/question-bank.js',5000);
  await loadScript('js/app.js',5000);
  await loadScript('js/official-simulators-host.js',2500);
+ await loadScript('js/lazy-simulators-v32.js',2500);
  await loadScript('js/gabarito-ui.js',5000);
  await loadScript('js/v6-release.js',5000);
  try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',5000)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}
- try{await loadScript('data/enem-official-native-v31.js',2500);await loadStyle('assets/enem-native-v31.css');await loadScript('js/enem-native-v31.js',3500)}catch(e){console.warn('[Gabarito+] Runner nativo do ENEM indisponível:',e.message)}
- try{await loadStyle('assets/enem-official-v27.css');await loadScript('js/enem-official-v27.js',5000)}catch(e){console.warn('[Gabarito+] ENEM oficial indisponível:',e.message)}
- try{await loadScript('js/enem-native-integration-v31.js',3500)}catch(e){console.warn('[Gabarito+] Integração nativa do ENEM indisponível:',e.message)}
- try{await loadScript('data/enem-official-catalog-v28.js',3500);await loadStyle('assets/enem-history-v28.css');await loadScript('js/enem-history-v28.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do ENEM indisponível:',e.message)}
- try{await loadStyle('assets/enem-document-v32.css');await loadScript('js/enem-document-v32.js',3500)}catch(e){console.warn('[Gabarito+] Leitor nativo do caderno oficial indisponível:',e.message)}
- try{await loadScript('data/pism-official-catalog-v29.js',3500);await loadStyle('assets/pism-history-v29.css');await loadScript('js/pism-history-v29.js',5000)}catch(e){console.warn('[Gabarito+] Biblioteca histórica do PISM indisponível:',e.message)}
  try{await loadStyle('assets/premium-v26.css')}catch(e){console.warn('[Gabarito+] Estilos de acessibilidade indisponíveis:',e.message)}
  try{await loadStyle('assets/theme-v29.css');await loadScript('js/theme-v29.js',3500)}catch(e){console.warn('[Gabarito+] Paleta visual 2.9 indisponível:',e.message)}
- try{await loadStyle('assets/enem-mobile-v30.css');await loadScript('js/enem-mobile-v30.js',3500)}catch(e){console.warn('[Gabarito+] Experiência ENEM mobile 3.0 indisponível:',e.message)}
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();
  window.GABARITO_APP.ready=true;
  setTimeout(loadQualityLayer,0);

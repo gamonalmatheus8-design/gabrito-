@@ -19,7 +19,7 @@ try{
  await page.waitForFunction(()=>window.GABARITO_APP?.simulatorsLazyReady===true,{timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
  await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:10000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.3.0',{timeout:10000});
  await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.3.0',{timeout:10000});
  await page.waitForSelector('#v28HistoryLibrary',{timeout:7000});
  assert.match(await page.locator('#v28HistoryLibrary').innerText(),/ENEM 2016–2025/i);

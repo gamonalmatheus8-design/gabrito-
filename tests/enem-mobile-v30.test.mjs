@@ -8,12 +8,13 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('camada ENEM mobile 3.0 existe, tem sintaxe válida e é carregada pelo boot',()=>{
- const js=read('js/enem-mobile-v30.js'),css=read('assets/enem-mobile-v30.css'),boot=read('js/gabarito-bootstrap.js');
+test('camada ENEM mobile existe, tem sintaxe válida e é carregada sob demanda',()=>{
+ const js=read('js/enem-mobile-v30.js'),css=read('assets/enem-mobile-v30.css'),lazy=read('js/lazy-simulators-v32.js'),boot=read('js/gabarito-bootstrap.js');
  assert.doesNotThrow(()=>new vm.Script(js,{filename:'js/enem-mobile-v30.js'}));
- assert.match(js,/const VERSION='3\.0\.1'/);
- assert.match(boot,/assets\/enem-mobile-v30\.css/);
- assert.match(boot,/js\/enem-mobile-v30\.js/);
+ assert.match(js,/const VERSION='3\.3\.0'/);
+ assert.match(lazy,/assets\/enem-mobile-v30\.css/);
+ assert.match(lazy,/js\/enem-mobile-v30\.js/);
+ assert.doesNotMatch(boot,/enem-mobile-v30/);
  assert.match(css,/@media\(max-width:900px\)/);
 });
 
@@ -53,14 +54,16 @@ test('biblioteca histórica 2016–2024 também ativa a experiência mobile 3.0'
  assert.match(css,/\.v28-paper/);
 });
 
-test('entrada pública e PWA usam cache-busting da release 3.0.1',()=>{
+test('entrada pública e PWA usam cache-busting da release 3.3.0',()=>{
  const html=read('index.html'),boot=read('js/gabarito-bootstrap.js'),sw=read('service-worker.js'),release=read('js/v6-release.js'),vercel=read('vercel.json');
- assert.match(html,/gabarito-bootstrap\.js\?v=3\.0\.1&r=20260901h/);
- assert.match(boot,/const VERSION='3\.0\.1'/);
- assert.match(boot,/const RECOVERY='20260901h'/);
- assert.match(sw,/gabarito-mais-3-0-1-app-shell/);
- assert.match(sw,/const V='3\.0\.1'/);
+ assert.match(html,/gabarito-bootstrap\.js\?v=3\.3\.0&r=20260903-perf1/);
+ assert.match(boot,/const VERSION='3\.3\.0'/);
+ assert.match(boot,/const RECOVERY='20260903-perf1'/);
+ assert.match(sw,/gabarito-mais-3-3-0-app-shell/);
+ assert.match(sw,/const V='3\.3\.0'/);
+ assert.match(sw,/const RECOVERY='20260903-perf1'/);
  assert.match(release,/service-worker\.js\?v=\$\{SW_VERSION\}&r=\$\{SW_RECOVERY\}/);
+ assert.match(release,/SW_VERSION='3\.3\.0',SW_RECOVERY='20260903-perf1'/);
  assert.match(vercel,/private, no-store, max-age=0, must-revalidate/);
 });
 

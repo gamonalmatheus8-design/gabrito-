@@ -42,13 +42,14 @@ test('integração preserva o PDF atual como fallback até o acervo nativo ficar
  assert.match(integration,/v31NativeReady/);
 });
 
-test('bootstrap carrega dados, estilo, runner e integração antes da camada mobile',()=>{
- const boot=read('js/gabarito-bootstrap.js');
- const data=boot.indexOf("data/enem-official-native-v31.js");
- const native=boot.indexOf("js/enem-native-v31.js");
- const official=boot.indexOf("js/enem-official-v27.js");
- const integration=boot.indexOf("js/enem-native-integration-v31.js");
- const mobile=boot.indexOf("js/enem-mobile-v30.js");
- assert.ok(data>=0&&native>data&&official>native&&integration>official&&mobile>integration);
- assert.match(boot,/assets\/enem-native-v31\.css/);
+test('lazy loader carrega dados, runner e integração antes da camada mobile',()=>{
+ const lazy=read('js/lazy-simulators-v32.js'),boot=read('js/gabarito-bootstrap.js');
+ const official=lazy.indexOf("js/enem-official-v27.js");
+ const data=lazy.indexOf("data/enem-official-native-v31.js");
+ const native=lazy.indexOf("js/enem-native-v31.js");
+ const integration=lazy.indexOf("js/enem-native-integration-v31.js");
+ const mobile=lazy.indexOf("js/enem-mobile-v30.js");
+ assert.ok(official>=0&&data>official&&native>data&&integration>native&&mobile>integration);
+ assert.match(lazy,/assets\/enem-native-v31\.css/);
+ assert.doesNotMatch(boot,/enem-native-v31/);
 });

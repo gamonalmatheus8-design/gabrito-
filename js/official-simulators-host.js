@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='3.1.0';
+const VERSION='3.3.0';
 const $=(s,r=document)=>r.querySelector(s);
 function hideLegacyDiscursives(){
  const moduleSelect=$('#discModule');

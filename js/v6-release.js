@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='2.0.0',SW_VERSION='3.0.1',SW_RECOVERY='20260901h';let installPrompt=null;
+const VERSION='2.0.0',SW_VERSION='3.3.0',SW_RECOVERY='20260903-perf1';let installPrompt=null;
 function q(id){return document.getElementById(id)}
 function updateOnline(){const el=q('v6NetworkStatus');if(!el)return;el.textContent=navigator.onLine?'Online':'Offline';el.dataset.state=navigator.onLine?'ok':'warn'}
 function loadProductPolish(){if(!document.querySelector('link[data-gplus-polish]')){const l=document.createElement('link');l.rel='stylesheet';l.href=`/assets/product-polish.css?v=${VERSION}`;l.dataset.gplusPolish='1';document.head.appendChild(l)}if(!document.querySelector('script[data-gplus-polish]')){const s=document.createElement('script');s.src=`/js/product-polish.js?v=${VERSION}`;s.defer=true;s.dataset.gplusPolish='1';document.head.appendChild(s)}}

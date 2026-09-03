@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.2.0';
-const RECOVERY='20260902-lazy1';
+const VERSION='3.3.0';
+const RECOVERY='20260903-perf1';
 const $=(s,r=document)=>r.querySelector(s);
 let corePromise=null,enhancePromise=null,ready=false,failed=null;
 const loadedScripts=new Set();
@@ -13,7 +13,7 @@ function loadScript(src,timeoutMs=7000){
  return new Promise((resolve,reject)=>{
   const s=document.createElement('script');let done=false,timer=null;
   const finish=err=>{if(done)return;done=true;if(timer)clearTimeout(timer);if(err){s.remove();reject(err)}else{loadedScripts.add(src);s.dataset.loaded='1';resolve()}};
-  s.src=asset(src);s.async=false;s.dataset.gplusLazy=src;s.onload=()=>finish();s.onerror=()=>finish(new Error('Falha ao carregar '+src));
+  s.src=asset(src);s.async=true;s.dataset.gplusLazy=src;s.onload=()=>finish();s.onerror=()=>finish(new Error('Falha ao carregar '+src));
   if(timeoutMs>0)timer=setTimeout(()=>finish(new Error('Tempo esgotado ao carregar '+src)),timeoutMs);
   document.head.appendChild(s);
  });

@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='3.0.1';
+const VERSION='3.3.0';
 const AUTHORIAL_KEY='gplus_enem_exam_v24';
 const OFFICIAL_KEY='gplus_enem_official_v27';
 const HISTORY_KEY='gplus_enem_history_exam_v28';

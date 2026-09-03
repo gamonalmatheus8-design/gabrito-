@@ -42,10 +42,11 @@ test('experiência oficial mantém tempo real, cartão-resposta e não inventa T
  assert.match(js,/beforeunload/);
 });
 
-test('boot carrega a camada oficial 2.7',()=>{
- const boot=read('js/gabarito-bootstrap.js');
- assert.match(boot,/assets\/enem-official-v27\.css/);
- assert.match(boot,/js\/enem-official-v27\.js/);
- assert.match(boot,/const VERSION='3\.0\.1'/);
+test('lazy loader carrega a camada oficial somente ao abrir Simulados',()=>{
+ const boot=read('js/gabarito-bootstrap.js'),lazy=read('js/lazy-simulators-v32.js');
+ assert.match(lazy,/assets\/enem-official-v27\.css/);
+ assert.match(lazy,/js\/enem-official-v27\.js/);
+ assert.doesNotMatch(boot,/enem-official-v27/);
+ assert.match(boot,/const VERSION='3\.3\.0'/);
 });
 

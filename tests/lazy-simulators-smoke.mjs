@@ -8,7 +8,7 @@ try{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- assert.equal(await page.evaluate(()=>window.GABARITO_APP?.lazySimulators),'3.2.0');
+ assert.equal(await page.evaluate(()=>window.GABARITO_APP?.lazySimulators),'3.3.0');
  const before=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
  for(const needle of ['enem-official-v27.js','enem-history-v28.js','pism-history-v29.js','enem-native-v31.js','enem-document-v32.js','enem-mobile-v30.js']){
   assert.equal(before.some(x=>x.includes(needle)),false,`${needle} não deve carregar no boot`);

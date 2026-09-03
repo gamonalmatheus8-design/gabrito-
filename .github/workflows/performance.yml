@@ -1,0 +1,66 @@
+name: Gabarito+ Performance Benchmark
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'js/**'
+      - 'data/**'
+      - 'assets/**'
+      - 'index.html'
+      - 'package.json'
+      - 'tools/benchmark-startup.mjs'
+      - '.github/workflows/performance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout atual
+        uses: actions/checkout@v4
+        with:
+          path: current
+      - name: Checkout baseline 3.2
+        uses: actions/checkout@v4
+        with:
+          ref: 669cef826098db63cb7366903db5bc0986f1f49d
+          path: baseline
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar Chromium
+        working-directory: current
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+      - name: Iniciar baseline e versão atual
+        run: |
+          PORT=3090 node baseline/server.mjs > /tmp/gabarito-baseline.log 2>&1 &
+          echo $! > /tmp/gabarito-baseline.pid
+          PORT=3091 node current/server.mjs > /tmp/gabarito-current.log 2>&1 &
+          echo $! > /tmp/gabarito-current.pid
+          for i in {1..30}; do
+            curl -fsS http://127.0.0.1:3090/api/health >/dev/null && curl -fsS http://127.0.0.1:3091/api/health >/dev/null && break
+            sleep 1
+          done
+      - name: Benchmark antes e depois
+        working-directory: current
+        run: node tools/benchmark-startup.mjs http://127.0.0.1:3090 http://127.0.0.1:3091
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gabarito-performance-report
+          path: current/perf-results/
+          if-no-files-found: warn
+      - name: Encerrar servidores
+        if: always()
+        run: |
+          kill $(cat /tmp/gabarito-baseline.pid) || true
+          kill $(cat /tmp/gabarito-current.pid) || true

@@ -7,10 +7,6 @@ try{
  const pageErrors=[];page.on('pageerror',e=>pageErrors.push(e.message));
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.3.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>{
@@ -20,13 +16,18 @@ try{
   };
   window.go('mocks');
  });
- await page.waitForSelector('#v28HistoryLibrary',{timeout:5000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.simulatorsLazyReady===true,{timeout:20000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.enemOfficial==='2.7.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_MOBILE?.version==='3.0.1',{timeout:10000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.3.0',{timeout:10000});
+ await page.waitForSelector('#v28HistoryLibrary',{timeout:7000});
  assert.match(await page.locator('#v28HistoryLibrary').innerText(),/ENEM 2016–2025/i);
- assert.match(await page.locator('#v24EnemHub .v24-enem-head').innerText(),/Treino estilo ENEM/i);
+ assert.equal(await page.locator('#v24EnemHub .v24-enem-head').count(),0,'treino autoral antigo não deve voltar à interface');
  await page.locator('#v28Lang2025').selectOption('Inglês');
  await page.locator('#v28HistoryLibrary [data-v28-year="2025"][data-v28-day="1"]').click();
- await page.waitForSelector('#v27OfficialRunner .v32-reader',{timeout:5000});
- await page.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
+ await page.waitForSelector('#v27OfficialRunner .v32-reader',{timeout:7000});
+ await page.waitForSelector('#v30EnemDock.show.official',{timeout:7000});
  assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('v27-official-active')),true);
  assert.equal(await page.locator('#v27OfficialRunner iframe').count(),0);
  assert.match(await page.locator('#v27OfficialRunner .v32-reader').innerText(),/LEITOR GABARITO\+/i);

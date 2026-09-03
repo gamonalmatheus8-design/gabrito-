@@ -9,20 +9,21 @@ try{
  await page.route('https://www2.ufjf.br/**',route=>route.abort());
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- await page.waitForFunction(()=>window.GABARITO_APP?.pismHistory==='2.9.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_OFFICIAL_DOCUMENT?.version==='3.3.0',{timeout:7000});
  await page.evaluate(()=>{window.pdfjsLib={GlobalWorkerOptions:{workerSrc:''},getDocument(){return{promise:Promise.resolve({numPages:24,async getPage(n){return{getViewport:({scale})=>({width:760*scale,height:1080*scale}),getTextContent:async()=>({items:n===2?[{str:'QUESTÃO 1'}]:n===4?[{str:'QUESTÃO 2'}]:[]}),render:()=>({promise:Promise.resolve(),cancel(){}})}}})}}}});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
  await page.evaluate(()=>window.go('mocks'));
- await page.waitForSelector('#v29PismOfficialHub',{timeout:5000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.simulatorsLazyReady===true,{timeout:20000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.pismHistory==='2.9.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_OFFICIAL_DOCUMENT?.version==='3.3.0',{timeout:10000});
+ await page.waitForSelector('#v29PismOfficialHub',{timeout:7000});
  assert.equal(await page.locator('#v29PismOfficialHub .v29-year-card').count(),10);
  assert.match(await page.locator('#v29PismOfficialHub').innerText(),/PISM 2017–2026/i);
- assert.match(await page.locator('#v25PismHub .v25p-head').innerText(),/TREINO AUTORAL/i);
+ assert.equal(await page.locator('#v25PismHub .v25p-head').count(),0,'treino autoral antigo não deve voltar à interface');
  await page.locator('#v29PismModule').selectOption('III');
  await page.locator('#v29PismArea').selectOption({label:'Exatas'});
  await page.locator('[data-v29-year="2024"][data-v29-day="1"]').click();
- await page.waitForSelector('#v29PismOfficialRunner .v32-reader',{timeout:5000});
+ await page.waitForSelector('#v29PismOfficialRunner .v32-reader',{timeout:7000});
  assert.equal(await page.locator('#v29PismOfficialRunner iframe').count(),0);
  assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/PISM 2024 · Módulo III · 1º dia/i);
  assert.match(await page.locator('#v29PismOfficialRunner').innerText(),/Exatas/i);

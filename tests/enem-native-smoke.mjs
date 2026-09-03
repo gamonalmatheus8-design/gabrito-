@@ -8,11 +8,13 @@ try{
  await page.route('https://riep.inep.gov.br/**',route=>route.abort());
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE?.version==='3.1.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE_INTEGRATION?.version==='3.1.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_OFFICIAL?.version==='2.7.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
+ await page.evaluate(()=>window.go('mocks'));
+ await page.waitForFunction(()=>window.GABARITO_APP?.simulatorsLazyReady===true,{timeout:20000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE?.version==='3.1.0',{timeout:10000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_NATIVE_INTEGRATION?.version==='3.1.0',{timeout:10000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_OFFICIAL?.version==='2.7.0',{timeout:7000});
  await page.evaluate(()=>{
   const rows=[];
   for(let number=1;number<=90;number++)rows.push({
@@ -25,13 +27,12 @@ try{
    sourceLabel:'Fixture de teste'
   });
   window.GABARITO_ENEM_NATIVE.register(rows);
-  window.go('mocks');
   const lang=document.querySelector('#v27Language');
   if(lang)lang.value='Inglês';
   window.GABARITO_ENEM_OFFICIAL.start(1);
  });
- await page.waitForSelector('#v31NativeMount .v31-question',{timeout:6000});
- await page.waitForSelector('#v30EnemDock.show.official',{timeout:5000});
+ await page.waitForSelector('#v31NativeMount .v31-question',{timeout:7000});
+ await page.waitForSelector('#v30EnemDock.show.official',{timeout:7000});
  assert.equal(await page.locator('#v27OfficialRunner iframe').count(),0);
  assert.match(await page.locator('#v31NativeMount').innerText(),/Questão 1/);
  assert.equal(await page.locator('#v31NativeMount [data-v31-letter]').count(),5);

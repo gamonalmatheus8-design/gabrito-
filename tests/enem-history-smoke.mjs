@@ -6,8 +6,6 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:844}});
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
- await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
- await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.3.0',{timeout:7000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:800});if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click()}catch{}
  await page.evaluate(()=>{
   window.pdfjsLib={
@@ -16,12 +14,15 @@ try{
   };
   window.go('mocks');
  });
- await page.waitForSelector('#v28HistoryLibrary',{timeout:5000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.simulatorsLazyReady===true,{timeout:20000});
+ await page.waitForFunction(()=>window.GABARITO_APP?.enemHistory==='2.8.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DOCUMENT?.version==='3.3.0',{timeout:10000});
+ await page.waitForSelector('#v28HistoryLibrary',{timeout:7000});
  assert.equal(await page.locator('#v28HistoryLibrary .v28-year-card').count(),10);
  const libraryText=await page.locator('#v28HistoryLibrary').innerText();assert.match(libraryText,/2016/);assert.match(libraryText,/2025/);
  await page.locator('[data-v28-year="2024"][data-v28-day="1"]').click();
- await page.waitForSelector('#v30EnemDock.show',{timeout:5000});
- await page.waitForSelector('#v28Runner .v32-reader',{timeout:5000});
+ await page.waitForSelector('#v30EnemDock.show',{timeout:7000});
+ await page.waitForSelector('#v28Runner .v32-reader',{timeout:7000});
  assert.equal(await page.locator('#v28Runner iframe').count(),0);
  assert.equal(await page.locator('#v28Sheet [data-v28-q]').count(),90);
  assert.match(await page.locator('#v28Runner').innerText(),/ENEM 2024 · Dia 1/);

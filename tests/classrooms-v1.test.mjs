@@ -2,20 +2,23 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
-const classrooms = await readFile(new URL('../js/classrooms-v1.js', import.meta.url), 'utf8');
+const loader = await readFile(new URL('../js/classrooms-v1.js', import.meta.url), 'utf8');
+const classrooms = await readFile(new URL('../js/classrooms-core-v1.js', import.meta.url), 'utf8');
+const attachments = await readFile(new URL('../js/assignment-attachments-v1.js', import.meta.url), 'utf8');
 const commercial = await readFile(new URL('../js/commercial-v2.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../assets/classrooms-v1.css', import.meta.url), 'utf8');
+const attachmentCss = await readFile(new URL('../assets/assignment-attachments-v1.css', import.meta.url), 'utf8');
 
 test('area de turmas e carregada pela camada comercial', () => {
   assert.match(commercial, /classrooms-v1\.js/);
   assert.match(commercial, /classrooms-v1\.css/);
   assert.match(commercial, /loadClassrooms\(\)/);
+  assert.match(loader, /classrooms-core-v1\.js/);
+  assert.match(loader, /assignment-attachments-v1\.js/);
 });
 
 test('fluxo do aluno usa RPCs de correcao segura no servidor', () => {
-  for (const rpc of ['start_assignment','get_assignment_questions','submit_assignment_answer','finish_assignment','get_assignment_review']) {
-    assert.match(classrooms, new RegExp(`rpc\\(['\"]${rpc}['\"]`));
-  }
+  for (const rpc of ['start_assignment','get_assignment_questions','submit_assignment_answer','finish_assignment','get_assignment_review']) assert.match(classrooms, new RegExp(`rpc\\(['\"]${rpc}['\"]`));
   assert.doesNotMatch(classrooms, /from\(['\"]assignment_answers['\"]\)\.insert/);
   assert.doesNotMatch(classrooms, /from\(['\"]assignment_submissions['\"]\)\.insert/);
 });
@@ -28,10 +31,21 @@ test('professor cria atividade pelo fluxo transacional do banco', () => {
 });
 
 test('interface possui navegacao, modo professor, modo aluno e adaptacao mobile', () => {
-  assert.match(classrooms, /id='page-classrooms'|id="page-classrooms"|page-classrooms/);
+  assert.match(classrooms, /page-classrooms/);
   assert.match(classrooms, /Professor/);
   assert.match(classrooms, /Aluno/);
   assert.match(classrooms, /join-classroom/);
   assert.match(css, /@media\(max-width:700px\)/);
   assert.match(css, /gplus-assignment-modal/);
+});
+
+test('anexos usam storage privado e metadados da atividade', () => {
+  assert.match(attachments, /assignment-attachments/);
+  assert.match(attachments, /assignment_attachments/);
+  assert.match(attachments, /\.upload\(/);
+  assert.match(attachments, /\.download\(/);
+  assert.match(attachments, /MAX_FILE_BYTES=10\*1024\*1024/);
+  assert.match(attachments, /data-gplus-attachment-upload/);
+  assert.match(attachments, /data-gplus-attachment-download/);
+  assert.match(attachmentCss, /gplus-attachment-item/);
 });

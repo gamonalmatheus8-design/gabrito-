@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 
 const loader = await readFile(new URL('../js/classrooms-v1.js', import.meta.url), 'utf8');
 const classrooms = await readFile(new URL('../js/classrooms-core-v1.js', import.meta.url), 'utf8');
+const studentMode = await readFile(new URL('../js/student-classroom-mode-v1.js', import.meta.url), 'utf8');
 const attachments = await readFile(new URL('../js/assignment-attachments-v1.js', import.meta.url), 'utf8');
 const commercial = await readFile(new URL('../js/commercial-v2.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../assets/classrooms-v1.css', import.meta.url), 'utf8');
@@ -14,7 +15,18 @@ test('area de turmas e carregada pela camada comercial', () => {
   assert.match(commercial, /classrooms-v1\.css/);
   assert.match(commercial, /loadClassrooms\(\)/);
   assert.match(loader, /classrooms-core-v1\.js/);
+  assert.match(loader, /student-classroom-mode-v1\.js/);
   assert.match(loader, /assignment-attachments-v1\.js/);
+});
+
+test('aluno entra na turma pelo codigo do professor', () => {
+  assert.match(classrooms, /functions\.invoke\(['\"]join-classroom['\"]/);
+  assert.match(classrooms, /gplusJoinForm/);
+  assert.match(classrooms, /gplusJoinCode/);
+  assert.match(studentMode, /get_my_account_role/);
+  assert.match(studentMode, /Entrar em uma turma/);
+  assert.match(studentMode, /Código enviado pelo professor/);
+  assert.match(studentMode, /stacks\[1\]\.hidden=true/);
 });
 
 test('fluxo do aluno usa RPCs de correcao segura no servidor', () => {

@@ -1,19 +1,31 @@
 (function(){
 'use strict';
-const S={user:null,profile:null,isAdmin:false,revision:0,resolved:false,busy:false,timer:null,lastHash:''};
+const S={user:null,profile:null,isAdmin:false,accountRole:'student',revision:0,resolved:false,busy:false,timer:null,lastHash:''};
 const SYNC_KEY='study_v7_last_sync_at';
 const client=window.estudosSupabase||null;
 const $=id=>document.getElementById(id);
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[c]))}
 function snapshot(){const out={};for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('study_')&&k!==SYNC_KEY)out[k]=localStorage.getItem(k)}return out}
 function meaningful(s){return Object.keys(s||{}).some(k=>/sessions|question_stats|essays|answer_log|mock_history|favorites|notes/.test(k)&&String(s[k]||'').length>2)}
 function applySnapshot(s){if(!s||typeof s!=='object')return;for(const [k,v] of Object.entries(s)){if(k.startsWith('study_')&&k!==SYNC_KEY)localStorage.setItem(k,String(v))}localStorage.setItem(SYNC_KEY,new Date().toISOString())}
 function hash(s){const raw=JSON.stringify(s,Object.keys(s).sort());let h=2166136261;for(let i=0;i<raw.length;i++){h^=raw.charCodeAt(i);h=Math.imul(h,16777619)}return String(h>>>0)}
 function setStatus(text,state='idle'){const el=$('v5SyncStatus');if(el){el.textContent=text;el.dataset.state=state}const mini=$('v5AccountMini');if(mini)mini.textContent=S.user?`${(S.profile?.display_name||S.user.email||'Conta').split(' ')[0]} · ${text}`:(window.GABARITO_APP?.configured?'Entrar':'Supabase')}
-async function getProfile(){if(!client||!S.user)return null;const [{data,error},{data:isAdmin,error:ae}]=await Promise.all([client.from('profiles').select('id,display_name').eq('id',S.user.id).maybeSingle(),client.rpc('is_current_user_admin')]);if(error)throw error;if(ae)throw ae;S.isAdmin=Boolean(isAdmin);return data}
+function roleLabel(){if(S.isAdmin||S.accountRole==='admin')return'Administrador';if(S.accountRole==='teacher')return'Professor';return'Estudante'}
+async function getProfile(){
+  if(!client||!S.user)return null;
+  const [{data,error},{data:isAdmin,error:ae},{data:accountRole,error:re}]=await Promise.all([
+    client.from('profiles').select('id,display_name').eq('id',S.user.id).maybeSingle(),
+    client.rpc('is_current_user_admin'),
+    client.rpc('get_my_account_role')
+  ]);
+  if(error)throw error;if(ae)throw ae;if(re)throw re;
+  S.isAdmin=Boolean(isAdmin);
+  S.accountRole=S.isAdmin?'admin':String(accountRole||'student').toLowerCase();
+  return data;
+}
 function renderAccount(){
   const logged=Boolean(S.user);$('v5AuthLoggedOut')?.classList.toggle('hidden',logged);$('v5AuthLoggedIn')?.classList.toggle('hidden',!logged);$('v5AccountBtn')?.classList.toggle('logged',logged);
-  if(logged){$('v5UserName').textContent=S.profile?.display_name||S.user.user_metadata?.name||S.user.email?.split('@')[0]||'Estudante';$('v5UserEmail').textContent=S.user.email||'—';$('v5UserRole').textContent=S.isAdmin?'Administrador':'Estudante'}
+  if(logged){$('v5UserName').textContent=S.profile?.display_name||S.user.user_metadata?.name||S.user.email?.split('@')[0]||'Estudante';$('v5UserEmail').textContent=S.user.email||'—';$('v5UserRole').textContent=roleLabel()}
   const admin=$('adminLink');if(admin)admin.style.display=S.isAdmin?'flex':'none';if(window.lucide)lucide.createIcons();
 }
 window.openV5Account=function(){$('v5AccountModal')?.classList.add('open');$('v5AccountModal')?.setAttribute('aria-hidden','false');renderAccount()}
@@ -31,11 +43,11 @@ window.v5SyncNow=async function(){if(!S.user)return openV5Account();await upload
 window.v5Login=async function(ev){ev?.preventDefault();const btn=$('v5LoginBtn');if(btn)btn.disabled=true;$('v5AuthError').textContent='';try{requireClient();const {data,error}=await client.auth.signInWithPassword({email:$('v5LoginEmail').value.trim(),password:$('v5LoginPassword').value});if(error)throw error;S.user=data.user;S.profile=await getProfile();renderAccount();await loadCloud()}catch(e){$('v5AuthError').textContent=e.message}finally{if(btn)btn.disabled=false}}
 window.v5Register=async function(ev){ev?.preventDefault();const btn=$('v5RegisterBtn');if(btn)btn.disabled=true;$('v5AuthError').textContent='';try{requireClient();const name=$('v5RegisterName').value.trim(),email=$('v5RegisterEmail').value.trim(),password=$('v5RegisterPassword').value;const {data,error}=await client.auth.signUp({email,password,options:{data:{display_name:name}}});if(error)throw error;if(!data.session){$('v5AuthError').textContent='Conta criada. Confira seu e-mail para confirmar o cadastro.';return}S.user=data.user;S.profile=await getProfile();renderAccount();await loadCloud()}catch(e){$('v5AuthError').textContent=e.message}finally{if(btn)btn.disabled=false}}
 window.v7ResetPassword=async function(){try{requireClient();const email=$('v5LoginEmail').value.trim();if(!email)throw new Error('Digite seu e-mail primeiro.');const {error}=await client.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw error;$('v5AuthError').textContent='Se a conta existir, você receberá um e-mail para redefinir a senha.'}catch(e){$('v5AuthError').textContent=e.message}}
-window.v5Logout=async function(){try{if(client)await client.auth.signOut({scope:'local'})}catch{}S.user=null;S.profile=null;S.isAdmin=false;S.resolved=false;S.revision=0;renderAccount();setStatus(window.GABARITO_APP?.configured?'Nuvem pronta':'Local','idle');closeV5Account()}
+window.v5Logout=async function(){try{if(client)await client.auth.signOut({scope:'local'})}catch{}S.user=null;S.profile=null;S.isAdmin=false;S.accountRole='student';S.resolved=false;S.revision=0;renderAccount();setStatus(window.GABARITO_APP?.configured?'Nuvem pronta':'Local','idle');closeV5Account()}
 window.v6ChangePassword=async function(ev){ev?.preventDefault();const msg=$('v6SecurityMessage');if(msg)msg.textContent='';try{requireClient();const current=$('v6CurrentPassword').value,newPassword=$('v6NewPassword').value,confirm=$('v6ConfirmPassword').value;if(newPassword!==confirm)throw new Error('As novas senhas não coincidem.');if(newPassword.length<10)throw new Error('Use pelo menos 10 caracteres.');if(current){const {error:reauth}=await client.auth.signInWithPassword({email:S.user.email,password:current});if(reauth)throw new Error('Senha atual incorreta.')}const {error}=await client.auth.updateUser({password:newPassword});if(error)throw error;$('v6CurrentPassword').value='';$('v6NewPassword').value='';$('v6ConfirmPassword').value='';if(msg){msg.textContent='Senha atualizada.';msg.dataset.state='ok'}}catch(e){if(msg){msg.textContent=e.message;msg.dataset.state='error'}}}
 window.v6RevokeOtherSessions=async function(){try{requireClient();const {error}=await client.auth.signOut({scope:'others'});if(error)throw error;alert('As outras sessões foram encerradas.')}catch(e){alert(e.message)}}
 window.v6ExportAccount=async function(){try{if(!S.user)throw new Error('Entre na conta primeiro.');const payload={exportedAt:new Date().toISOString(),user:{id:S.user.id,email:S.user.email},profile:S.profile,progress:snapshot()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='gabarito-mais-dados.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),800)}catch(e){alert(e.message)}}
-window.v6DeleteAccount=async function(){const password=$('v6DeletePassword')?.value||'';if(!password){$('v6DeleteMessage').textContent='Digite sua senha para confirmar.';return}if(!confirm('Excluir sua conta e progresso na nuvem? Esta ação não pode ser desfeita.'))return;try{requireClient();const {error:reauth}=await client.auth.signInWithPassword({email:S.user.email,password});if(reauth)throw new Error('Senha incorreta.');const {error}=await client.functions.invoke('delete-account',{body:{confirm:true}});if(error)throw error;S.user=null;S.profile=null;localStorage.removeItem(SYNC_KEY);renderAccount();closeV5Account();alert('Conta excluída da nuvem. Você ainda pode limpar os dados locais em Ajustes.')}catch(e){$('v6DeleteMessage').textContent=e.message}}
+window.v6DeleteAccount=async function(){const password=$('v6DeletePassword')?.value||'';if(!password){$('v6DeleteMessage').textContent='Digite sua senha para confirmar.';return}if(!confirm('Excluir sua conta e progresso na nuvem? Esta ação não pode ser desfeita.'))return;try{requireClient();const {error:reauth}=await client.auth.signInWithPassword({email:S.user.email,password});if(reauth)throw new Error('Senha incorreta.');const {error}=await client.functions.invoke('delete-account',{body:{confirm:true}});if(error)throw error;S.user=null;S.profile=null;S.accountRole='student';localStorage.removeItem(SYNC_KEY);renderAccount();closeV5Account();alert('Conta excluída da nuvem. Você ainda pode limpar os dados locais em Ajustes.')}catch(e){$('v6DeleteMessage').textContent=e.message}}
 window.v6ToggleAccountSection=function(id){$(id)?.classList.toggle('hidden')}
 window.v6RevokeSession=()=>{};
 
@@ -56,9 +68,9 @@ async function boot(){
   if(!client){setStatus('Configurar Supabase','warn');renderAccount();instrument();instrumentEssay();return}
   try{const {data,error}=await client.auth.getUser();if(error&&error.name!=='AuthSessionMissingError')console.warn(error);S.user=data?.user||null;if(S.user){S.profile=await getProfile();renderAccount();await loadCloud()}else{renderAccount();setStatus('Nuvem pronta','idle')}}catch(e){console.warn(e);setStatus('Offline','error')}
   S.lastHash=hash(snapshot());instrumentEssay();clearInterval(S.timer);S.timer=setInterval(()=>{if(!S.user||!S.resolved||S.busy)return;const s=snapshot(),h=hash(s);if(h!==S.lastHash)upload(s)},15000);instrument();
-  client.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){setTimeout(()=>{openV5Account();$('v5AuthLoggedOut')?.classList.add('hidden');$('v5AuthLoggedIn')?.classList.remove('hidden');$('v6SecuritySection')?.classList.remove('hidden')},0)}if(event==='SIGNED_OUT'){S.user=null;S.profile=null;S.isAdmin=false;renderAccount()}})
+  client.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY'){setTimeout(()=>{openV5Account();$('v5AuthLoggedOut')?.classList.add('hidden');$('v5AuthLoggedIn')?.classList.remove('hidden');$('v6SecuritySection')?.classList.remove('hidden')},0)}if(event==='SIGNED_OUT'){S.user=null;S.profile=null;S.isAdmin=false;S.accountRole='student';renderAccount()}})
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&S.user&&S.resolved&&!S.busy){const s=snapshot();if(hash(s)!==S.lastHash)upload(s)}});
-window.__ESTUDOS_SUPABASE={client,get user(){return S.user},get profile(){return S.profile}};
+window.__ESTUDOS_SUPABASE={client,get user(){return S.user},get profile(){return S.profile},get role(){return S.accountRole}};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,80));else setTimeout(boot,80);
 })();

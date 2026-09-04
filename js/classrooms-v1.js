@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-if(window.__GABARITO_CLASSROOMS_LOADER_V19__)return;
-window.__GABARITO_CLASSROOMS_LOADER_V19__=true;
+if(window.__GABARITO_CLASSROOMS_LOADER_V20__)return;
+window.__GABARITO_CLASSROOMS_LOADER_V20__=true;
 
 function load(src,attr,onload){
   const existing=document.querySelector(`script[${attr}]`);
@@ -19,7 +19,7 @@ load('/js/classrooms-core-v1.js?v=1.0.1','data-gplus-classrooms-core',()=>{
   load('/js/student-classroom-mode-v1.js?v=1.0.1','data-gplus-student-classroom-mode');
   load('/js/student-join-rpc-v1.js?v=1.0.1','data-gplus-student-join-rpc');
   load('/js/assignment-attachments-v1.js?v=1.0.2','data-gplus-assignment-attachments');
-  load('/js/assignment-actions-v2.js?v=2.0.1','data-gplus-assignment-actions');
+  load('/js/assignment-actions-v2.js?v=2.1.0','data-gplus-assignment-actions');
   load('/js/teacher-submissions-v1.js?v=1.0.1','data-gplus-teacher-submissions');
   load('/js/teacher-activity-stats-v1.js?v=1.0.1','data-gplus-teacher-activity-stats');
   load('/js/teacher-performance-direct-v1.js?v=1.0.0','data-gplus-teacher-performance-direct');

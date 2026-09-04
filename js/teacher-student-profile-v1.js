@@ -1,132 +1,187 @@
 (function(){
 'use strict';
-if(window.__GABARITO_TEACHER_STUDENT_PROFILE_V1__)return;
-window.__GABARITO_TEACHER_STUDENT_PROFILE_V1__=true;
+if(window.__GABARITO_TEACHER_STUDENT_PROFILE_V2__)return;
+window.__GABARITO_TEACHER_STUDENT_PROFILE_V2__=true;
 
 const getClient=()=>window.__ESTUDOS_SUPABASE?.client||window.estudosSupabase||null;
 const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const num=value=>Number.isFinite(Number(value))?Number(value):0;
-let timer=null,inFlight=false,cachedClassroom='',cachedMembers=[];
+let timer=null,loading=false,lastClassroom='',membersCache=[];
 
 function icon(name){return `<i data-lucide="${name}" class="icon"></i>`}
-function refreshIcons(){if(window.lucide)window.lucide.createIcons()}
+function icons(){if(window.lucide)window.lucide.createIcons()}
 function fmtDate(value){return value?new Date(value).toLocaleDateString('pt-BR'):'—'}
 function fmtDateTime(value){return value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—'}
 function notify(message){if(typeof window.toast==='function')window.toast(message);else alert(message)}
 
-function ensureStyle(){
-  if(document.getElementById('gplusTeacherStudentProfileStyle'))return;
+function ensureStyles(){
+  if(document.getElementById('gplusStudentProfileV2Style'))return;
   const style=document.createElement('style');
-  style.id='gplusTeacherStudentProfileStyle';
+  style.id='gplusStudentProfileV2Style';
   style.textContent=`
-  .gplus-student-row{cursor:pointer;transition:border-color .16s ease,background .16s ease}.gplus-student-row:hover{border-color:color-mix(in srgb,var(--primary) 38%,var(--line));background:color-mix(in srgb,var(--primary-soft) 35%,var(--surface-2))}.gplus-student-row strong[data-gplus-student-name]{color:var(--text);text-decoration:none}.gplus-student-profile-btn{margin-left:auto;white-space:nowrap;flex:0 0 auto}
-  .gplus-student-modal{position:fixed;inset:0;z-index:245;display:none}.gplus-student-modal.open{display:grid;place-items:center;padding:18px}.gplus-student-backdrop{position:absolute;inset:0;background:rgba(10,15,25,.7);backdrop-filter:blur(8px)}.gplus-student-dialog{position:relative;z-index:1;width:min(1040px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 24px 80px rgba(0,0,0,.32);padding:20px}.gplus-student-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:15px}.gplus-student-top span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--primary);font-weight:800}.gplus-student-top h2{font:800 22px 'Manrope',sans-serif;letter-spacing:-.03em;margin:3px 0 0}.gplus-student-top p{font-size:10px;color:var(--muted);margin:4px 0 0}
-  .gplus-student-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:16px}.gplus-student-kpi{padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2)}.gplus-student-kpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}.gplus-student-kpi strong{display:block;font:800 21px 'Manrope',sans-serif;margin-top:4px}.gplus-student-kpi small{display:block;font-size:9px;color:var(--muted);margin-top:2px}
-  .gplus-student-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:12px}.gplus-student-section{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:14px;min-width:0}.gplus-student-section-head{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:11px}.gplus-student-section-head strong{font:800 14px 'Manrope',sans-serif}.gplus-student-section-head span{font-size:9px;color:var(--muted)}
-  .gplus-evolution-chart{height:190px;position:relative;border-radius:12px;background:var(--surface);border:1px solid var(--line);padding:10px}.gplus-evolution-chart svg{width:100%;height:145px;display:block}.gplus-evolution-labels{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(60px,1fr);gap:5px;overflow:auto;padding-top:4px}.gplus-evolution-labels div{font-size:8px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gplus-evolution-empty{height:190px;display:grid;place-items:center;border:1px dashed var(--line-2);border-radius:12px;color:var(--muted);font-size:11px;background:var(--surface)}
-  .gplus-subject-list,.gplus-student-history{display:grid;gap:8px}.gplus-subject-row,.gplus-history-item{padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}.gplus-subject-top,.gplus-history-top{display:flex;justify-content:space-between;gap:10px;align-items:center}.gplus-subject-top strong,.gplus-history-top strong{font-size:11px}.gplus-subject-top b,.gplus-history-score{font:800 12px 'Manrope',sans-serif}.gplus-subject-meta,.gplus-history-meta{font-size:9px;color:var(--muted);margin-top:3px}.gplus-subject-bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:8px}.gplus-subject-bar span{display:block;height:100%;background:var(--primary);border-radius:999px}.gplus-history-status{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;border-radius:999px;border:1px solid var(--line)}.gplus-history-status.submitted{color:var(--success);background:color-mix(in srgb,var(--success) 9%,var(--surface))}.gplus-history-status.in_progress{color:var(--warning);background:color-mix(in srgb,var(--warning) 9%,var(--surface))}.gplus-history-status.pending{color:var(--muted);background:var(--surface-2)}.gplus-history-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}.gplus-profile-empty{padding:16px;border:1px dashed var(--line-2);border-radius:11px;color:var(--muted);font-size:11px;text-align:center;background:var(--surface)}
-  @media(max-width:850px){.gplus-student-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.gplus-student-grid{grid-template-columns:1fr}.gplus-student-profile-btn{width:auto}}@media(max-width:620px){.gplus-student-modal.open{padding:0;align-items:end}.gplus-student-dialog{width:100%;max-height:95vh;border-radius:20px 20px 0 0;border-bottom:0;padding:16px}.gplus-student-summary{grid-template-columns:1fr 1fr}.gplus-student-profile-btn{font-size:0;padding:9px}.gplus-student-profile-btn .icon{margin:0}}
+    .gplus-student-row[data-gplus-profile-ready="1"]{cursor:pointer}
+    .gplus-student-row[data-gplus-profile-ready="1"]>div:nth-child(2){min-width:0}
+    .gplus-student-row [data-gplus-student-name]{cursor:pointer}
+    .gplus-student-profile-inline{display:inline-flex!important;align-items:center;gap:6px;margin-top:7px;padding:6px 9px!important;width:auto!important;font-size:10px!important}
+    .gplus-student-profile-modal{position:fixed;inset:0;z-index:280;display:none;place-items:center;padding:18px}
+    .gplus-student-profile-modal.open{display:grid}
+    .gplus-student-profile-backdrop{position:absolute;inset:0;background:rgba(4,8,16,.72);backdrop-filter:blur(8px)}
+    .gplus-student-profile-dialog{position:relative;z-index:1;width:min(1020px,100%);max-height:92vh;overflow:auto;border:1px solid var(--line);border-radius:20px;background:var(--surface);box-shadow:0 26px 90px rgba(0,0,0,.35);padding:20px}
+    .gplus-student-profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:14px}
+    .gplus-student-profile-head span{display:block;color:var(--primary);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+    .gplus-student-profile-head h2{margin:3px 0 0;font:800 22px 'Manrope',sans-serif;letter-spacing:-.03em}
+    .gplus-student-profile-head p{margin:4px 0 0;color:var(--muted);font-size:10px}
+    .gplus-student-profile-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:14px}
+    .gplus-student-profile-kpi{border:1px solid var(--line);border-radius:13px;background:var(--surface-2);padding:12px}
+    .gplus-student-profile-kpi span{display:block;color:var(--muted);font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+    .gplus-student-profile-kpi strong{display:block;margin-top:4px;font:800 20px 'Manrope',sans-serif}
+    .gplus-student-profile-kpi small{display:block;margin-top:2px;color:var(--muted);font-size:8px}
+    .gplus-student-profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .gplus-student-profile-section{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:13px;min-width:0}
+    .gplus-student-profile-section h3{margin:0 0 10px;font:800 13px 'Manrope',sans-serif}
+    .gplus-student-evolution,.gplus-student-subjects,.gplus-student-history-v2{display:grid;gap:8px}
+    .gplus-student-evo-row,.gplus-student-subject-row,.gplus-student-history-row-v2{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:10px}
+    .gplus-student-evo-top,.gplus-student-subject-top,.gplus-student-history-top-v2{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .gplus-student-evo-top strong,.gplus-student-subject-top strong,.gplus-student-history-top-v2 strong{font-size:10px}
+    .gplus-student-evo-top b,.gplus-student-subject-top b,.gplus-student-history-score-v2{font:800 12px 'Manrope',sans-serif}
+    .gplus-student-bar{height:6px;margin-top:7px;border-radius:999px;background:var(--line);overflow:hidden}
+    .gplus-student-bar span{display:block;height:100%;border-radius:999px;background:var(--primary)}
+    .gplus-student-meta-v2{margin-top:3px;color:var(--muted);font-size:8px}
+    .gplus-student-status-v2{display:inline-block;padding:3px 6px;border:1px solid var(--line);border-radius:999px;font-size:7px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+    .gplus-student-history-right-v2{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+    .gplus-student-profile-empty{padding:14px;border:1px dashed var(--line-2);border-radius:10px;color:var(--muted);font-size:10px;text-align:center;background:var(--surface)}
+    @media(max-width:800px){.gplus-student-profile-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.gplus-student-profile-grid{grid-template-columns:1fr}}
+    @media(max-width:620px){.gplus-student-profile-modal.open{align-items:end;padding:0}.gplus-student-profile-dialog{width:100%;max-height:95vh;border-radius:18px 18px 0 0;border-bottom:0;padding:15px}}
   `;
   document.head.appendChild(style);
 }
 
 function ensureModal(){
-  if(document.getElementById('gplusTeacherStudentProfileModal'))return;
+  if(document.getElementById('gplusStudentProfileModalV2'))return;
   const modal=document.createElement('div');
-  modal.id='gplusTeacherStudentProfileModal';
-  modal.className='gplus-student-modal';
+  modal.id='gplusStudentProfileModalV2';
+  modal.className='gplus-student-profile-modal';
   modal.setAttribute('aria-hidden','true');
-  modal.innerHTML=`<div class="gplus-student-backdrop" data-close-student-profile></div><div class="gplus-student-dialog" role="dialog" aria-modal="true" aria-labelledby="gplusTeacherStudentProfileTitle"><div class="gplus-student-top"><div><span>Perfil individual</span><h2 id="gplusTeacherStudentProfileTitle">Aluno</h2><p id="gplusTeacherStudentProfileMeta"></p></div><button class="icon-btn" type="button" data-close-student-profile aria-label="Fechar perfil do aluno">${icon('x')}</button></div><div id="gplusTeacherStudentProfileBody"></div></div>`;
+  modal.innerHTML=`<div class="gplus-student-profile-backdrop" data-close-profile-v2></div><div class="gplus-student-profile-dialog" role="dialog" aria-modal="true" aria-labelledby="gplusStudentProfileTitleV2"><div class="gplus-student-profile-head"><div><span>Perfil individual</span><h2 id="gplusStudentProfileTitleV2">Aluno</h2><p id="gplusStudentProfileMetaV2"></p></div><button class="icon-btn" type="button" data-close-profile-v2 aria-label="Fechar perfil do aluno">${icon('x')}</button></div><div id="gplusStudentProfileBodyV2"></div></div>`;
   document.body.appendChild(modal);
-  modal.querySelectorAll('[data-close-student-profile]').forEach(el=>el.addEventListener('click',closeModal));
-  refreshIcons();
+  modal.querySelectorAll('[data-close-profile-v2]').forEach(el=>el.addEventListener('click',closeModal));
+  icons();
 }
-function openModal(){ensureModal();const m=document.getElementById('gplusTeacherStudentProfileModal');m?.classList.add('open');m?.setAttribute('aria-hidden','false')}
-function closeModal(){const m=document.getElementById('gplusTeacherStudentProfileModal');m?.classList.remove('open');m?.setAttribute('aria-hidden','true')}
+function openModal(){ensureModal();const modal=document.getElementById('gplusStudentProfileModalV2');modal?.classList.add('open');modal?.setAttribute('aria-hidden','false')}
+function closeModal(){const modal=document.getElementById('gplusStudentProfileModalV2');modal?.classList.remove('open');modal?.setAttribute('aria-hidden','true')}
 
 async function getMembers(classroomId){
-  const client=getClient();if(!client)return [];
-  if(cachedClassroom===classroomId&&cachedMembers.length)return cachedMembers;
+  const client=getClient();
+  if(!client)return [];
+  if(lastClassroom===classroomId&&membersCache.length)return membersCache;
   const {data,error}=await client.from('classroom_members').select('user_id,joined_at').eq('classroom_id',classroomId).eq('role','student').order('joined_at',{ascending:true});
   if(error)throw error;
-  cachedClassroom=classroomId;cachedMembers=data||[];return cachedMembers;
+  lastClassroom=classroomId;
+  membersCache=data||[];
+  return membersCache;
 }
 
-async function ensureStudentLinks(){
-  if(inFlight)return;
+async function hydrateRows(){
+  if(loading)return;
   const select=document.getElementById('gplusTeacherClassSelect');
-  const rows=[...document.querySelectorAll('#page-classrooms .gplus-student-list .gplus-student-row')];
   const classroomId=select?.value;
+  const rows=[...document.querySelectorAll('#page-classrooms .gplus-student-list > .gplus-student-row')];
   if(!classroomId||!rows.length)return;
-  inFlight=true;
+  loading=true;
   try{
     const members=await getMembers(classroomId);
     rows.forEach((row,index)=>{
-      const member=members[index];if(!member)return;
+      const member=members[index];
+      if(!member)return;
       row.dataset.gplusStudentId=member.user_id;
       row.dataset.gplusClassroomId=classroomId;
-      const name=row.querySelector('strong');
+      row.dataset.gplusProfileReady='1';
+      const info=row.children[1]||row;
+      const name=info.querySelector('strong');
       if(name){name.dataset.gplusStudentName='1';name.title='Abrir perfil do aluno'}
-      if(!row.querySelector('[data-open-student-profile]')){
-        const btn=document.createElement('button');
-        btn.type='button';btn.className='btn btn-ghost btn-sm gplus-student-profile-btn';
-        btn.dataset.openStudentProfile=member.user_id;btn.dataset.classroomId=classroomId;
-        btn.innerHTML=`${icon('chart-no-axes-combined')}Ver aluno`;
-        row.appendChild(btn);
+      let button=info.querySelector('[data-open-student-profile-v2]');
+      if(!button){
+        button=document.createElement('button');
+        button.type='button';
+        button.className='btn btn-ghost btn-sm gplus-student-profile-inline';
+        button.dataset.openStudentProfileV2=member.user_id;
+        button.dataset.classroomId=classroomId;
+        button.innerHTML=`${icon('chart-no-axes-combined')}Ver aluno`;
+        info.appendChild(button);
+      }else{
+        button.dataset.openStudentProfileV2=member.user_id;
+        button.dataset.classroomId=classroomId;
       }
     });
-    refreshIcons();
-  }catch(error){console.warn('[Gabarito+] Perfil do aluno:',error?.message||error)}finally{inFlight=false}
+    icons();
+  }catch(error){console.warn('[Gabarito+] perfil individual:',error?.message||error)}finally{loading=false}
 }
-function schedule(delay=100){clearTimeout(timer);timer=setTimeout(ensureStudentLinks,delay)}
+function schedule(delay=80){clearTimeout(timer);timer=setTimeout(hydrateRows,delay)}
 
-function evolutionChart(points){
-  if(!points.length)return '<div class="gplus-evolution-empty">A evolução aparecerá após a primeira atividade entregue.</div>';
-  const w=620,h=145,padX=28,padY=18;
-  const coords=points.map((p,i)=>{const x=points.length===1?w/2:padX+i*(w-padX*2)/(points.length-1);const y=padY+(100-num(p.pct))*(h-padY*2)/100;return{x,y,pct:num(p.pct)}});
-  const line=coords.map(p=>`${p.x},${p.y}`).join(' ');
-  const dots=coords.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--primary)"/><text x="${p.x}" y="${Math.max(12,p.y-9)}" text-anchor="middle" font-size="11" fill="currentColor">${p.pct}%</text>`).join('');
-  return `<div class="gplus-evolution-chart"><svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Evolução do aproveitamento"><line x1="${padX}" y1="${padY}" x2="${w-padX}" y2="${padY}" stroke="var(--line)"/><line x1="${padX}" y1="${h/2}" x2="${w-padX}" y2="${h/2}" stroke="var(--line)"/><line x1="${padX}" y1="${h-padY}" x2="${w-padX}" y2="${h-padY}" stroke="var(--line)"/><polyline points="${line}" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}</svg><div class="gplus-evolution-labels">${points.map(p=>`<div title="${esc(p.title)}">${esc(p.title)}</div>`).join('')}</div></div>`;
-}
-
+function statusLabel(status){return status==='submitted'?'Entregue':status==='in_progress'?'Em andamento':'Pendente'}
 function renderProfile(data){
-  const student=data?.student||{},s=data?.summary||{},evo=Array.isArray(data?.evolution)?data.evolution:[],subjects=Array.isArray(data?.subjects)?data.subjects:[],history=Array.isArray(data?.history)?data.history:[];
-  const title=document.getElementById('gplusTeacherStudentProfileTitle');
-  const meta=document.getElementById('gplusTeacherStudentProfileMeta');
-  const body=document.getElementById('gplusTeacherStudentProfileBody');
+  const student=data?.student||{};
+  const summary=data?.summary||{};
+  const evolution=Array.isArray(data?.evolution)?data.evolution:[];
+  const subjects=Array.isArray(data?.subjects)?data.subjects:[];
+  const history=Array.isArray(data?.history)?data.history:[];
+  const title=document.getElementById('gplusStudentProfileTitleV2');
+  const meta=document.getElementById('gplusStudentProfileMetaV2');
+  const body=document.getElementById('gplusStudentProfileBodyV2');
   if(title)title.textContent=student.display_name||'Aluno';
   if(meta)meta.textContent=`Na turma desde ${fmtDate(student.joined_at)}`;
-  const delta=num(s.evolution_delta);const deltaText=delta>0?`+${delta} pp`:delta<0?`${delta} pp`:'0 pp';
-  const subjectHtml=subjects.slice(0,6).map(item=>`<div class="gplus-subject-row"><div class="gplus-subject-top"><div><strong>${esc(item.subject)}</strong><div class="gplus-subject-meta">${num(item.error_count)} erro(s) · ${num(item.answered_count)} resposta(s)</div></div><b>${num(item.pct)}%</b></div><div class="gplus-subject-bar"><span style="width:${Math.max(0,Math.min(100,num(item.pct)))}%"></span></div></div>`).join('');
-  const statusLabel={submitted:'Entregue',in_progress:'Em andamento',pending:'Pendente'};
-  const historyHtml=history.map(item=>`<div class="gplus-history-item"><div class="gplus-history-top"><div><strong>${esc(item.title)}</strong><div class="gplus-history-meta">${item.status==='submitted'?`Entregue ${fmtDateTime(item.submitted_at)}`:item.status==='in_progress'?`Iniciada ${fmtDateTime(item.started_at)}`:item.due_at?`Prazo ${fmtDateTime(item.due_at)}`:'Ainda não iniciada'}${item.duration_minutes!=null?` · ${num(item.duration_minutes)} min`:''}</div></div><div class="gplus-history-right">${item.pct!=null?`<span class="gplus-history-score">${num(item.pct)}%</span>`:''}<span class="gplus-history-status ${esc(item.status)}">${statusLabel[item.status]||item.status}</span></div></div></div>`).join('');
+  const delta=num(summary.evolution_delta);
+  const deltaText=delta>0?`+${delta} pp`:delta<0?`${delta} pp`:'0 pp';
+  const evolutionHtml=evolution.map(item=>`<div class="gplus-student-evo-row"><div class="gplus-student-evo-top"><strong>${esc(item.title)}</strong><b>${num(item.pct)}%</b></div><div class="gplus-student-bar"><span style="width:${Math.max(0,Math.min(100,num(item.pct)))}%"></span></div><div class="gplus-student-meta-v2">${fmtDateTime(item.submitted_at)}</div></div>`).join('');
+  const subjectsHtml=subjects.slice(0,8).map(item=>`<div class="gplus-student-subject-row"><div class="gplus-student-subject-top"><strong>${esc(item.subject)}</strong><b>${num(item.pct)}%</b></div><div class="gplus-student-bar"><span style="width:${Math.max(0,Math.min(100,num(item.pct)))}%"></span></div><div class="gplus-student-meta-v2">${num(item.error_count)} erro(s) · ${num(item.correct_count)} acerto(s) · ${num(item.answered_count)} resposta(s)</div></div>`).join('');
+  const historyHtml=history.map(item=>`<div class="gplus-student-history-row-v2"><div class="gplus-student-history-top-v2"><div><strong>${esc(item.title)}</strong><div class="gplus-student-meta-v2">${item.status==='submitted'?`Entregue ${fmtDateTime(item.submitted_at)}`:item.status==='in_progress'?`Iniciada ${fmtDateTime(item.started_at)}`:item.due_at?`Prazo ${fmtDateTime(item.due_at)}`:'Ainda não iniciada'}${item.duration_minutes!=null?` · ${num(item.duration_minutes)} min`:''}</div></div><div class="gplus-student-history-right-v2">${item.pct!=null?`<span class="gplus-student-history-score-v2">${num(item.pct)}%</span>`:''}<span class="gplus-student-status-v2">${statusLabel(item.status)}</span></div></div></div>`).join('');
   if(body)body.innerHTML=`
-    <div class="gplus-student-summary">
-      <div class="gplus-student-kpi"><span>Média geral</span><strong>${num(s.average_pct)}%</strong><small>atividades entregues</small></div>
-      <div class="gplus-student-kpi"><span>Entregues</span><strong>${num(s.submitted_count)}/${num(s.total_assignments)}</strong><small>${num(s.pending_count)} pendente(s)</small></div>
-      <div class="gplus-student-kpi"><span>Melhor resultado</span><strong>${num(s.best_pct)}%</strong><small>melhor atividade</small></div>
-      <div class="gplus-student-kpi"><span>Último resultado</span><strong>${num(s.last_pct)}%</strong><small>atividade mais recente</small></div>
-      <div class="gplus-student-kpi"><span>Evolução</span><strong>${deltaText}</strong><small>primeira → última entrega</small></div>
+    <div class="gplus-student-profile-kpis">
+      <div class="gplus-student-profile-kpi"><span>Média geral</span><strong>${num(summary.average_pct)}%</strong><small>atividades entregues</small></div>
+      <div class="gplus-student-profile-kpi"><span>Entregues</span><strong>${num(summary.submitted_count)}/${num(summary.total_assignments)}</strong><small>${num(summary.pending_count)} pendente(s)</small></div>
+      <div class="gplus-student-profile-kpi"><span>Melhor resultado</span><strong>${num(summary.best_pct)}%</strong><small>melhor atividade</small></div>
+      <div class="gplus-student-profile-kpi"><span>Último resultado</span><strong>${num(summary.last_pct)}%</strong><small>atividade mais recente</small></div>
+      <div class="gplus-student-profile-kpi"><span>Evolução</span><strong>${deltaText}</strong><small>primeira → última entrega</small></div>
     </div>
-    <div class="gplus-student-grid">
-      <section class="gplus-student-section"><div class="gplus-student-section-head"><strong>Evolução nas atividades</strong><span>aproveitamento por entrega</span></div>${evolutionChart(evo)}</section>
-      <section class="gplus-student-section"><div class="gplus-student-section-head"><strong>Matérias com mais dificuldade</strong><span>menor aproveitamento primeiro</span></div><div class="gplus-subject-list">${subjectHtml||'<div class="gplus-profile-empty">Ainda não há respostas suficientes para analisar matérias.</div>'}</div></section>
+    <div class="gplus-student-profile-grid">
+      <section class="gplus-student-profile-section"><h3>Evolução nas atividades</h3><div class="gplus-student-evolution">${evolutionHtml||'<div class="gplus-student-profile-empty">A evolução aparecerá após a primeira atividade entregue.</div>'}</div></section>
+      <section class="gplus-student-profile-section"><h3>Matérias com mais dificuldade</h3><div class="gplus-student-subjects">${subjectsHtml||'<div class="gplus-student-profile-empty">Ainda não há respostas suficientes para analisar matérias.</div>'}</div></section>
     </div>
-    <section class="gplus-student-section" style="margin-top:12px"><div class="gplus-student-section-head"><strong>Histórico de atividades</strong><span>entregues, em andamento e pendentes</span></div><div class="gplus-student-history">${historyHtml||'<div class="gplus-profile-empty">Nenhuma atividade disponível nesta turma.</div>'}</div></section>`;
+    <section class="gplus-student-profile-section" style="margin-top:12px"><h3>Histórico de atividades</h3><div class="gplus-student-history-v2">${historyHtml||'<div class="gplus-student-profile-empty">Nenhuma atividade disponível nesta turma.</div>'}</div></section>`;
 }
 
 async function openProfile(classroomId,studentId){
-  const client=getClient();if(!client){notify('Não foi possível acessar os dados do aluno agora.');return}
-  openModal();const body=document.getElementById('gplusTeacherStudentProfileBody');if(body)body.innerHTML='<div class="notice">Montando o perfil do aluno…</div>';
-  try{const {data,error}=await client.rpc('get_teacher_student_dashboard',{p_classroom_id:classroomId,p_student_id:studentId});if(error)throw error;renderProfile(data||{})}catch(error){console.error('[Gabarito+] perfil individual:',error);if(body)body.innerHTML=`<div class="notice"><strong>Não foi possível carregar o perfil.</strong><br>${esc(error?.message||error)}</div>`}
+  if(!classroomId||!studentId)return;
+  const client=getClient();
+  if(!client){notify('Não foi possível acessar os dados do aluno agora.');return}
+  openModal();
+  const body=document.getElementById('gplusStudentProfileBodyV2');
+  if(body)body.innerHTML='<div class="notice">Montando o perfil do aluno…</div>';
+  try{
+    const {data,error}=await client.rpc('get_teacher_student_dashboard',{p_classroom_id:classroomId,p_student_id:studentId});
+    if(error)throw error;
+    renderProfile(data||{});
+  }catch(error){
+    console.error('[Gabarito+] perfil individual:',error);
+    if(body)body.innerHTML=`<div class="notice"><strong>Não foi possível carregar o perfil.</strong><br>${esc(error?.message||error)}</div>`;
+  }
 }
 
 function onClick(event){
-  const btn=event.target.closest?.('[data-open-student-profile]');
-  if(btn){openProfile(btn.dataset.classroomId,btn.dataset.openStudentProfile);return}
-  const row=event.target.closest?.('.gplus-student-row');
-  if(row&&event.target.closest?.('strong[data-gplus-student-name]'))openProfile(row.dataset.gplusClassroomId,row.dataset.gplusStudentId);
+  const button=event.target.closest?.('[data-open-student-profile-v2]');
+  if(button){event.preventDefault();event.stopPropagation();openProfile(button.dataset.classroomId,button.dataset.openStudentProfileV2);return}
+  const name=event.target.closest?.('[data-gplus-student-name]');
+  if(name){const row=name.closest('.gplus-student-row');if(row)openProfile(row.dataset.gplusClassroomId,row.dataset.gplusStudentId)}
 }
-function init(){ensureStyle();ensureModal();document.addEventListener('click',onClick);const observer=new MutationObserver(()=>schedule());observer.observe(document.body,{childList:true,subtree:true});schedule(40)}
+
+function init(){
+  ensureStyles();ensureModal();
+  document.addEventListener('click',onClick);
+  document.addEventListener('change',event=>{if(event.target?.id==='gplusTeacherClassSelect'){lastClassroom='';membersCache=[];schedule(100)}});
+  const observer=new MutationObserver(()=>schedule());
+  observer.observe(document.body,{childList:true,subtree:true});
+  schedule(30);
+}
+
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

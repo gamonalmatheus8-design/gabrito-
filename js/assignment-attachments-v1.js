@@ -24,6 +24,9 @@ function ensureAssets(){
   if(!document.querySelector('link[data-gplus-assignment-attachments-css]')){
     const l=document.createElement('link');l.rel='stylesheet';l.href='/assets/assignment-attachments-v1.css?v=1.0.0';l.dataset.gplusAssignmentAttachmentsCss='1';document.head.appendChild(l);
   }
+  if(!document.querySelector('script[data-gplus-assignment-title-edit]')){
+    const s=document.createElement('script');s.src='/js/assignment-title-edit-v1.js?v=1.0.0';s.defer=true;s.dataset.gplusAssignmentTitleEdit='1';document.head.appendChild(s);
+  }
   if(!document.getElementById('gplusAttachmentInput')){
     const input=document.createElement('input');input.type='file';input.id='gplusAttachmentInput';input.hidden=true;input.multiple=true;
     input.accept='.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.webp';

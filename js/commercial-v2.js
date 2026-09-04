@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const V='2.0.0',cfg=window.ESTUDOS_SUPABASE_CONFIG||{},CLASSROOM_VERSION='1.0.0';
+const V='2.0.0',cfg=window.ESTUDOS_SUPABASE_CONFIG||{},CLASSROOM_VERSION='1.1.0';
 const DIAG_KEY='gplus_v2_diagnostic_done',ANON_KEY='gplus_v2_anon_id';
 let reportQuestion=null,lastPage='',lastPageAt=0;
 const safeParse=(raw,fallback)=>{try{return JSON.parse(raw)}catch{return fallback}};

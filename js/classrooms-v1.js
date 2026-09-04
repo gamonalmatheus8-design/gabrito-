@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-if(window.__GABARITO_CLASSROOMS_LOADER_V27__)return;
-window.__GABARITO_CLASSROOMS_LOADER_V27__=true;
+if(window.__GABARITO_CLASSROOMS_LOADER_V28__)return;
+window.__GABARITO_CLASSROOMS_LOADER_V28__=true;
 
 function load(src,attr,onload){
   const existing=document.querySelector(`script[${attr}]`);
@@ -25,8 +25,6 @@ load('/js/classrooms-core-v1.js?v=1.0.1','data-gplus-classrooms-core',()=>{
   load('/js/teacher-performance-direct-v1.js?v=1.0.0','data-gplus-teacher-performance-direct');
   load('/js/teacher-classroom-layout-v1.js?v=1.0.0','data-gplus-teacher-classroom-layout');
   load('/js/teacher-student-profile-v3.js?v=3.1.0','data-gplus-teacher-student-profile-v3');
-  load('/js/coordinator-school-v1.js?v=1.0.1','data-gplus-coordinator-school',()=>{
-    load('/js/coordinator-access-v2.js?v=2.0.0','data-gplus-coordinator-access');
-  });
+  load('/js/coordinator-school-v1.js?v=1.0.1','data-gplus-coordinator-school');
 });
 })();

@@ -7,6 +7,7 @@ const classrooms = await readFile(new URL('../js/classrooms-core-v1.js', import.
 const studentMode = await readFile(new URL('../js/student-classroom-mode-v1.js', import.meta.url), 'utf8');
 const studentJoin = await readFile(new URL('../js/student-join-rpc-v1.js', import.meta.url), 'utf8');
 const attachments = await readFile(new URL('../js/assignment-attachments-v1.js', import.meta.url), 'utf8');
+const teacherSubmissions = await readFile(new URL('../js/teacher-submissions-v1.js', import.meta.url), 'utf8');
 const commercial = await readFile(new URL('../js/commercial-v2.js', import.meta.url), 'utf8');
 const css = await readFile(new URL('../assets/classrooms-v1.css', import.meta.url), 'utf8');
 const attachmentCss = await readFile(new URL('../assets/assignment-attachments-v1.css', import.meta.url), 'utf8');
@@ -19,6 +20,7 @@ test('area de turmas e carregada pela camada comercial', () => {
   assert.match(loader, /student-classroom-mode-v1\.js/);
   assert.match(loader, /student-join-rpc-v1\.js/);
   assert.match(loader, /assignment-attachments-v1\.js/);
+  assert.match(loader, /teacher-submissions-v1\.js/);
 });
 
 test('aluno entra na turma pelo codigo usando rpc autenticada', () => {
@@ -45,6 +47,16 @@ test('professor cria atividade pelo fluxo transacional do banco', () => {
   assert.match(classrooms, /from\(['\"]classrooms['\"]\)\.insert/);
   assert.match(classrooms, /data-copy-code/);
   assert.match(classrooms, /assignment_submissions/);
+});
+
+test('professor visualiza entregas e respostas dos alunos', () => {
+  assert.match(teacherSubmissions, /Ver entregas/);
+  assert.match(teacherSubmissions, /assignment_submissions/);
+  assert.match(teacherSubmissions, /classroom_members/);
+  assert.match(teacherSubmissions, /get_teacher_submission_review/);
+  assert.match(teacherSubmissions, /Ver respostas/);
+  assert.match(teacherSubmissions, /Média da turma/);
+  assert.match(teacherSubmissions, /Ainda não entregou/);
 });
 
 test('interface possui navegacao, modo professor, modo aluno e adaptacao mobile', () => {

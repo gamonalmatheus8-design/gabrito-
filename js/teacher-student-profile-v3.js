@@ -1,138 +1,136 @@
 (function(){
 'use strict';
-if(window.__GABARITO_TEACHER_STUDENT_PROFILE_V3__)return;
-window.__GABARITO_TEACHER_STUDENT_PROFILE_V3__=true;
+if(window.__GABARITO_TEACHER_STUDENT_PROFILE_V4__)return;
+window.__GABARITO_TEACHER_STUDENT_PROFILE_V4__=true;
 
 const getClient=()=>window.__ESTUDOS_SUPABASE?.client||window.estudosSupabase||null;
 const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const num=value=>Number.isFinite(Number(value))?Number(value):0;
+const clamp=value=>Math.max(0,Math.min(100,num(value)));
 const fmtDate=value=>value?new Date(value).toLocaleDateString('pt-BR'):'—';
 const fmtDateTime=value=>value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—';
 let decorating=false;
 
 function icon(name){return `<i data-lucide="${name}" class="icon"></i>`}
 function refreshIcons(){if(window.lucide)window.lucide.createIcons()}
+function initials(name){return String(name||'Aluno').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'A'}
+function daysSince(value){if(!value)return null;return Math.max(0,Math.floor((Date.now()-new Date(value).getTime())/86400000))}
+function statusInfo(summary){
+  const avg=num(summary.average_pct),part=num(summary.participation_pct),delta=num(summary.evolution_delta);
+  if(part<50)return{label:'Acompanhamento necessário',tone:'attention'};
+  if(avg>=80&&part>=80)return{label:'Excelente desempenho',tone:'great'};
+  if(delta>=5)return{label:'Em evolução',tone:'good'};
+  if(avg>=60)return{label:'Bom progresso',tone:'good'};
+  return{label:'Ponto de atenção',tone:'attention'};
+}
+function priorityInfo(pct){pct=num(pct);if(pct<45)return{label:'Prioridade alta',tone:'high'};if(pct<65)return{label:'Atenção',tone:'medium'};return{label:'Em evolução',tone:'low'}}
 
 function ensureStyle(){
-  if(document.getElementById('gplusStudentProfileV3Style'))return;
+  if(document.getElementById('gplusStudentProfileV4Style'))return;
   const style=document.createElement('style');
-  style.id='gplusStudentProfileV3Style';
+  style.id='gplusStudentProfileV4Style';
   style.textContent=`
-    .gplus-profile-inline-action{display:inline-flex!important;align-items:center;gap:6px;margin-top:7px!important;padding:0!important;border:0!important;background:transparent!important;color:var(--primary)!important;font-size:10px!important;font-weight:800!important;cursor:pointer!important;line-height:1.35!important}
-    .gplus-profile-inline-action .icon{width:13px;height:13px}
-    .gplus-profile-click-name{cursor:pointer;text-decoration:none}.gplus-profile-click-name:hover{color:var(--primary)}
-    .gplus-profile-v3-modal{position:fixed;inset:0;z-index:260;display:none}.gplus-profile-v3-modal.open{display:grid;place-items:center;padding:18px}
-    .gplus-profile-v3-backdrop{position:absolute;inset:0;background:rgba(8,13,23,.72);backdrop-filter:blur(8px)}
-    .gplus-profile-v3-dialog{position:relative;z-index:1;width:min(1040px,100%);max-height:92vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 28px 90px rgba(0,0,0,.36);padding:20px}
-    .gplus-profile-v3-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:15px}.gplus-profile-v3-head span{font-size:9px;text-transform:uppercase;letter-spacing:.09em;color:var(--primary);font-weight:800}.gplus-profile-v3-head h2{font:800 22px 'Manrope',sans-serif;letter-spacing:-.03em;margin:3px 0 0}.gplus-profile-v3-head p{font-size:10px;color:var(--muted);margin:4px 0 0}
-    .gplus-profile-v3-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:14px}.gplus-profile-v3-kpi{padding:13px;border:1px solid var(--line);border-radius:13px;background:var(--surface-2)}.gplus-profile-v3-kpi span{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:800}.gplus-profile-v3-kpi strong{display:block;font:800 20px 'Manrope',sans-serif;margin-top:4px}.gplus-profile-v3-kpi small{display:block;font-size:9px;color:var(--muted);margin-top:3px}
-    .gplus-profile-v3-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gplus-profile-v3-section{border:1px solid var(--line);border-radius:14px;background:var(--surface-2);padding:14px;min-width:0}.gplus-profile-v3-section h3{font:800 14px 'Manrope',sans-serif;margin:0 0 10px}.gplus-profile-v3-list{display:grid;gap:8px}.gplus-profile-v3-item{padding:11px;border:1px solid var(--line);border-radius:11px;background:var(--surface)}.gplus-profile-v3-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.gplus-profile-v3-top strong{font-size:11px}.gplus-profile-v3-meta{font-size:9px;color:var(--muted);margin-top:3px}.gplus-profile-v3-bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:8px}.gplus-profile-v3-bar span{display:block;height:100%;background:var(--primary);border-radius:999px}.gplus-profile-v3-history{grid-column:1/-1}.gplus-profile-v3-status{font-size:8px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:4px 7px;border:1px solid var(--line);border-radius:999px}.gplus-profile-v3-empty{padding:15px;border:1px dashed var(--line-2);border-radius:11px;color:var(--muted);font-size:10px;text-align:center}
-    @media(max-width:820px){.gplus-profile-v3-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.gplus-profile-v3-grid{grid-template-columns:1fr}.gplus-profile-v3-history{grid-column:auto}}
-    @media(max-width:620px){.gplus-profile-v3-modal.open{padding:0;align-items:end}.gplus-profile-v3-dialog{width:100%;max-height:95vh;border-radius:20px 20px 0 0;border-bottom:0;padding:16px}}
+  .gplus-profile-inline-action{display:inline-flex!important;align-items:center;gap:6px;margin-top:7px!important;padding:0!important;border:0!important;background:transparent!important;color:var(--primary)!important;font-size:10px!important;font-weight:800!important;cursor:pointer!important;line-height:1.35!important}.gplus-profile-inline-action .icon{width:13px;height:13px}.gplus-profile-click-name{cursor:pointer}.gplus-profile-click-name:hover{color:var(--primary)}
+  .gplus-premium-modal{position:fixed;inset:0;z-index:270;display:none}.gplus-premium-modal.open{display:grid;place-items:center;padding:18px}.gplus-premium-backdrop{position:absolute;inset:0;background:rgba(7,11,20,.76);backdrop-filter:blur(10px)}
+  .gplus-premium-dialog{position:relative;z-index:1;width:min(1140px,100%);max-height:94vh;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:26px;box-shadow:0 34px 110px rgba(0,0,0,.34);padding:22px;animation:gplusPremiumIn .18s ease-out}@keyframes gplusPremiumIn{from{opacity:0;transform:translateY(10px) scale(.99)}to{opacity:1;transform:none}}
+  .gplus-premium-header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:2px 2px 18px;border-bottom:1px solid var(--line);margin-bottom:18px}.gplus-premium-identity{display:flex;gap:14px;align-items:center;min-width:0}.gplus-premium-avatar{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--primary-soft),var(--surface-2));border:1px solid color-mix(in srgb,var(--primary) 24%,var(--line));color:var(--primary);font:800 16px 'Manrope',sans-serif;flex:0 0 auto}.gplus-premium-kicker{font-size:9px;text-transform:uppercase;letter-spacing:.11em;color:var(--primary);font-weight:800}.gplus-premium-title{font:800 24px 'Manrope',sans-serif;letter-spacing:-.035em;margin:3px 0 2px}.gplus-premium-sub{font-size:10px;color:var(--muted);line-height:1.5}.gplus-premium-headright{display:flex;align-items:center;gap:10px}.gplus-premium-status{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;font-size:9px;font-weight:800;border:1px solid var(--line);white-space:nowrap}.gplus-premium-status.good,.gplus-premium-status.great{color:var(--primary);background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 22%,var(--line))}.gplus-premium-status.attention{color:var(--warning);background:color-mix(in srgb,var(--warning) 8%,var(--surface));border-color:color-mix(in srgb,var(--warning) 24%,var(--line))}
+  .gplus-premium-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.gplus-premium-kpi{padding:15px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--surface-2),color-mix(in srgb,var(--surface-2) 72%,var(--surface)));min-width:0}.gplus-premium-kpi-label{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800}.gplus-premium-kpi-value{display:block;font:800 25px 'Manrope',sans-serif;letter-spacing:-.04em;margin:5px 0 3px}.gplus-premium-kpi-note{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gplus-premium-insight{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;padding:17px 18px;border:1px solid color-mix(in srgb,var(--primary) 18%,var(--line));border-radius:17px;background:linear-gradient(135deg,color-mix(in srgb,var(--primary-soft) 72%,var(--surface)),var(--surface));margin-bottom:14px}.gplus-premium-insight h3{font:800 15px 'Manrope',sans-serif;margin:2px 0 5px}.gplus-premium-insight p{font-size:10px;color:var(--muted);line-height:1.6;margin:0;max-width:78ch}.gplus-premium-priority{min-width:150px;padding:11px 12px;border-left:1px solid var(--line)}.gplus-premium-priority span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:800}.gplus-premium-priority strong{display:block;font:800 13px 'Manrope',sans-serif;margin-top:4px}
+  .gplus-premium-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:12px;margin-bottom:12px}.gplus-premium-card{border:1px solid var(--line);border-radius:17px;background:var(--surface-2);padding:15px;min-width:0}.gplus-premium-cardhead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}.gplus-premium-cardhead h3{font:800 14px 'Manrope',sans-serif;margin:0}.gplus-premium-cardhead span{font-size:9px;color:var(--muted)}
+  .gplus-premium-chart{height:226px;border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:10px;overflow:hidden}.gplus-premium-chart svg{width:100%;height:180px;display:block;color:var(--text)}.gplus-premium-chart-labels{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(70px,1fr);gap:5px;overflow:auto}.gplus-premium-chart-labels div{font-size:8px;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gplus-premium-empty{min-height:150px;display:grid;place-items:center;border:1px dashed var(--line-2);border-radius:13px;color:var(--muted);font-size:10px;text-align:center;padding:18px;background:var(--surface)}
+  .gplus-premium-subjects{display:grid;gap:9px}.gplus-premium-subject{padding:10px 11px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.gplus-premium-subjecttop{display:flex;justify-content:space-between;gap:10px;align-items:center}.gplus-premium-subjecttop strong{font-size:10px}.gplus-premium-subjecttop b{font:800 11px 'Manrope',sans-serif}.gplus-premium-subjectmeta{font-size:8px;color:var(--muted);margin-top:3px}.gplus-premium-bar{height:6px;background:var(--line);border-radius:999px;overflow:hidden;margin-top:7px}.gplus-premium-bar span{display:block;height:100%;background:var(--primary);border-radius:999px}
+  .gplus-premium-focusgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.gplus-premium-focus{padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface);min-width:0}.gplus-premium-focusbadge{display:inline-block;font-size:8px;font-weight:800;padding:4px 7px;border-radius:999px;border:1px solid var(--line);margin-bottom:8px}.gplus-premium-focusbadge.high{color:var(--danger);background:color-mix(in srgb,var(--danger) 7%,var(--surface))}.gplus-premium-focusbadge.medium{color:var(--warning);background:color-mix(in srgb,var(--warning) 7%,var(--surface))}.gplus-premium-focusbadge.low{color:var(--success);background:color-mix(in srgb,var(--success) 7%,var(--surface))}.gplus-premium-focus strong{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gplus-premium-focus p{font-size:8px;color:var(--muted);line-height:1.45;margin:4px 0 0}
+  .gplus-premium-compare{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.gplus-premium-compare>div{padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}.gplus-premium-compare span{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800}.gplus-premium-compare strong{display:block;font:800 18px 'Manrope',sans-serif;margin-top:4px}.gplus-premium-compare small{font-size:8px;color:var(--muted)}
+  .gplus-premium-filters{display:flex;gap:6px;flex-wrap:wrap}.gplus-premium-filter{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-size:8px;font-weight:800;padding:6px 9px;border-radius:999px;cursor:pointer}.gplus-premium-filter.active{background:var(--primary);border-color:var(--primary);color:#fff}.gplus-premium-activitylist{display:grid;gap:8px}.gplus-premium-activity{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}.gplus-premium-activity[hidden]{display:none}.gplus-premium-activity strong{display:block;font-size:10px}.gplus-premium-activitymeta{font-size:8px;color:var(--muted);line-height:1.5;margin-top:3px}.gplus-premium-activityright{display:flex;align-items:center;gap:9px;flex:0 0 auto}.gplus-premium-score{font:800 13px 'Manrope',sans-serif}.gplus-premium-chip{font-size:8px;font-weight:800;padding:5px 7px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}.gplus-premium-chip.submitted{color:var(--success);background:color-mix(in srgb,var(--success) 7%,var(--surface))}.gplus-premium-chip.in_progress{color:var(--warning);background:color-mix(in srgb,var(--warning) 7%,var(--surface))}.gplus-premium-chip.pending{color:var(--muted);background:var(--surface-2)}
+  .gplus-premium-bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,.55fr);gap:12px;margin-top:12px}.gplus-premium-timeline{display:grid;gap:0}.gplus-premium-timeitem{display:grid;grid-template-columns:54px 12px minmax(0,1fr);gap:8px;align-items:start;padding:7px 0}.gplus-premium-timeitem time{font-size:8px;font-weight:800;color:var(--muted);text-transform:uppercase}.gplus-premium-dot{width:8px;height:8px;border-radius:50%;background:var(--primary);margin-top:3px;box-shadow:0 0 0 4px var(--primary-soft)}.gplus-premium-timecopy strong{display:block;font-size:9px}.gplus-premium-timecopy span{font-size:8px;color:var(--muted)}.gplus-premium-participation{display:grid;grid-template-columns:1fr 1fr;gap:8px}.gplus-premium-participation>div{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.gplus-premium-participation span{display:block;font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:800}.gplus-premium-participation strong{display:block;font:800 16px 'Manrope',sans-serif;margin-top:4px}.gplus-premium-footer{display:flex;justify-content:flex-end;gap:8px;padding-top:16px;margin-top:16px;border-top:1px solid var(--line)}
+  @media(max-width:900px){.gplus-premium-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.gplus-premium-grid,.gplus-premium-bottom{grid-template-columns:1fr}.gplus-premium-focusgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:620px){.gplus-premium-modal.open{padding:0;align-items:end}.gplus-premium-dialog{width:100%;max-height:96vh;border-radius:22px 22px 0 0;border-bottom:0;padding:16px}.gplus-premium-header{align-items:flex-start}.gplus-premium-headright{align-items:flex-end;flex-direction:column}.gplus-premium-status{white-space:normal;text-align:center}.gplus-premium-kpis{grid-template-columns:1fr 1fr}.gplus-premium-insight{grid-template-columns:1fr}.gplus-premium-priority{border-left:0;border-top:1px solid var(--line);padding-left:0}.gplus-premium-focusgrid,.gplus-premium-compare{grid-template-columns:1fr 1fr}.gplus-premium-activity{align-items:flex-start;flex-direction:column}.gplus-premium-activityright{width:100%;justify-content:space-between}}
   `;
   document.head.appendChild(style);
 }
 
 function ensureModal(){
-  if(document.getElementById('gplusStudentProfileV3Modal'))return;
+  if(document.getElementById('gplusStudentPremiumModal'))return;
   const modal=document.createElement('div');
-  modal.id='gplusStudentProfileV3Modal';
-  modal.className='gplus-profile-v3-modal';
-  modal.setAttribute('aria-hidden','true');
-  modal.innerHTML=`<div class="gplus-profile-v3-backdrop" data-gplus-profile-close></div><div class="gplus-profile-v3-dialog" role="dialog" aria-modal="true" aria-labelledby="gplusStudentProfileV3Title"><div class="gplus-profile-v3-head"><div><span>Perfil individual</span><h2 id="gplusStudentProfileV3Title">Aluno</h2><p id="gplusStudentProfileV3Meta"></p></div><button class="icon-btn" type="button" data-gplus-profile-close aria-label="Fechar perfil do aluno">${icon('x')}</button></div><div id="gplusStudentProfileV3Body"></div></div>`;
+  modal.id='gplusStudentPremiumModal';modal.className='gplus-premium-modal';modal.setAttribute('aria-hidden','true');
+  modal.innerHTML=`<div class="gplus-premium-backdrop" data-gplus-profile-close></div><div class="gplus-premium-dialog" role="dialog" aria-modal="true" aria-labelledby="gplusStudentPremiumTitle"><div id="gplusStudentPremiumBody"></div></div>`;
   document.body.appendChild(modal);
-  modal.querySelectorAll('[data-gplus-profile-close]').forEach(el=>el.addEventListener('click',closeModal));
-  refreshIcons();
+  modal.querySelector('[data-gplus-profile-close]')?.addEventListener('click',closeModal);
 }
-function openModal(){ensureModal();const m=document.getElementById('gplusStudentProfileV3Modal');m?.classList.add('open');m?.setAttribute('aria-hidden','false')}
-function closeModal(){const m=document.getElementById('gplusStudentProfileV3Modal');m?.classList.remove('open');m?.setAttribute('aria-hidden','true')}
+function openModal(){ensureModal();const m=document.getElementById('gplusStudentPremiumModal');m?.classList.add('open');m?.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+function closeModal(){const m=document.getElementById('gplusStudentPremiumModal');m?.classList.remove('open');m?.setAttribute('aria-hidden','true');document.body.style.overflow=''}
 
 function decorateRows(){
-  if(decorating)return;
-  decorating=true;
+  if(decorating)return;decorating=true;
   try{
     const classroomId=document.getElementById('gplusTeacherClassSelect')?.value||'';
     const rows=[...document.querySelectorAll('#page-classrooms .gplus-student-list .gplus-student-row')];
     rows.forEach((row,index)=>{
-      const info=row.children?.[1]||row.querySelector('div:last-child');
-      if(!info)return;
-      row.dataset.gplusProfileRowIndex=String(index);
-      row.dataset.gplusProfileClassroomId=classroomId;
-      const name=info.querySelector('strong');
-      if(name){name.classList.add('gplus-profile-click-name');name.dataset.gplusProfileName='1';name.title='Abrir perfil do aluno'}
-      if(!info.querySelector('[data-gplus-profile-open]')){
-        const btn=document.createElement('button');
-        btn.type='button';
-        btn.className='gplus-profile-inline-action';
-        btn.dataset.gplusProfileOpen='1';
-        btn.dataset.rowIndex=String(index);
-        btn.dataset.classroomId=classroomId;
-        btn.innerHTML=`${icon('chart-no-axes-combined')}Ver aluno`;
-        info.appendChild(btn);
-      }else{
-        const btn=info.querySelector('[data-gplus-profile-open]');
-        btn.dataset.rowIndex=String(index);btn.dataset.classroomId=classroomId;
-      }
-    });
-    refreshIcons();
+      const info=row.children?.[1]||row.querySelector('div:last-child');if(!info)return;
+      row.dataset.gplusProfileRowIndex=String(index);row.dataset.gplusProfileClassroomId=classroomId;
+      const name=info.querySelector('strong');if(name){name.classList.add('gplus-profile-click-name');name.dataset.gplusProfileName='1';name.title='Abrir perfil do aluno'}
+      let btn=info.querySelector('[data-gplus-profile-open]');
+      if(!btn){btn=document.createElement('button');btn.type='button';btn.className='gplus-profile-inline-action';btn.dataset.gplusProfileOpen='1';btn.innerHTML=`${icon('chart-no-axes-combined')}Ver aluno`;info.appendChild(btn)}
+      btn.dataset.rowIndex=String(index);btn.dataset.classroomId=classroomId;
+    });refreshIcons();
   }finally{decorating=false}
 }
-
 async function resolveStudent(classroomId,index){
-  const client=getClient();
-  if(!client)throw new Error('Conta ainda está conectando. Atualize e tente novamente.');
+  const client=getClient();if(!client)throw new Error('Conta ainda está conectando.');
   const {data,error}=await client.from('classroom_members').select('user_id,joined_at').eq('classroom_id',classroomId).eq('role','student').order('joined_at',{ascending:true});
-  if(error)throw error;
-  const member=(data||[])[Number(index)];
-  if(!member?.user_id)throw new Error('Não foi possível identificar este aluno.');
-  return member;
+  if(error)throw error;const member=(data||[])[Number(index)];if(!member?.user_id)throw new Error('Não foi possível identificar este aluno.');return member;
 }
 
-function renderProfile(data){
-  const student=data?.student||{},s=data?.summary||{},subjects=Array.isArray(data?.subjects)?data.subjects:[],history=Array.isArray(data?.history)?data.history:[],evolution=Array.isArray(data?.evolution)?data.evolution:[];
-  const title=document.getElementById('gplusStudentProfileV3Title');
-  const meta=document.getElementById('gplusStudentProfileV3Meta');
-  const body=document.getElementById('gplusStudentProfileV3Body');
-  if(title)title.textContent=student.display_name||'Aluno';
-  if(meta)meta.textContent=`Na turma desde ${fmtDate(student.joined_at)}`;
-  const delta=num(s.evolution_delta);const deltaText=delta>0?`+${delta} pp`:delta<0?`${delta} pp`:'0 pp';
-  const evolutionHtml=evolution.length?evolution.map(item=>`<div class="gplus-profile-v3-item"><div class="gplus-profile-v3-top"><strong>${esc(item.title||'Atividade')}</strong><b>${num(item.pct)}%</b></div><div class="gplus-profile-v3-bar"><span style="width:${Math.max(0,Math.min(100,num(item.pct)))}%"></span></div></div>`).join(''):'<div class="gplus-profile-v3-empty">A evolução aparecerá após as atividades entregues.</div>';
-  const subjectsHtml=subjects.length?subjects.slice(0,8).map(item=>`<div class="gplus-profile-v3-item"><div class="gplus-profile-v3-top"><strong>${esc(item.subject||'Matéria')}</strong><b>${num(item.pct)}%</b></div><div class="gplus-profile-v3-meta">${num(item.error_count)} erro(s) · ${num(item.answered_count)} resposta(s)</div><div class="gplus-profile-v3-bar"><span style="width:${Math.max(0,Math.min(100,num(item.pct)))}%"></span></div></div>`).join(''):'<div class="gplus-profile-v3-empty">Ainda não há respostas suficientes para analisar matérias.</div>';
+function evolutionChart(points){
+  if(points.length<2){
+    if(points.length===1)return `<div class="gplus-premium-empty"><div><strong>${num(points[0].pct)}%</strong><br>Primeira entrega registrada. A tendência aparecerá após novas atividades.</div></div>`;
+    return '<div class="gplus-premium-empty">A evolução aparecerá após as primeiras atividades entregues.</div>';
+  }
+  const w=680,h=180,px=30,py=20;
+  const coords=points.map((p,i)=>({x:px+i*(w-px*2)/(points.length-1),y:py+(100-clamp(p.pct))*(h-py*2)/100,pct:clamp(p.pct)}));
+  const poly=coords.map(p=>`${p.x},${p.y}`).join(' ');
+  const dots=coords.map((p,i)=>`<circle cx="${p.x}" cy="${p.y}" r="5" fill="var(--primary)"/><text x="${p.x}" y="${Math.max(12,p.y-10)}" text-anchor="middle" font-size="10" fill="currentColor">${p.pct}%</text><title>${esc(points[i].title)} · ${p.pct}%</title>`).join('');
+  return `<div class="gplus-premium-chart"><svg viewBox="0 0 ${w} ${h}" aria-label="Evolução do aluno"><line x1="${px}" y1="${py}" x2="${w-px}" y2="${py}" stroke="var(--line)"/><line x1="${px}" y1="${h/2}" x2="${w-px}" y2="${h/2}" stroke="var(--line)"/><line x1="${px}" y1="${h-py}" x2="${w-px}" y2="${h-py}" stroke="var(--line)"/><polyline points="${poly}" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>${dots}</svg><div class="gplus-premium-chart-labels">${points.map(p=>`<div title="${esc(p.title)}">${esc(p.title)}</div>`).join('')}</div></div>`;
+}
+
+function buildInsight(data){
+  const s=data.summary||{},subjects=Array.isArray(data.subjects)?data.subjects:[],comparison=data.class_comparison||{};
+  const weakest=subjects[0];const pending=num(s.pending_count),delta=num(s.evolution_delta),diff=num(comparison.difference_pct);
+  let headline='Acompanhamento do aluno';let text='O painel será enriquecido conforme novas atividades forem entregues.';
+  if(weakest){headline=`${weakest.subject} é o principal ponto de atenção`;text=`O aluno tem ${num(weakest.pct)}% de aproveitamento em ${weakest.subject}. ${pending?`Há ${pending} atividade(s) pendente(s). `:''}${delta>0?`A evolução recente é positiva, com +${delta} ponto(s) percentuais desde a primeira entrega. `:''}${diff>0?`A média geral está ${diff} ponto(s) acima da média da turma.`:diff<0?`A média geral está ${Math.abs(diff)} ponto(s) abaixo da média da turma.`:''}`.trim()}
+  return{headline,text,priority:weakest?.subject||'Acompanhar próximas entregas'};
+}
+
+function renderProfile(data,classroomName){
+  const student=data?.student||{},s=data?.summary||{},comparison=data?.class_comparison||{},subjects=Array.isArray(data?.subjects)?data.subjects:[],focus=Array.isArray(data?.focus_topics)?data.focus_topics:[],history=Array.isArray(data?.history)?data.history:[],evolution=Array.isArray(data?.evolution)?data.evolution:[];
+  const body=document.getElementById('gplusStudentPremiumBody');if(!body)return;
+  const status=statusInfo(s),insight=buildInsight(data),delta=num(s.evolution_delta),deltaText=delta>0?`+${delta} pts`:delta<0?`${delta} pts`:'0 pts',diff=num(comparison.difference_pct),lastDays=daysSince(s.last_submitted_at);
+  const subjectHtml=subjects.slice(0,7).map(x=>`<div class="gplus-premium-subject"><div class="gplus-premium-subjecttop"><strong>${esc(x.subject)}</strong><b>${num(x.pct)}%</b></div><div class="gplus-premium-subjectmeta">${num(x.correct_count)}/${num(x.answered_count)} acertos · ${num(x.error_count)} erro(s)</div><div class="gplus-premium-bar"><span style="width:${clamp(x.pct)}%"></span></div></div>`).join('');
+  const focusHtml=focus.slice(0,4).map(x=>{const p=priorityInfo(x.pct);return `<div class="gplus-premium-focus"><span class="gplus-premium-focusbadge ${p.tone}">${p.label}</span><strong title="${esc(x.topic)}">${esc(x.topic)}</strong><p>${esc(x.subject)} · ${num(x.pct)}% de acerto<br>${num(x.answered_count)} respostas · ${num(x.error_count)} erro(s)</p></div>`}).join('');
   const statusLabel={submitted:'Entregue',in_progress:'Em andamento',pending:'Pendente'};
-  const historyHtml=history.length?history.map(item=>`<div class="gplus-profile-v3-item"><div class="gplus-profile-v3-top"><div><strong>${esc(item.title||'Atividade')}</strong><div class="gplus-profile-v3-meta">${item.status==='submitted'?`Entregue ${fmtDateTime(item.submitted_at)}`:item.status==='in_progress'?`Iniciada ${fmtDateTime(item.started_at)}`:item.due_at?`Prazo ${fmtDateTime(item.due_at)}`:'Ainda não iniciada'}${item.duration_minutes!=null?` · ${num(item.duration_minutes)} min`:''}</div></div><div style="display:flex;align-items:center;gap:8px">${item.pct!=null?`<b>${num(item.pct)}%</b>`:''}<span class="gplus-profile-v3-status">${statusLabel[item.status]||esc(item.status||'—')}</span></div></div></div>`).join(''):'<div class="gplus-profile-v3-empty">Nenhuma atividade disponível nesta turma.</div>';
-  if(body)body.innerHTML=`<div class="gplus-profile-v3-kpis"><div class="gplus-profile-v3-kpi"><span>Média geral</span><strong>${num(s.average_pct)}%</strong><small>atividades entregues</small></div><div class="gplus-profile-v3-kpi"><span>Entregues</span><strong>${num(s.submitted_count)}/${num(s.total_assignments)}</strong><small>${num(s.pending_count)} pendente(s)</small></div><div class="gplus-profile-v3-kpi"><span>Melhor resultado</span><strong>${num(s.best_pct)}%</strong><small>melhor atividade</small></div><div class="gplus-profile-v3-kpi"><span>Último resultado</span><strong>${num(s.last_pct)}%</strong><small>atividade mais recente</small></div><div class="gplus-profile-v3-kpi"><span>Evolução</span><strong>${deltaText}</strong><small>primeira → última entrega</small></div></div><div class="gplus-profile-v3-grid"><section class="gplus-profile-v3-section"><h3>Evolução nas atividades</h3><div class="gplus-profile-v3-list">${evolutionHtml}</div></section><section class="gplus-profile-v3-section"><h3>Matérias com mais dificuldade</h3><div class="gplus-profile-v3-list">${subjectsHtml}</div></section><section class="gplus-profile-v3-section gplus-profile-v3-history"><h3>Histórico de atividades</h3><div class="gplus-profile-v3-list">${historyHtml}</div></section></div>`;
+  const activityHtml=history.map(x=>`<div class="gplus-premium-activity" data-profile-activity-status="${esc(x.status)}"><div><strong>${esc(x.title)}</strong><div class="gplus-premium-activitymeta">${x.status==='submitted'?`Entregue ${fmtDateTime(x.submitted_at)}`:x.status==='in_progress'?`Iniciada ${fmtDateTime(x.started_at)}`:x.due_at?`Prazo ${fmtDateTime(x.due_at)}`:'Ainda não iniciada'}${x.duration_minutes!=null?` · ${num(x.duration_minutes)} min`:''}${x.status==='submitted'&&x.question_count?` · ${num(x.correct_count)}/${num(x.question_count)} acertos`:''}</div></div><div class="gplus-premium-activityright">${x.pct!=null?`<span class="gplus-premium-score">${num(x.pct)}%</span>`:''}<span class="gplus-premium-chip ${esc(x.status)}">${statusLabel[x.status]||esc(x.status)}</span></div></div>`).join('');
+  const timelineHtml=history.filter(x=>x.submitted_at).slice(0,5).map(x=>`<div class="gplus-premium-timeitem"><time>${new Date(x.submitted_at).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}).replace('.','')}</time><span class="gplus-premium-dot"></span><div class="gplus-premium-timecopy"><strong>${esc(x.title)}</strong><span>${x.pct!=null?`${num(x.pct)}% · `:''}${fmtDateTime(x.submitted_at)}</span></div></div>`).join('');
+  body.innerHTML=`
+    <header class="gplus-premium-header"><div class="gplus-premium-identity"><div class="gplus-premium-avatar">${esc(initials(student.display_name))}</div><div><div class="gplus-premium-kicker">Perfil individual</div><h2 class="gplus-premium-title" id="gplusStudentPremiumTitle">${esc(student.display_name||'Aluno')}</h2><div class="gplus-premium-sub">${esc(classroomName||'Turma')} · na turma desde ${fmtDate(student.joined_at)}${s.last_submitted_at?` · última entrega ${fmtDate(s.last_submitted_at)}`:''}</div></div></div><div class="gplus-premium-headright"><span class="gplus-premium-status ${status.tone}">${icon(status.tone==='attention'?'circle-alert':'trending-up')}${status.label}</span><button class="icon-btn" type="button" data-gplus-profile-close aria-label="Fechar perfil">${icon('x')}</button></div></header>
+    <div class="gplus-premium-kpis"><div class="gplus-premium-kpi"><span class="gplus-premium-kpi-label">Média geral</span><strong class="gplus-premium-kpi-value">${num(s.average_pct)}%</strong><div class="gplus-premium-kpi-note">${diff===0?'na média da turma':diff>0?`+${diff} pts acima da turma`:`${Math.abs(diff)} pts abaixo da turma`}</div></div><div class="gplus-premium-kpi"><span class="gplus-premium-kpi-label">Entregas</span><strong class="gplus-premium-kpi-value">${num(s.submitted_count)}/${num(s.total_assignments)}</strong><div class="gplus-premium-kpi-note">${num(s.pending_count)} pendente(s) · ${num(s.participation_pct)}% participação</div></div><div class="gplus-premium-kpi"><span class="gplus-premium-kpi-label">Melhor resultado</span><strong class="gplus-premium-kpi-value">${num(s.best_pct)}%</strong><div class="gplus-premium-kpi-note">melhor atividade entregue</div></div><div class="gplus-premium-kpi"><span class="gplus-premium-kpi-label">Evolução</span><strong class="gplus-premium-kpi-value">${deltaText}</strong><div class="gplus-premium-kpi-note">primeira → última entrega</div></div></div>
+    <section class="gplus-premium-insight"><div><div class="gplus-premium-kicker">Análise do aluno</div><h3>${esc(insight.headline)}</h3><p>${esc(insight.text)}</p></div><div class="gplus-premium-priority"><span>Prioridade atual</span><strong>${esc(insight.priority)}</strong></div></section>
+    <div class="gplus-premium-grid"><section class="gplus-premium-card"><div class="gplus-premium-cardhead"><h3>Evolução nas atividades</h3><span>${evolution.length} entrega(s) registrada(s)</span></div>${evolutionChart(evolution)}</section><section class="gplus-premium-card"><div class="gplus-premium-cardhead"><h3>Desempenho por matéria</h3><span>menor aproveitamento primeiro</span></div><div class="gplus-premium-subjects">${subjectHtml||'<div class="gplus-premium-empty">Ainda não há respostas suficientes por matéria.</div>'}</div></section></div>
+    <section class="gplus-premium-card" style="margin-bottom:12px"><div class="gplus-premium-cardhead"><h3>Focos prioritários</h3><span>assuntos que mais merecem revisão</span></div><div class="gplus-premium-focusgrid">${focusHtml||'<div class="gplus-premium-empty" style="grid-column:1/-1">Os focos aparecerão quando houver respostas suficientes.</div>'}</div></section>
+    <section class="gplus-premium-card" style="margin-bottom:12px"><div class="gplus-premium-cardhead"><h3>Em relação à turma</h3><span>comparação pedagógica</span></div><div class="gplus-premium-compare"><div><span>Aluno</span><strong>${num(s.average_pct)}%</strong><small>média geral</small></div><div><span>Média da turma</span><strong>${num(comparison.class_average_pct)}%</strong><small>${num(comparison.scored_student_count)} aluno(s) com nota</small></div><div><span>Diferença</span><strong>${diff>0?'+':''}${diff} pts</strong><small>${diff>0?'acima da média':diff<0?'abaixo da média':'na média'}</small></div><div><span>Posição</span><strong>${comparison.position&&num(comparison.student_count)>1?`${num(comparison.position)}º`:'—'}</strong><small>${num(comparison.student_count)>1?`de ${num(comparison.student_count)} alunos`:'turma com 1 aluno'}</small></div></div></section>
+    <section class="gplus-premium-card"><div class="gplus-premium-cardhead"><div><h3>Atividades</h3><span>entregues, pendentes e em andamento</span></div><div class="gplus-premium-filters"><button class="gplus-premium-filter active" type="button" data-profile-filter="all">Todas</button><button class="gplus-premium-filter" type="button" data-profile-filter="submitted">Entregues</button><button class="gplus-premium-filter" type="button" data-profile-filter="pending">Pendentes</button><button class="gplus-premium-filter" type="button" data-profile-filter="in_progress">Em andamento</button></div></div><div class="gplus-premium-activitylist">${activityHtml||'<div class="gplus-premium-empty">Nenhuma atividade disponível nesta turma.</div>'}</div></section>
+    <div class="gplus-premium-bottom"><section class="gplus-premium-card"><div class="gplus-premium-cardhead"><h3>Histórico recente</h3><span>últimas entregas</span></div><div class="gplus-premium-timeline">${timelineHtml||'<div class="gplus-premium-empty">Nenhuma entrega registrada ainda.</div>'}</div></section><section class="gplus-premium-card"><div class="gplus-premium-cardhead"><h3>Participação</h3><span>ritmo de entrega</span></div><div class="gplus-premium-participation"><div><span>Participação</span><strong>${num(s.participation_pct)}%</strong></div><div><span>Pendentes</span><strong>${num(s.pending_count)}</strong></div><div><span>Tempo médio</span><strong>${num(s.average_duration_minutes)} min</strong></div><div><span>Última entrega</span><strong>${lastDays==null?'—':lastDays===0?'Hoje':`${lastDays}d`}</strong></div></div></section></div>
+    <footer class="gplus-premium-footer"><button class="btn btn-secondary" type="button" data-gplus-profile-close>Fechar</button></footer>`;
+  body.querySelectorAll('[data-gplus-profile-close]').forEach(el=>el.addEventListener('click',closeModal));
+  body.querySelectorAll('[data-profile-filter]').forEach(btn=>btn.addEventListener('click',()=>{const f=btn.dataset.profileFilter;body.querySelectorAll('[data-profile-filter]').forEach(x=>x.classList.toggle('active',x===btn));body.querySelectorAll('[data-profile-activity-status]').forEach(row=>{row.hidden=f!=='all'&&row.dataset.profileActivityStatus!==f})}));
+  refreshIcons();
 }
 
 async function openProfile(classroomId,index){
   if(!classroomId){alert('Selecione uma turma primeiro.');return}
-  openModal();
-  const body=document.getElementById('gplusStudentProfileV3Body');
-  if(body)body.innerHTML='<div class="notice">Carregando perfil do aluno…</div>';
-  try{
-    const member=await resolveStudent(classroomId,index);
-    const client=getClient();
-    const {data,error}=await client.rpc('get_teacher_student_dashboard',{p_classroom_id:classroomId,p_student_id:member.user_id});
-    if(error)throw error;
-    renderProfile(data||{});
-  }catch(error){
-    console.error('[Gabarito+] perfil individual v3:',error);
-    if(body)body.innerHTML=`<div class="notice"><strong>Não foi possível carregar o perfil.</strong><br>${esc(error?.message||error)}</div>`;
-  }
+  openModal();const body=document.getElementById('gplusStudentPremiumBody');if(body)body.innerHTML='<div class="notice">Montando o painel pedagógico…</div>';
+  try{const member=await resolveStudent(classroomId,index);const client=getClient();const {data,error}=await client.rpc('get_teacher_student_dashboard',{p_classroom_id:classroomId,p_student_id:member.user_id});if(error)throw error;const select=document.getElementById('gplusTeacherClassSelect');const classroomName=select?.selectedOptions?.[0]?.textContent||'Turma';renderProfile(data||{},classroomName)}catch(error){console.error('[Gabarito+] perfil premium:',error);if(body)body.innerHTML=`<div class="notice"><strong>Não foi possível carregar o perfil.</strong><br>${esc(error?.message||error)}</div>`}
 }
-
-function onClick(event){
-  const btn=event.target.closest?.('[data-gplus-profile-open]');
-  if(btn){event.preventDefault();event.stopPropagation();openProfile(btn.dataset.classroomId,btn.dataset.rowIndex);return}
-  const name=event.target.closest?.('[data-gplus-profile-name]');
-  if(name){const row=name.closest('.gplus-student-row');openProfile(row?.dataset.gplusProfileClassroomId,row?.dataset.gplusProfileRowIndex)}
-}
-
-function init(){
-  ensureStyle();ensureModal();decorateRows();
-  document.addEventListener('click',onClick);
-  const observer=new MutationObserver(()=>setTimeout(decorateRows,30));
-  observer.observe(document.body,{subtree:true,childList:true});
-  setInterval(decorateRows,1200);
-}
+function onClick(event){const btn=event.target.closest?.('[data-gplus-profile-open]');if(btn){event.preventDefault();event.stopPropagation();openProfile(btn.dataset.classroomId,btn.dataset.rowIndex);return}const name=event.target.closest?.('[data-gplus-profile-name]');if(name){const row=name.closest('.gplus-student-row');openProfile(row?.dataset.gplusProfileClassroomId,row?.dataset.gplusProfileRowIndex)}}
+function init(){ensureStyle();ensureModal();decorateRows();document.addEventListener('click',onClick);const observer=new MutationObserver(()=>setTimeout(decorateRows,30));observer.observe(document.body,{subtree:true,childList:true});setInterval(decorateRows,1200)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

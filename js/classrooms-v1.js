@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-if(window.__GABARITO_CLASSROOMS_LOADER_V11__)return;
-window.__GABARITO_CLASSROOMS_LOADER_V11__=true;
+if(window.__GABARITO_CLASSROOMS_LOADER_V12__)return;
+window.__GABARITO_CLASSROOMS_LOADER_V12__=true;
 
 function load(src,attr,onload){
   const existing=document.querySelector(`script[${attr}]`);
@@ -16,6 +16,8 @@ function load(src,attr,onload){
 }
 
 load('/js/classrooms-core-v1.js?v=1.0.0','data-gplus-classrooms-core',()=>{
-  load('/js/assignment-attachments-v1.js?v=1.0.0','data-gplus-assignment-attachments');
+  load('/js/assignment-attachments-v1.js?v=1.0.1','data-gplus-assignment-attachments',()=>{
+    load('/js/assignment-actions-v2.js?v=2.0.0','data-gplus-assignment-actions');
+  });
 });
 })();

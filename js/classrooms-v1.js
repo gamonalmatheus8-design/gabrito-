@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-if(window.__GABARITO_CLASSROOMS_LOADER_V17__)return;
-window.__GABARITO_CLASSROOMS_LOADER_V17__=true;
+if(window.__GABARITO_CLASSROOMS_LOADER_V18__)return;
+window.__GABARITO_CLASSROOMS_LOADER_V18__=true;
 
 function load(src,attr,onload){
   const existing=document.querySelector(`script[${attr}]`);
@@ -22,5 +22,6 @@ load('/js/classrooms-core-v1.js?v=1.0.1','data-gplus-classrooms-core',()=>{
   load('/js/assignment-actions-v2.js?v=2.0.1','data-gplus-assignment-actions');
   load('/js/teacher-submissions-v1.js?v=1.0.1','data-gplus-teacher-submissions');
   load('/js/teacher-activity-stats-v1.js?v=1.0.1','data-gplus-teacher-activity-stats');
+  load('/js/teacher-performance-direct-v1.js?v=1.0.0','data-gplus-teacher-performance-direct');
 });
 })();

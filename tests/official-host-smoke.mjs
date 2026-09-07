@@ -10,11 +10,14 @@ try{
  await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:15000});
  try{await page.waitForSelector('#v37Onboarding.open',{timeout:1000})}catch{}
  if(await page.locator('#v37Onboarding.open').count())await page.locator('#onSkipBtn').click();
+ await page.waitForFunction(()=>window.GABARITO_APP?.officialSimulatorsHost==='3.5.0',{timeout:7000});
+ await page.waitForFunction(()=>window.GABARITO_ENEM_DIRECT_SYNC?.version==='3.5.0',{timeout:7000});
  await page.evaluate(()=>window.go('mocks'));
  await page.waitForSelector('#v24EnemHub',{state:'attached',timeout:5000});
  await page.waitForSelector('#v28HistoryLibrary',{timeout:7000});
  await page.waitForSelector('#v29PismOfficialHub',{timeout:7000});
- assert.equal(await page.evaluate(()=>window.GABARITO_APP?.officialSimulatorsHost),'3.3.0');
+ assert.equal(await page.evaluate(()=>window.GABARITO_APP?.officialSimulatorsHost),'3.5.0');
+ assert.equal(await page.evaluate(()=>window.GABARITO_ENEM_DIRECT_SYNC?.version),'3.5.0');
  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.enemSimulator),undefined);
  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.pismSimulator),undefined);
  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.premiumPolish),undefined);

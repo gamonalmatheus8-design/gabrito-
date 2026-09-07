@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.3.1';
-const DIRECT_SYNC_VERSION='3.3.1-20260905';
+const VERSION='3.5.0';
+const DIRECT_SYNC_VERSION='3.5.0-20260907';
 const $=(s,r=document)=>r.querySelector(s);
 
 function hideLegacyDiscursives(){
@@ -21,10 +21,12 @@ function ensureDirectExamSync(){
    l.dataset.gplusDirectExamSync='1';
    document.head.appendChild(l);
  }
- if(!document.querySelector('script[data-gplus-direct-exam-sync]')){
+ const old=document.querySelector('script[data-gplus-direct-exam-sync]');
+ if(old&&!old.src.includes('enem-direct-sync-v35.js'))old.remove();
+ if(!document.querySelector('script[src*="enem-direct-sync-v35.js"]')){
    const s=document.createElement('script');
-   s.src=`/js/enem-direct-sync-v33.js?v=${DIRECT_SYNC_VERSION}`;
-   s.defer=true;
+   s.src=`/js/enem-direct-sync-v35.js?v=${DIRECT_SYNC_VERSION}`;
+   s.async=true;
    s.dataset.gplusDirectExamSync='1';
    document.head.appendChild(s);
  }

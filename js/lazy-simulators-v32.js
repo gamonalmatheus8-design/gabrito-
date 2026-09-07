@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.4.0';
-const RECOVERY='20260907-enem-sync1';
+const VERSION='3.5.0';
+const RECOVERY='20260907-enem-sync2';
 const $=(s,r=document)=>r.querySelector(s);
 let corePromise=null,enhancePromise=null,ready=false,failed=null;
 const loadedScripts=new Set();
@@ -44,8 +44,8 @@ async function loadEnemCore(){
  await loadScript('js/enem-official-v27.js');
  await loadScript('data/enem-official-catalog-v28.js');
  await loadScript('js/enem-history-v28.js');
- await loadScript('js/enem-direct-sync-v33.js');
- if(!window.GABARITO_ENEM_DIRECT_SYNC)throw new Error('Sincronização obrigatória do caderno ENEM não carregou.');
+ if(!window.GABARITO_ENEM_DIRECT_SYNC||window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.5.0')await loadScript('js/enem-direct-sync-v35.js');
+ if(window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.5.0')throw new Error('Sincronização obrigatória do caderno ENEM não carregou.');
 }
 async function loadPismCore(){
  await Promise.all([loadStyle('assets/pism-history-v29.css'),loadScript('data/pism-official-catalog-v29.js')]);
@@ -76,7 +76,7 @@ async function ensureLoaded(force=false){
  corePromise=(async()=>{
   try{
    await Promise.all([loadEnemCore(),loadPismCore()]);
-   await new Promise(r=>setTimeout(r,320));
+   await new Promise(r=>setTimeout(r,250));
    ready=true;window.GABARITO_APP.simulatorsLazyReady=true;window.GABARITO_APP.simulatorsLoadedAt=Date.now();window.GABARITO_APP.simulatorsSyncRequired=true;setStatus('ready');
    try{window.GABARITO_ENEM_HISTORY?.enhance?.()}catch{}
    try{window.GABARITO_ENEM_DIRECT_SYNC?.enhance?.()}catch{}

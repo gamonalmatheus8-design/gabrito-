@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.3.0';
-const RECOVERY='20260903-perf1';
+const VERSION='3.4.0';
+const RECOVERY='20260907-enem-sync1';
 const $=(s,r=document)=>r.querySelector(s);
 let corePromise=null,enhancePromise=null,ready=false,failed=null;
 const loadedScripts=new Set();
@@ -40,10 +40,12 @@ function setStatus(state,text){
  host.querySelector('[data-lazy-retry]')?.addEventListener('click',()=>{corePromise=null;enhancePromise=null;failed=null;ensureLoaded(true).catch(()=>{})});
 }
 async function loadEnemCore(){
- await Promise.all([loadStyle('assets/enem-official-v27.css'),loadStyle('assets/enem-history-v28.css')]);
+ await Promise.all([loadStyle('assets/enem-official-v27.css'),loadStyle('assets/enem-history-v28.css'),loadStyle('assets/enem-document-v32.css')]);
  await loadScript('js/enem-official-v27.js');
  await loadScript('data/enem-official-catalog-v28.js');
  await loadScript('js/enem-history-v28.js');
+ await loadScript('js/enem-direct-sync-v33.js');
+ if(!window.GABARITO_ENEM_DIRECT_SYNC)throw new Error('Sincronização obrigatória do caderno ENEM não carregou.');
 }
 async function loadPismCore(){
  await Promise.all([loadStyle('assets/pism-history-v29.css'),loadScript('data/pism-official-catalog-v29.js')]);
@@ -53,7 +55,7 @@ async function loadEnhancements(){
  if(enhancePromise)return enhancePromise;
  enhancePromise=(async()=>{
   try{
-   await Promise.all([loadStyle('assets/enem-native-v31.css'),loadStyle('assets/enem-document-v32.css'),loadStyle('assets/enem-mobile-v30.css')]);
+   await Promise.all([loadStyle('assets/enem-native-v31.css'),loadStyle('assets/enem-mobile-v30.css')]);
    await loadScript('data/enem-official-native-v31.js');
    await loadScript('js/enem-native-v31.js');
    await loadScript('js/enem-native-integration-v31.js');
@@ -70,13 +72,14 @@ async function loadEnhancements(){
 async function ensureLoaded(force=false){
  if(ready&&!force)return true;
  if(corePromise&&!force)return corePromise;
- failed=null;setStatus('loading','As bibliotecas oficiais são carregadas sob demanda para deixar o início do app mais rápido.');
+ failed=null;setStatus('loading','Carregando provas oficiais e sincronização direta do caderno.');
  corePromise=(async()=>{
   try{
    await Promise.all([loadEnemCore(),loadPismCore()]);
-   await new Promise(r=>setTimeout(r,520));
-   ready=true;window.GABARITO_APP.simulatorsLazyReady=true;window.GABARITO_APP.simulatorsLoadedAt=Date.now();setStatus('ready');
+   await new Promise(r=>setTimeout(r,320));
+   ready=true;window.GABARITO_APP.simulatorsLazyReady=true;window.GABARITO_APP.simulatorsLoadedAt=Date.now();window.GABARITO_APP.simulatorsSyncRequired=true;setStatus('ready');
    try{window.GABARITO_ENEM_HISTORY?.enhance?.()}catch{}
+   try{window.GABARITO_ENEM_DIRECT_SYNC?.enhance?.()}catch{}
    loadEnhancements().catch(()=>{});
    return true;
   }catch(e){
@@ -92,9 +95,7 @@ function wrapGo(){
  Object.assign(wrapped,base);wrapped.__gplusLazySimulators=true;window.go=wrapped;
 }
 function init(){
- window.GABARITO_APP=window.GABARITO_APP||{};
- window.GABARITO_APP.lazySimulators=VERSION;
- wrapGo();
+ window.GABARITO_APP=window.GABARITO_APP||{};window.GABARITO_APP.lazySimulators=VERSION;wrapGo();
  if($('#page-mocks')?.classList.contains('active')||localStorage.getItem('study_v2_page')==='mocks')ensureLoaded().catch(()=>{});
  const observer=new MutationObserver(()=>{if(!window.go?.__gplusLazySimulators)wrapGo()});observer.observe(document.documentElement,{subtree:true,childList:true});
  window.GABARITO_SIMULATORS_LAZY={version:VERSION,ensureLoaded,get ready(){return ready},get failed(){return failed}};

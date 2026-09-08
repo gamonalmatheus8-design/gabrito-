@@ -54,16 +54,16 @@ test('biblioteca histórica 2016–2024 também ativa a experiência mobile 3.0'
  assert.match(css,/\.v28-paper/);
 });
 
-test('entrada pública e PWA usam cache-busting da release 3.3.0',()=>{
+test('PWA invalida caches antigos na release 3.7.0 do banco oficial',()=>{
  const html=read('index.html'),boot=read('js/gabarito-bootstrap.js'),sw=read('service-worker.js'),release=read('js/v6-release.js'),vercel=read('vercel.json');
- assert.match(html,/gabarito-bootstrap\.js\?v=3\.3\.0&r=20260903-perf1/);
- assert.match(boot,/const VERSION='3\.3\.0'/);
- assert.match(boot,/const RECOVERY='20260903-perf1'/);
- assert.match(sw,/gabarito-mais-3-3-0-app-shell/);
- assert.match(sw,/const V='3\.3\.0'/);
- assert.match(sw,/const RECOVERY='20260903-perf1'/);
+ assert.match(html,/gabarito-bootstrap\.js\?v=/);
+ assert.match(boot,/const VERSION='3\.7\.0'/);
+ assert.match(boot,/const RECOVERY='20260908-official-bank-v2'/);
+ assert.match(sw,/gabarito-mais-3-7-0-official-bank/);
+ assert.match(sw,/const V='3\.7\.0'/);
+ assert.match(sw,/const RECOVERY='20260908-official-bank-v2'/);
  assert.match(release,/service-worker\.js\?v=\$\{SW_VERSION\}&r=\$\{SW_RECOVERY\}/);
- assert.match(release,/SW_VERSION='3\.3\.0',SW_RECOVERY='20260903-perf1'/);
+ assert.match(release,/SW_VERSION='3\.7\.0',SW_RECOVERY='20260908-official-bank-v2'/);
  assert.match(vercel,/private, no-store, max-age=0, must-revalidate/);
 });
 
@@ -76,4 +76,3 @@ test('cartão mobile mantém 45 questões por área e ações essenciais',()=>{
  assert.match(js,/dock\.dataset\.signature===signature/);
  assert.match(js,/panel\.dataset\.signature===signature/);
 });
-

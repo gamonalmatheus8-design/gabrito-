@@ -3,12 +3,13 @@
 if(window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__)return;
 window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__=true;
 
-const VERSION='1.0.0';
+const VERSION='1.0.1';
 const $=(s,r=document)=>r.querySelector(s);
 let active=false;
 let token=0;
 let originalGo=null;
 let originalSetFocusExam=null;
+let installAttempts=0;
 
 function currentExam(){
  const explicit=String(window.app?.settings?.focusExam||'').toUpperCase();
@@ -96,7 +97,7 @@ async function waitForTarget(exam,myToken){
  const deadline=Date.now()+16000;
  while(Date.now()<deadline){
   if(myToken!==token||!active)return null;
-  let target=$(selector);
+  const target=$(selector);
   if(target)return target;
   if(exam==='ENEM')window.GABARITO_ENEM_HISTORY?.enhance?.();
   await new Promise(resolve=>setTimeout(resolve,180));
@@ -105,6 +106,10 @@ async function waitForTarget(exam,myToken){
 }
 
 async function openBank(exam=currentExam()){
+ if(typeof originalGo!=='function'){
+  init();
+  if(typeof originalGo!=='function')return;
+ }
  exam=exam==='PISM'?'PISM':'ENEM';
  active=true;
  token+=1;
@@ -115,7 +120,8 @@ async function openBank(exam=currentExam()){
  window.GABARITO_APP.questionBankMode='official_v2';
  window.GABARITO_APP.questionPracticeSource='official-exams-only';
  window.GABARITO_APP.authorialQuestionPractice=false;
- if(typeof originalGo==='function')originalGo('mocks');
+ window.GABARITO_APP.questionBankVisible=true;
+ originalGo('mocks');
  markQuestionNav();
  renderIntro(exam,'Carregando biblioteca oficial…');
  const target=await waitForTarget(exam,myToken);
@@ -150,7 +156,10 @@ function switchExam(exam){
 
 function installNavigation(){
  if(typeof window.go!=='function')return false;
- if(window.go.__officialQuestionBankV1)return true;
+ if(window.go.__officialQuestionBankV1){
+  originalGo=window.go.__officialQuestionBankBaseGo||originalGo;
+  return true;
+ }
  originalGo=window.go;
  const wrapped=function(page,...args){
   if(page==='questions')return openBank();
@@ -159,6 +168,7 @@ function installNavigation(){
  };
  Object.assign(wrapped,originalGo);
  wrapped.__officialQuestionBankV1=true;
+ wrapped.__officialQuestionBankBaseGo=originalGo;
  window.go=wrapped;
 
  originalSetFocusExam=typeof window.setFocusExam==='function'?window.setFocusExam:null;
@@ -178,14 +188,17 @@ function installNavigation(){
 
 function init(){
  installStyles();
- installNavigation();
+ installAttempts+=1;
+ const installed=installNavigation();
  window.GABARITO_APP=window.GABARITO_APP||{};
  window.GABARITO_APP.officialQuestionBank=VERSION;
  window.GABARITO_APP.questionBankMode='official_v2';
  window.GABARITO_APP.questionPracticeSource='official-exams-only';
  window.GABARITO_APP.authorialQuestionPractice=false;
  const count=$('#sideQCount');if(count)count.textContent='OFICIAL';
+ if(!installed&&installAttempts<80)setTimeout(init,100);
 }
 
+window.addEventListener('gplus:ready',init);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

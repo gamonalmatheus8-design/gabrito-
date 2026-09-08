@@ -25,34 +25,20 @@ test('runner arquivado só aceitaria 90 itens oficiais válidos',()=>{
 
 test('implementação arquivada preserva resposta, navegação e revisão',()=>{
  const js=read('js/enem-native-v31.js'),integration=read('js/enem-native-integration-v31.js');
- assert.match(js,/v31-option/);
- assert.match(js,/data-v31-prev/);
- assert.match(js,/data-v31-next/);
- assert.match(js,/data-v31-review/);
- assert.match(integration,/gplus_enem_official_v27/);
- assert.match(integration,/data-letter/);
- assert.match(integration,/data-q/);
- assert.match(integration,/marked/);
+ assert.match(js,/v31-option/);assert.match(js,/data-v31-prev/);assert.match(js,/data-v31-next/);assert.match(js,/data-v31-review/);
+ assert.match(integration,/gplus_enem_official_v27/);assert.match(integration,/data-letter/);assert.match(integration,/data-q/);assert.match(integration,/marked/);
 });
 
 test('implementação arquivada nunca substitui PDF com acervo incompleto',()=>{
  const integration=read('js/enem-native-integration-v31.js'),official=read('js/enem-official-v27.js');
- assert.match(integration,/if\(!status\.complete\)return false/);
- assert.match(official,/<iframe/);
- assert.match(integration,/v31NativeReady/);
+ assert.match(integration,/if\(!status\.complete\)return false/);assert.match(official,/<iframe/);assert.match(integration,/v31NativeReady/);
 });
 
-test('lazy loader usa somente leitor sincronizado estável e não carrega v31',()=>{
+test('lazy loader usa leitores sincronizados atuais e não carrega v31',()=>{
  const lazy=read('js/lazy-simulators-v32.js'),boot=read('js/gabarito-bootstrap.js');
- const official=lazy.indexOf("js/enem-official-v27.js");
- const history=lazy.indexOf("js/enem-history-v28.js");
- const sync=lazy.indexOf("js/enem-direct-sync-v36.js");
- const mobile=lazy.indexOf("js/enem-mobile-v30.js");
+ const official=lazy.indexOf("js/enem-official-v27.js"),history=lazy.indexOf("js/enem-history-v28.js"),sync=lazy.indexOf("js/enem-direct-sync-v36.js"),mobile=lazy.indexOf("js/enem-mobile-v30.js");
  assert.ok(official>=0&&history>official&&sync>history&&mobile>sync);
- assert.doesNotMatch(lazy,/enem-official-native-v31/);
- assert.doesNotMatch(lazy,/enem-native-v31/);
- assert.doesNotMatch(lazy,/enem-native-integration-v31/);
- assert.doesNotMatch(lazy,/assets\/enem-native-v31\.css/);
- assert.match(lazy,/simulatorReader='direct-sync-v36'/);
+ assert.doesNotMatch(lazy,/enem-official-native-v31/);assert.doesNotMatch(lazy,/enem-native-v31/);assert.doesNotMatch(lazy,/enem-native-integration-v31/);assert.doesNotMatch(lazy,/assets\/enem-native-v31\.css/);
+ assert.match(lazy,/enemSimulatorReader='direct-sync-v36'/);assert.match(lazy,/pismSimulatorReader='direct-sync-v37'/);assert.match(lazy,/simulatorReader='official-direct-sync'/);
  assert.doesNotMatch(boot,/enem-native-v31/);
 });

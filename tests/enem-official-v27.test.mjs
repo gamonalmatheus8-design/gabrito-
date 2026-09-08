@@ -42,11 +42,11 @@ test('experiência oficial mantém tempo real, cartão-resposta e não inventa T
  assert.match(js,/beforeunload/);
 });
 
-test('camada oficial continua sob demanda na release 3.7',()=>{
+test('camada oficial continua sob demanda na release 3.8',()=>{
  const boot=read('js/gabarito-bootstrap.js'),lazy=read('js/lazy-simulators-v32.js'),bank=read('js/official-question-bank-v1.js');
  assert.match(lazy,/assets\/enem-official-v27\.css/);
  assert.match(lazy,/js\/enem-official-v27\.js/);
  assert.doesNotMatch(boot,/js\/enem-official-v27\.js/);
- assert.match(boot,/const VERSION='3\.7\.0'/);
+ assert.match(boot,/const VERSION='3\.8\.0'/);
  assert.match(bank,/#v28HistoryLibrary/);
 });

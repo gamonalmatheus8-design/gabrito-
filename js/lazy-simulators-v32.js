@@ -57,6 +57,7 @@ async function loadEnhancements(){
   try{
    await loadStyle('assets/enem-mobile-v30.css');
    await loadScript('js/enem-mobile-v30.js');
+   await loadScript('js/enem-mobile-official-bridge-v37.js');
    window.GABARITO_APP.simulatorEnhancementsReady=true;
   }catch(e){
    console.warn('[Gabarito+] Melhorias móveis dos simulados indisponíveis:',e.message);

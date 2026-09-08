@@ -30,13 +30,12 @@ test('acabamento premium cobre mobile, foco visível e movimento reduzido',()=>{
  assert.match(css,/v26-post-plan/);
 });
 
-test('release 3.3.0 preserva somente o CSS de acessibilidade da camada premium',()=>{
+test('release 3.7.0 preserva somente o CSS de acessibilidade da camada premium',()=>{
  const boot=read('js/gabarito-bootstrap.js'),pkg=JSON.parse(read('package.json')),sw=read('service-worker.js');
- assert.equal(pkg.version,'3.3.0');
- assert.match(boot,/const VERSION='3\.3\.0'/);
+ assert.equal(pkg.version,'3.7.0');
+ assert.match(boot,/const VERSION='3\.7\.0'/);
  assert.match(boot,/assets\/premium-v26\.css/);
  assert.doesNotMatch(boot,/js\/premium-v26\.js/);
- assert.match(sw,/gabarito-mais-3-3-0-app-shell/);
- assert.match(sw,/const V='3\.3\.0'/);
+ assert.match(sw,/gabarito-mais-3-7-0-official-bank/);
+ assert.match(sw,/const V='3\.7\.0'/);
 });
-

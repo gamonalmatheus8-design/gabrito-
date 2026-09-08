@@ -6,9 +6,24 @@ const $=(s,r=document)=>r.querySelector(s);
 let corePromise=null,enhancePromise=null,ready=false,failed=null;
 const loadedScripts=new Set();
 const loadedStyles=new Set();
+const pendingStyles=new Map();
 const asset=src=>/^https?:/i.test(src)?src:`${src}${src.includes('?')?'&':'?'}v=${encodeURIComponent(window.GABARITO_APP?.version||VERSION)}&r=${RECOVERY}`;
 function loadScript(src,timeoutMs=7000){if(loadedScripts.has(src))return Promise.resolve();const stale=document.querySelector(`script[data-gplus-lazy="${src}"]`);if(stale)stale.remove();return new Promise((resolve,reject)=>{const s=document.createElement('script');let done=false,timer=null;const finish=err=>{if(done)return;done=true;if(timer)clearTimeout(timer);if(err){s.remove();reject(err)}else{loadedScripts.add(src);s.dataset.loaded='1';resolve()}};s.src=asset(src);s.async=true;s.dataset.gplusLazy=src;s.onload=()=>finish();s.onerror=()=>finish(new Error('Falha ao carregar '+src));if(timeoutMs>0)timer=setTimeout(()=>finish(new Error('Tempo esgotado ao carregar '+src)),timeoutMs);document.head.appendChild(s)})}
-function loadStyle(src){if(loadedStyles.has(src))return Promise.resolve();const stale=document.querySelector(`link[data-gplus-lazy-style="${src}"]`);if(stale)stale.remove();return new Promise((resolve,reject)=>{const l=document.createElement('link');l.rel='stylesheet';l.href=asset(src);l.dataset.gplusLazyStyle=src;l.onload=()=>{loadedStyles.add(src);l.dataset.loaded='1';resolve()};l.onerror=()=>{l.remove();reject(new Error('Falha ao carregar '+src))};document.head.appendChild(l)})}
+function loadStyle(src){
+ if(loadedStyles.has(src))return Promise.resolve();
+ if(pendingStyles.has(src))return pendingStyles.get(src);
+ const existing=document.querySelector(`link[data-gplus-lazy-style="${src}"][data-loaded="1"]`);
+ if(existing){loadedStyles.add(src);return Promise.resolve()}
+ const promise=new Promise((resolve,reject)=>{
+  const stale=document.querySelector(`link[data-gplus-lazy-style="${src}"]`);if(stale)stale.remove();
+  const l=document.createElement('link');l.rel='stylesheet';l.href=asset(src);l.dataset.gplusLazyStyle=src;
+  l.onload=()=>{loadedStyles.add(src);l.dataset.loaded='1';resolve()};
+  l.onerror=()=>{l.remove();reject(new Error('Falha ao carregar '+src))};
+  document.head.appendChild(l);
+ }).finally(()=>pendingStyles.delete(src));
+ pendingStyles.set(src,promise);
+ return promise;
+}
 function statusHost(){const page=$('#page-mocks');if(!page)return null;let host=$('#gplusLazySimStatus',page);if(!host){host=document.createElement('div');host.id='gplusLazySimStatus';host.className='card';host.style.cssText='margin:0 0 16px;padding:16px;display:none';const anchor=$('#v24EnemHub',page)||page.firstElementChild;anchor?page.insertBefore(host,anchor):page.prepend(host)}return host}
 function setStatus(state,text){const host=statusHost();if(!host)return;host.dataset.state=state;host.style.display=state==='ready'?'none':'block';if(state==='loading')host.innerHTML=`<strong>Abrindo simulados oficiais…</strong><p style="margin:6px 0 0;color:var(--muted)">${text||'Carregando somente o necessário para ENEM e PISM.'}</p>`;else if(state==='error')host.innerHTML=`<strong>Não foi possível abrir os simulados.</strong><p style="margin:6px 0 10px;color:var(--muted)">${text||'Tente novamente.'}</p><button type="button" class="btn btn-primary" data-lazy-retry>Tentar novamente</button>`;host.querySelector('[data-lazy-retry]')?.addEventListener('click',()=>{corePromise=null;enhancePromise=null;failed=null;ensureLoaded(true).catch(()=>{})})}
 async function loadEnemCore(){await Promise.all([loadStyle('assets/enem-official-v27.css'),loadStyle('assets/enem-history-v28.css'),loadStyle('assets/enem-document-v32.css')]);await loadScript('js/enem-official-v27.js');await loadScript('data/enem-official-catalog-v28.js');await loadScript('js/enem-history-v28.js');await loadScript('js/enem-direct-sync-v36.js');if(window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.6.0')throw new Error('Sincronização do caderno ENEM não carregou.')}

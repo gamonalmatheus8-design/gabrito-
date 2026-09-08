@@ -15,14 +15,14 @@ test('bootstrap carrega banco oficial e depois o treino separado',()=>{
   assert.ok(bootstrap.indexOf('official-question-bank-v1.js')<bootstrap.indexOf('official-practice-v1.js'));
 });
 
-test('Questões não volta para o banco autoral nem abre Simulados',()=>{
+test('Questões entra no treino oficial e Simulados só abre por ação explícita',()=>{
   assert.match(nav,/if\(page==='questions'\)return practice\.open\(\)/);
   assert.match(nav,/window\.v42OpenQuestions=\(\)=>practice\.open\(\)/);
   assert.match(nav,/window\.v40OpenFocusedQuestions=\(\)=>practice\.open\(\)/);
   assert.match(practice,/questionPracticeSource='official-exams-only'/);
   assert.match(practice,/authorialQuestionPractice=false/);
-  assert.match(practice,/baseGo\('questions'\)/);
-  assert.doesNotMatch(practice,/baseGo\('mocks'\)/);
+  assert.match(practice,/async function open\(opts=\{\}\).*?baseGo\('questions'\)/s);
+  assert.match(practice,/#gpGoMocks'\)\?\.addEventListener\('click',\(\)=>\{state\.active=false;baseGo\('mocks'\)\}\)/);
 });
 
 test('Banco oficial continua ancorado no índice oficial ENEM e PISM',()=>{

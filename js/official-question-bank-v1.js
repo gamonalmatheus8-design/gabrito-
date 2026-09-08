@@ -3,13 +3,70 @@
 if(window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__)return;
 window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__=true;
 
-const VERSION='1.0.1';
+const VERSION='2.0.0';
 const $=(s,r=document)=>r.querySelector(s);
 let active=false;
 let token=0;
 let originalGo=null;
 let originalSetFocusExam=null;
 let installAttempts=0;
+let inventoryPromise=null;
+let inventory={ready:false,total:0,enem:0,pism:0,sources:0,loadedAt:0,error:null};
+
+function getClient(){return window.__ESTUDOS_SUPABASE?.client||window.estudosSupabase||null}
+function fmt(n){return Number(n||0).toLocaleString('pt-BR')}
+function compact(n){const value=Number(n||0);return value>=1000?`${(value/1000).toFixed(value>=10000?0:1).replace('.',',')}K`:String(value||'OFICIAL')}
+
+async function syncInventory(force=false){
+ if(inventory.ready&&!force&&Date.now()-inventory.loadedAt<60000)return inventory;
+ if(inventoryPromise&&!force)return inventoryPromise;
+ const client=getClient();
+ if(!client)return inventory;
+ inventoryPromise=(async()=>{
+  const [all,enem,pism,sources]=await Promise.all([
+   client.from('official_question_index').select('id',{count:'exact',head:true}),
+   client.from('official_question_index').select('id',{count:'exact',head:true}).eq('exam','ENEM'),
+   client.from('official_question_index').select('id',{count:'exact',head:true}).eq('exam','PISM'),
+   client.from('official_exam_sources').select('id',{count:'exact',head:true})
+  ]);
+  const failed=[all,enem,pism,sources].find(x=>x.error);
+  if(failed?.error)throw failed.error;
+  inventory={ready:true,total:Number(all.count||0),enem:Number(enem.count||0),pism:Number(pism.count||0),sources:Number(sources.count||0),loadedAt:Date.now(),error:null};
+  window.GABARITO_APP=window.GABARITO_APP||{};
+  window.GABARITO_APP.officialBankInventory={...inventory};
+  markQuestionNav();
+  if(active)renderIntro(currentExam(),readyStatus(currentExam()));
+  return inventory;
+ })().catch(error=>{
+  inventory={...inventory,ready:false,error:error?.message||String(error)};
+  window.GABARITO_APP=window.GABARITO_APP||{};
+  window.GABARITO_APP.officialBankInventoryError=inventory.error;
+  return inventory;
+ }).finally(()=>{inventoryPromise=null});
+ return inventoryPromise;
+}
+
+function applyFilters(query,filters){
+ for(const [key,value] of Object.entries(filters||{})){
+  if(value===undefined||value===null||value==='')continue;
+  if(['exam','year','module','day','track','area','subject','topic','source_id','question_number','variant'].includes(key))query=query.eq(key,value);
+ }
+ return query;
+}
+
+async function listQuestions(filters={},limit=250){
+ const client=getClient();if(!client)throw new Error('Supabase indisponível.');
+ let query=client.from('official_question_index').select('id,source_id,exam,year,module,day,track,question_number,area,subject,topic,skill,page_number,correct_answer,answer_status,difficulty_label,difficulty_basis,difficulty_value,classification_status,validation_status,variant,provenance');
+ query=applyFilters(query,filters).order('year',{ascending:false}).order('day',{ascending:true}).order('question_number',{ascending:true}).limit(Math.max(1,Math.min(500,Number(limit)||250)));
+ const {data,error}=await query;if(error)throw error;return data||[];
+}
+
+async function listSources(filters={},limit=200){
+ const client=getClient();if(!client)throw new Error('Supabase indisponível.');
+ let query=client.from('official_exam_sources').select('id,exam,institution,year,module,day,track,booklet,source_page_url,pdf_url,answer_key_url,resolver,question_start,question_end,objective_count,license_note,source_status');
+ query=applyFilters(query,filters).order('year',{ascending:false}).order('day',{ascending:true}).limit(Math.max(1,Math.min(250,Number(limit)||200)));
+ const {data,error}=await query;if(error)throw error;return data||[];
+}
 
 function currentExam(){
  const explicit=String(window.app?.settings?.focusExam||'').toUpperCase();
@@ -67,13 +124,19 @@ function isolate(target){
 function markQuestionNav(){
  document.querySelectorAll('[data-page]').forEach(el=>el.classList.toggle('active',el.dataset.page==='questions'));
  const count=$('#sideQCount');
- if(count){count.textContent='OFICIAL';count.title='Somente provas oficiais INEP e UFJF/COPESE'}
+ if(count){count.textContent=inventory.ready?compact(inventory.total):'OFICIAL';count.title=inventory.ready?`${fmt(inventory.total)} itens oficiais indexados no Supabase`:'Somente provas oficiais INEP e UFJF/COPESE'}
  const source=$('#v7BankSource');
- if(source)source.textContent='Banco oficial · INEP / UFJF';
+ if(source)source.textContent=inventory.ready?`Banco oficial · ${fmt(inventory.total)} itens`:'Banco oficial · INEP / UFJF';
+}
+
+function readyStatus(exam){
+ const action=exam==='ENEM'?'escolha um ano e um dia do ENEM.':'escolha módulo, área, ano e dia do PISM.';
+ return inventory.ready?`Banco Supabase conectado · ${fmt(inventory.total)} itens oficiais em ${fmt(inventory.sources)} cadernos/fontes · ${action}`:`Biblioteca oficial pronta · ${action}`;
 }
 
 function introMarkup(exam,status='Carregando biblioteca oficial…'){
- return `<div class="gplus-official-bank-copy"><span>BANCO OFICIAL · SEM QUESTÕES AUTORAIS</span><h1>Questões reais de ENEM e PISM.</h1><p>Esta área usa exclusivamente cadernos de provas que realmente foram aplicados. Selecione uma edição e depois navegue pelo número da questão no cartão-resposta.</p><div class="gplus-official-bank-trust"><b>ENEM · INEP · 2016–2025</b><b>PISM · UFJF/COPESE · 2017–2026</b><b>gabarito oficial após entrega</b></div><div class="gplus-official-bank-status" id="gplusOfficialBankStatus">${status}</div></div><div class="gplus-official-bank-actions"><button type="button" class="btn btn-secondary gplus-official-bank-exam ${exam==='ENEM'?'active':''}" data-gplus-bank-exam="ENEM">ENEM</button><button type="button" class="btn btn-secondary gplus-official-bank-exam ${exam==='PISM'?'active':''}" data-gplus-bank-exam="PISM">PISM</button><button type="button" class="btn btn-ghost" data-gplus-bank-sim>Simulados</button></div>`;
+ const cloud=inventory.ready?`<b>${fmt(inventory.total)} itens oficiais</b><b>${fmt(inventory.sources)} cadernos/fontes</b>`:'';
+ return `<div class="gplus-official-bank-copy"><span>BANCO OFICIAL · SEM QUESTÕES AUTORAIS</span><h1>Questões reais de ENEM e PISM.</h1><p>Esta área usa exclusivamente cadernos de provas que realmente foram aplicados. Selecione uma edição e depois navegue pelo número da questão no cartão-resposta.</p><div class="gplus-official-bank-trust"><b>ENEM · INEP · 2016–2025</b><b>PISM · UFJF/COPESE · 2017–2026</b>${cloud}<b>gabarito oficial após entrega</b></div><div class="gplus-official-bank-status" id="gplusOfficialBankStatus">${status}</div></div><div class="gplus-official-bank-actions"><button type="button" class="btn btn-secondary gplus-official-bank-exam ${exam==='ENEM'?'active':''}" data-gplus-bank-exam="ENEM">ENEM</button><button type="button" class="btn btn-secondary gplus-official-bank-exam ${exam==='PISM'?'active':''}" data-gplus-bank-exam="PISM">PISM</button><button type="button" class="btn btn-ghost" data-gplus-bank-sim>Simulados</button></div>`;
 }
 
 function renderIntro(exam,status){
@@ -118,12 +181,13 @@ async function openBank(exam=currentExam()){
  document.body.classList.add('gplus-official-bank-mode');
  window.GABARITO_APP=window.GABARITO_APP||{};
  window.GABARITO_APP.questionBankMode='official_v2';
- window.GABARITO_APP.questionPracticeSource='official-exams-only';
+ window.GABARITO_APP.questionPracticeSource='official-question-index';
  window.GABARITO_APP.authorialQuestionPractice=false;
  window.GABARITO_APP.questionBankVisible=true;
  originalGo('mocks');
  markQuestionNav();
- renderIntro(exam,'Carregando biblioteca oficial…');
+ renderIntro(exam,'Carregando biblioteca oficial e índice de questões…');
+ syncInventory().catch(()=>{});
  const target=await waitForTarget(exam,myToken);
  if(myToken!==token||!active)return;
  if(!target){
@@ -131,7 +195,7 @@ async function openBank(exam=currentExam()){
   return;
  }
  isolate(target);
- renderIntro(exam,exam==='ENEM'?'Pronto: escolha um ano e um dia do ENEM.':'Pronto: escolha módulo, área, ano e dia do PISM.');
+ renderIntro(exam,readyStatus(exam));
  markQuestionNav();
  setTimeout(()=>{if(active&&target.isConnected)target.scrollIntoView({block:'start',behavior:'auto'})},80);
  if(window.lucide)window.lucide.createIcons();
@@ -193,9 +257,12 @@ function init(){
  window.GABARITO_APP=window.GABARITO_APP||{};
  window.GABARITO_APP.officialQuestionBank=VERSION;
  window.GABARITO_APP.questionBankMode='official_v2';
- window.GABARITO_APP.questionPracticeSource='official-exams-only';
+ window.GABARITO_APP.questionPracticeSource='official-question-index';
  window.GABARITO_APP.authorialQuestionPractice=false;
- const count=$('#sideQCount');if(count)count.textContent='OFICIAL';
+ window.GABARITO_OFFICIAL_QUESTION_BANK={version:VERSION,open:openBank,syncInventory,listQuestions,listSources,get inventory(){return {...inventory}}};
+ markQuestionNav();
+ syncInventory().catch(()=>{});
+ if(!getClient()&&installAttempts<20)setTimeout(()=>syncInventory().catch(()=>{}),600);
  if(!installed&&installAttempts<80)setTimeout(init,100);
 }
 

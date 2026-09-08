@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.5.0';
-const RECOVERY='20260907-enem-sync2';
+const VERSION='3.6.0';
+const RECOVERY='20260908-enem-stable1';
 const $=(s,r=document)=>r.querySelector(s);
 let corePromise=null,enhancePromise=null,ready=false,failed=null;
 const loadedScripts=new Set();
@@ -44,8 +44,8 @@ async function loadEnemCore(){
  await loadScript('js/enem-official-v27.js');
  await loadScript('data/enem-official-catalog-v28.js');
  await loadScript('js/enem-history-v28.js');
- if(!window.GABARITO_ENEM_DIRECT_SYNC||window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.5.0')await loadScript('js/enem-direct-sync-v35.js');
- if(window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.5.0')throw new Error('Sincronização obrigatória do caderno ENEM não carregou.');
+ await loadScript('js/enem-direct-sync-v36.js');
+ if(window.GABARITO_ENEM_DIRECT_SYNC?.version!=='3.6.0')throw new Error('Sincronização do caderno ENEM não carregou.');
 }
 async function loadPismCore(){
  await Promise.all([loadStyle('assets/pism-history-v29.css'),loadScript('data/pism-official-catalog-v29.js')]);
@@ -55,15 +55,11 @@ async function loadEnhancements(){
  if(enhancePromise)return enhancePromise;
  enhancePromise=(async()=>{
   try{
-   await Promise.all([loadStyle('assets/enem-native-v31.css'),loadStyle('assets/enem-mobile-v30.css')]);
-   await loadScript('data/enem-official-native-v31.js');
-   await loadScript('js/enem-native-v31.js');
-   await loadScript('js/enem-native-integration-v31.js');
-   await loadScript('js/enem-document-v32.js');
+   await loadStyle('assets/enem-mobile-v30.css');
    await loadScript('js/enem-mobile-v30.js');
    window.GABARITO_APP.simulatorEnhancementsReady=true;
   }catch(e){
-   console.warn('[Gabarito+] Melhorias de simulados carregadas parcialmente:',e.message);
+   console.warn('[Gabarito+] Melhorias móveis dos simulados indisponíveis:',e.message);
    window.GABARITO_APP.simulatorEnhancementError=e.message;
   }
  })();
@@ -72,14 +68,18 @@ async function loadEnhancements(){
 async function ensureLoaded(force=false){
  if(ready&&!force)return true;
  if(corePromise&&!force)return corePromise;
- failed=null;setStatus('loading','Carregando provas oficiais e sincronização direta do caderno.');
+ failed=null;setStatus('loading','Carregando provas oficiais e o leitor sincronizado.');
  corePromise=(async()=>{
   try{
    await Promise.all([loadEnemCore(),loadPismCore()]);
-   await new Promise(r=>setTimeout(r,250));
-   ready=true;window.GABARITO_APP.simulatorsLazyReady=true;window.GABARITO_APP.simulatorsLoadedAt=Date.now();window.GABARITO_APP.simulatorsSyncRequired=true;setStatus('ready');
+   await new Promise(r=>setTimeout(r,120));
+   ready=true;
+   window.GABARITO_APP.simulatorsLazyReady=true;
+   window.GABARITO_APP.simulatorsLoadedAt=Date.now();
+   window.GABARITO_APP.simulatorsSyncRequired=true;
+   window.GABARITO_APP.simulatorReader='direct-sync-v36';
+   setStatus('ready');
    try{window.GABARITO_ENEM_HISTORY?.enhance?.()}catch{}
-   try{window.GABARITO_ENEM_DIRECT_SYNC?.enhance?.()}catch{}
    loadEnhancements().catch(()=>{});
    return true;
   }catch(e){
@@ -95,7 +95,9 @@ function wrapGo(){
  Object.assign(wrapped,base);wrapped.__gplusLazySimulators=true;window.go=wrapped;
 }
 function init(){
- window.GABARITO_APP=window.GABARITO_APP||{};window.GABARITO_APP.lazySimulators=VERSION;wrapGo();
+ window.GABARITO_APP=window.GABARITO_APP||{};
+ window.GABARITO_APP.lazySimulators=VERSION;
+ wrapGo();
  if($('#page-mocks')?.classList.contains('active')||localStorage.getItem('study_v2_page')==='mocks')ensureLoaded().catch(()=>{});
  const observer=new MutationObserver(()=>{if(!window.go?.__gplusLazySimulators)wrapGo()});observer.observe(document.documentElement,{subtree:true,childList:true});
  window.GABARITO_SIMULATORS_LAZY={version:VERSION,ensureLoaded,get ready(){return ready},get failed(){return failed}};

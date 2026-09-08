@@ -3,7 +3,7 @@
 if(window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__)return;
 window.__GABARITO_OFFICIAL_QUESTION_BANK_V1__=true;
 
-const VERSION='2.0.0';
+const VERSION='2.0.1';
 const $=(s,r=document)=>r.querySelector(s);
 let active=false;
 let token=0;
@@ -181,7 +181,8 @@ async function openBank(exam=currentExam()){
  document.body.classList.add('gplus-official-bank-mode');
  window.GABARITO_APP=window.GABARITO_APP||{};
  window.GABARITO_APP.questionBankMode='official_v2';
- window.GABARITO_APP.questionPracticeSource='official-question-index';
+ window.GABARITO_APP.questionPracticeSource='official-exams-only';
+ window.GABARITO_APP.questionBankBackend='official-question-index';
  window.GABARITO_APP.authorialQuestionPractice=false;
  window.GABARITO_APP.questionBankVisible=true;
  originalGo('mocks');
@@ -257,7 +258,8 @@ function init(){
  window.GABARITO_APP=window.GABARITO_APP||{};
  window.GABARITO_APP.officialQuestionBank=VERSION;
  window.GABARITO_APP.questionBankMode='official_v2';
- window.GABARITO_APP.questionPracticeSource='official-question-index';
+ window.GABARITO_APP.questionPracticeSource='official-exams-only';
+ window.GABARITO_APP.questionBankBackend='official-question-index';
  window.GABARITO_APP.authorialQuestionPractice=false;
  window.GABARITO_OFFICIAL_QUESTION_BANK={version:VERSION,open:openBank,syncInventory,listQuestions,listSources,get inventory(){return {...inventory}}};
  markQuestionNav();

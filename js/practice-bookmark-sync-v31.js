@@ -3,7 +3,8 @@
 if(window.__GABARITO_PRACTICE_BOOKMARK_SYNC_V31__)return;
 window.__GABARITO_PRACTICE_BOOKMARK_SYNC_V31__=true;
 
-const VERSION='3.1.0';
+const VERSION='3.1.1';
+const CLOUD_PAGE_SIZE=500;
 const LOCAL_KEY='gplus_practice_v3_bookmarks';
 const PENDING_KEY='gplus_practice_v3_bookmark_ops';
 const MIGRATION_PREFIX='gplus_practice_v3_bookmarks_migrated_';
@@ -23,6 +24,22 @@ function setStatus(value){window.GABARITO_APP=window.GABARITO_APP||{};window.GAB
 
 async function currentUser(c){
   try{const {data:{user}={}}=await c.auth.getUser();return user||null}catch{return null}
+}
+
+async function readCloud(c,user){
+  const rows=[];
+  for(let from=0;;from+=CLOUD_PAGE_SIZE){
+    const {data,error}=await c.from('practice_bookmarks')
+      .select('question_id,created_at')
+      .eq('user_id',user.id)
+      .order('created_at',{ascending:false})
+      .range(from,from+CLOUD_PAGE_SIZE-1);
+    if(error)return {data:null,error};
+    const page=Array.isArray(data)?data:[];
+    rows.push(...page);
+    if(page.length<CLOUD_PAGE_SIZE)break;
+  }
+  return {data:rows,error:null};
 }
 
 async function reloadPracticeIfNeeded(before,after){
@@ -55,7 +72,7 @@ async function syncAll(){
     const c=client();if(!c){setStatus('local');return false}
     const user=await currentUser(c);if(!user){setStatus('local');return false}
     setStatus('syncing');
-    const {data,error}=await c.from('practice_bookmarks').select('question_id,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(1000);
+    const {data,error}=await readCloud(c,user);
     if(error){setStatus('local-fallback');return false}
 
     const before=readLocal(),cloud=new Set((data||[]).map(row=>String(row.question_id))),pending=readPending();

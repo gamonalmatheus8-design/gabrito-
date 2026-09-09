@@ -3,8 +3,10 @@
 if(window.__GABARITO_PRACTICE_BANK_V3__)return;
 window.__GABARITO_PRACTICE_BANK_V3__=true;
 
-const VERSION='3.0.1';
+const VERSION='3.0.2';
 const REST_PAGE_SIZE=500;
+const CLOUD_HISTORY_PAGE_SIZE=500;
+const CLOUD_HISTORY_LIMIT=2000;
 const LOCAL_ATTEMPTS='gplus_practice_v3_attempts';
 const LOCAL_BOOKMARKS='gplus_practice_v3_bookmarks';
 const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
@@ -16,7 +18,7 @@ const safe=(raw,fallback)=>{try{return JSON.parse(raw)}catch{return fallback}};
 const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
 const state={
-  loaded:false,loading:null,catalog:[],sources:new Map(),exam:'ENEM',area:'ALL',subject:'ALL',topic:'ALL',status:'ALL',
+  loaded:false,loading:null,catalog:[],catalogById:new Map(),sources:new Map(),exam:'ENEM',area:'ALL',subject:'ALL',topic:'ALL',status:'ALL',
   current:null,selected:null,attempts:[],bookmarks:new Set(),paintToken:0,active:false,cloudLoaded:false
 };
 const pdfCache=new Map();
@@ -29,7 +31,7 @@ function pct(a,b){return b?Math.round(a/b*100):0}
 function unique(xs){return [...new Set(xs.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'pt-BR'))}
 function localAttempts(){const rows=safe(localStorage.getItem(LOCAL_ATTEMPTS),[]);return Array.isArray(rows)?rows:[]}
 function localBookmarks(){const rows=safe(localStorage.getItem(LOCAL_BOOKMARKS),[]);return new Set(Array.isArray(rows)?rows:[])}
-function saveAttempts(rows){try{localStorage.setItem(LOCAL_ATTEMPTS,JSON.stringify(rows.slice(0,2000)))}catch{}}
+function saveAttempts(rows){try{localStorage.setItem(LOCAL_ATTEMPTS,JSON.stringify(rows.slice(0,CLOUD_HISTORY_LIMIT)))}catch{}}
 function saveBookmarks(){try{localStorage.setItem(LOCAL_BOOKMARKS,JSON.stringify([...state.bookmarks]))}catch{}}
 
 async function rest(table,params={}){
@@ -68,6 +70,7 @@ async function loadCatalog(force=false){
       })
     ]);
     state.catalog=Array.isArray(questions)?questions:[];
+    state.catalogById=new Map(state.catalog.map(q=>[q.id,q]));
     state.sources=new Map((Array.isArray(sources)?sources:[]).map(x=>[x.id,x]));
     state.attempts=localAttempts();
     state.bookmarks=localBookmarks();
@@ -87,14 +90,21 @@ async function loadCloudHistory(){
   const client=appClient();if(!client)return;
   const {data:{user}={}}=await client.auth.getUser().catch(()=>({data:{user:null}}));
   if(!user)return;
-  const {data,error}=await client.from('practice_attempts')
-    .select('question_id,selected_answer,correct_answer,is_correct,response_ms,created_at')
-    .eq('user_id',user.id).order('created_at',{ascending:false}).limit(1000);
-  if(error)return;
+  const cloud=[];
+  for(let from=0;from<CLOUD_HISTORY_LIMIT;from+=CLOUD_HISTORY_PAGE_SIZE){
+    const to=Math.min(from+CLOUD_HISTORY_PAGE_SIZE-1,CLOUD_HISTORY_LIMIT-1);
+    const {data,error}=await client.from('practice_attempts')
+      .select('question_id,selected_answer,correct_answer,is_correct,response_ms,created_at')
+      .eq('user_id',user.id).order('created_at',{ascending:false}).range(from,to);
+    if(error)return;
+    const page=Array.isArray(data)?data:[];
+    cloud.push(...page);
+    if(page.length<CLOUD_HISTORY_PAGE_SIZE)break;
+  }
   const local=localAttempts(),seen=new Set(local.map(x=>`${x.question_id}|${x.created_at}`));
-  for(const row of data||[])if(!seen.has(`${row.question_id}|${row.created_at}`))local.push(row);
+  for(const row of cloud)if(!seen.has(`${row.question_id}|${row.created_at}`))local.push(row);
   local.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));
-  state.attempts=local.slice(0,2000);saveAttempts(state.attempts);state.cloudLoaded=true;
+  state.attempts=local.slice(0,CLOUD_HISTORY_LIMIT);saveAttempts(state.attempts);state.cloudLoaded=true;
 }
 
 function installStyles(){
@@ -196,13 +206,13 @@ async function saveCloudAttempt(row){
 }
 
 function renderMetrics(){
-  const rows=state.attempts.filter(a=>state.catalog.some(q=>q.id===a.question_id&&q.exam===state.exam));const answered=rows.length,correct=rows.filter(x=>x.is_correct===true).length,wrong=rows.filter(x=>x.is_correct===false).length;
+  const rows=state.attempts.filter(a=>state.catalogById.get(a.question_id)?.exam===state.exam),answered=rows.length,correct=rows.filter(x=>x.is_correct===true).length,wrong=rows.filter(x=>x.is_correct===false).length;
   if($('#pv3Answered'))$('#pv3Answered').textContent=fmt(answered);if($('#pv3Correct'))$('#pv3Correct').textContent=fmt(correct);if($('#pv3Wrong'))$('#pv3Wrong').textContent=fmt(wrong);if($('#pv3Rate'))$('#pv3Rate').textContent=`${pct(correct,answered)}%`;
   renderDiagnosis(rows);
 }
 
 function renderDiagnosis(attempts){
-  const byId=new Map(state.catalog.map(q=>[q.id,q])),groups=new Map();for(const a of attempts){const q=byId.get(a.question_id);if(!q)continue;const key=q.subject||q.area||'Geral',g=groups.get(key)||{a:0,c:0};g.a++;if(a.is_correct)g.c++;groups.set(key,g)}
+  const groups=new Map();for(const a of attempts){const q=state.catalogById.get(a.question_id);if(!q)continue;const key=q.subject||q.area||'Geral',g=groups.get(key)||{a:0,c:0};g.a++;if(a.is_correct)g.c++;groups.set(key,g)}
   const rows=[...groups].map(([name,g])=>({name,...g,rate:pct(g.c,g.a)})).sort((a,b)=>a.rate-b.rate||b.a-a.a);const text=$('#pv3DiagnosisText'),bars=$('#pv3Bars');
   if(!rows.length){if(text)text.textContent='Responda algumas questões para o diagnóstico começar a orientar sua revisão.';if(bars)bars.innerHTML='';return}
   const weak=rows[0];if(text)text.innerHTML=`Prioridade atual: <b>${esc(weak.name)}</b> · ${weak.rate}% de acerto em ${weak.a} tentativa(s). Use o filtro de disciplina para concentrar o próximo bloco.`;
@@ -234,7 +244,7 @@ function renderCropFallback(src,error){const host=$('#pv3Visual');if(!host)retur
 
 async function open(){
   state.active=true;ensureShell();const visual=$('#pv3Visual');if(visual)visual.innerHTML='<div class="pv3-loading"><b>Preparando banco de treino…</b><br><small>Carregando somente questões validadas.</small></div>';
-  try{await loadCatalog();refreshControls();if(!state.current||!state.catalog.some(q=>q.id===state.current.id))pickQuestion(true);else renderCurrent()}catch(e){if(visual)visual.innerHTML=`<div class="pv3-empty"><strong>Banco de treino indisponível agora.</strong>${esc(e?.message||'Tente novamente em alguns instantes.')}</div>`;console.error('[Gabarito+] Practice V3:',e)}
+  try{await loadCatalog();refreshControls();if(!state.current||!state.catalogById.has(state.current.id))pickQuestion(true);else renderCurrent()}catch(e){if(visual)visual.innerHTML=`<div class="pv3-empty"><strong>Banco de treino indisponível agora.</strong>${esc(e?.message||'Tente novamente em alguns instantes.')}</div>`;console.error('[Gabarito+] Practice V3:',e)}
 }
 
 function install(){
@@ -242,7 +252,7 @@ function install(){
   window.renderQuestionPage=open;
   window.v42OpenQuestions=()=>window.go?.('questions');
   window.v40OpenFocusedQuestions=()=>window.go?.('questions');
-  window.GABARITO_PRACTICE_V3={version:VERSION,open,next:()=>pickQuestion(true),reload:()=>loadCatalog(true),get state(){return{...state,catalog:[...state.catalog],sources:new Map(state.sources),bookmarks:new Set(state.bookmarks)}}};
+  window.GABARITO_PRACTICE_V3={version:VERSION,open,next:()=>pickQuestion(true),reload:()=>loadCatalog(true),get state(){return{...state,catalog:[...state.catalog],catalogById:new Map(state.catalogById),sources:new Map(state.sources),bookmarks:new Set(state.bookmarks)}}};
   window.GABARITO_OFFICIAL_QUESTION_BANK=window.GABARITO_PRACTICE_V3;
   window.GABARITO_APP=window.GABARITO_APP||{};
   window.GABARITO_APP.questionBankMode='validated_practice_v3';

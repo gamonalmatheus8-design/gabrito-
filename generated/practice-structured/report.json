@@ -1,0 +1,28 @@
+{
+  "extraction_version": "structured-v1-20260909",
+  "published_questions": 351,
+  "structured": 174,
+  "failed": 177,
+  "with_visual_asset": 138,
+  "coverage_percent": 49.57,
+  "per_source": [
+    {
+      "source_key": "enem-2024-d2-yellow",
+      "questions": 74,
+      "structured": 49,
+      "failed": 25
+    },
+    {
+      "source_key": "enem-2025-d1-yellow",
+      "questions": 95,
+      "structured": 70,
+      "failed": 25
+    },
+    {
+      "source_key": "enem-2025-d2-yellow",
+      "questions": 87,
+      "structured": 55,
+      "failed": 32
+    }
+  ]
+}

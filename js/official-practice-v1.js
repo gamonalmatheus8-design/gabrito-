@@ -3,7 +3,7 @@
 if(window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__)return;
 window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
 const VERSION='3.0.1';
-const BOOKMARK_SYNC_VERSION='3.1.0-20260909';
+const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
 function open(){return window.GABARITO_PRACTICE_V3?.open?.()||window.go?.('questions')}
 function next(){return window.GABARITO_PRACTICE_V3?.next?.()}
 function loadBookmarkSync(){

@@ -9,7 +9,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
-  await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_standalone_v33',{timeout:10000});
+  await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_standalone_v34',{timeout:10000});
 
   async function dismissOnboarding(){
     try{await page.waitForSelector('#v37Onboarding.open',{state:'visible',timeout:1800})}catch{}
@@ -31,7 +31,7 @@ try{
   const sidebarQuestions=page.locator('.sidebar [data-page="questions"]');
   assert.equal(await sidebarQuestions.count(),1,'deve existir um único botão Questões na sidebar desktop');
   await sidebarQuestions.click();
-  await page.waitForSelector('#practiceV3[data-mode="standalone-v33"]',{state:'visible',timeout:8000});
+  await page.waitForSelector('#practiceV3[data-mode="standalone-v34"]',{state:'visible',timeout:8000});
   await page.waitForSelector('#page-questions.active',{timeout:3000});
   await page.waitForSelector('#pv3Year',{state:'visible',timeout:3000});
   await page.waitForSelector('#pv3Area',{state:'visible',timeout:3000});
@@ -54,11 +54,13 @@ try{
 
   await page.waitForFunction(()=>window.GABARITO_APP?.questionCounterSource==='validated-practice-bank',{timeout:5000});
   const counter=await page.locator('#sideQCount').textContent();
-  assert.notEqual(String(counter||'').trim(),'3598','contador legado não pode aparecer em Questões');
+  assert.equal(String(counter||'').trim(),'351','contador deve refletir o banco curado publicado');
 
   const after=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   assert.equal(after.some(x=>x.includes('practice-fast-render-v32.js')),false,'renderizador antigo não deve ser carregado');
-  assert.equal(after.some(x=>x.includes('practice-standalone-v33.js')),true,'camada standalone deve ser carregada');
+  assert.equal(after.some(x=>x.includes('practice-standalone-v34.js')),true,'camada standalone 3.4 deve ser carregada');
+  assert.equal(after.some(x=>x.includes('practice-standalone-v33.js')),false,'camada standalone antiga não deve ser carregada');
+  assert.equal(after.some(x=>x.includes('pdfjs-dist')),false,'área Questões não deve carregar PDF.js');
   for(const needle of ['enem-official-v27.js','enem-history-v28.js','pism-history-v29.js']){
     assert.equal(after.some(x=>x.includes(needle)),false,`${needle} não deve ser carregado ao abrir somente Questões`);
   }

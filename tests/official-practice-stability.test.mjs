@@ -13,7 +13,7 @@ test('Questões V3 usa a navegação nativa do app sem wrappers, polling ou obse
   const nav=read('js/official-practice-navigation-v1.js');
   const stability=read('js/official-practice-stability-v1.js');
   for(const [name,js] of [['bank',bank],['nav',nav],['stability',stability]])assert.doesNotThrow(()=>new vm.Script(js,{filename:name}));
-  assert.match(bank,/const VERSION='3\.0\.0'/);
+  assert.match(bank,/const VERSION='3\.0\.2'/);
   assert.match(bank,/window\.renderQuestionPage=open/);
   assert.match(nav,/window\.v42OpenQuestions=\(\)=>window\.go\?\.\('questions'\)/);
   assert.match(nav,/window\.v40OpenFocusedQuestions=\(\)=>window\.go\?\.\('questions'\)/);

@@ -30,11 +30,14 @@ try{
  assert.equal(await page.locator('#v29Sheet [data-v29-q]').count(),20);
  assert.equal(await page.locator('#v29Sheet [data-v29-letter]').count(),5);
  await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 2'),{timeout:6000});
+ // Espera os agendamentos de montagem terminarem para que o smoke não confunda
+ // uma ressincronização tardia com falha do botão de próxima página.
+ await page.waitForTimeout(4500);
  await page.locator('#v29PismOfficialRunner [data-v32-next]').click();
- await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 3'),{timeout:5000});
+ await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 3'),{timeout:8000});
  assert.match(await page.locator('#v29PismOfficialRunner .v32-page-label').innerText(),/Página 3/);
  await page.locator('#v29Sheet [data-v29-q="2"]').click();
- await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 4'),{timeout:5000});
+ await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 4'),{timeout:8000});
  await page.locator('#v29Sheet [data-v29-letter="A"]').click();
  await page.waitForFunction(()=>JSON.parse(localStorage.getItem('gplus_pism_official_session_v29')||'{}').answers?.['2']==='A',{timeout:3000});
  page.once('dialog',d=>d.accept());

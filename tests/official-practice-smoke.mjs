@@ -9,8 +9,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
-  await page.waitForFunction(()=>Boolean(window.GABARITO_OFFICIAL_PRACTICE?.open),{timeout:5000});
-  await page.waitForFunction(()=>window.GABARITO_APP?.questionNavigationStability==='2.0.0',{timeout:12000});
+  await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_v3',{timeout:8000});
 
   const before=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   assert.equal(before.some(x=>x.includes('enem-official-v27.js')),false,'runner ENEM não deve carregar no boot');
@@ -19,19 +18,26 @@ try{
   const sidebarQuestions=page.locator('.sidebar [data-page="questions"]');
   assert.equal(await sidebarQuestions.count(),1,'deve existir um único botão Questões na sidebar desktop');
   await sidebarQuestions.click();
-  await page.waitForSelector('#gplusPractice',{state:'visible',timeout:7000});
+  await page.waitForSelector('#practiceV3',{state:'visible',timeout:8000});
   await page.waitForSelector('#page-questions.active',{timeout:3000});
+  await page.waitForSelector('#pv3Area',{state:'visible',timeout:3000});
+  await page.waitForSelector('#pv3Subject',{state:'visible',timeout:3000});
+  await page.waitForSelector('#pv3Topic',{state:'visible',timeout:3000});
 
   assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('active')),false,'Simulados deve permanecer fechado ao clicar em Questões');
-  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionRouteOwner),'official-practice-v2');
-  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionPracticeMode),'official-single-question');
+  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionRouteOwner),'app-go-direct');
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionPracticeSeparatedFromMocks),true);
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.authorialQuestionPractice),false);
-  assert.ok(await page.locator('#gplusPractice').getByText('TREINO OFICIAL · SEM SIMULADO').count());
-  assert.ok(await page.locator('#gplusPractice').getByText('Respondidas').count());
-  assert.ok(await page.locator('#gplusPractice').getByText('Acertos').count());
-  assert.ok(await page.locator('#gplusPractice').getByText('Erros').count());
-  assert.ok(await page.locator('#gplusPractice').getByText('Diagnóstico').count());
+  assert.ok(await page.locator('#practiceV3').getByText('BANCO DE TREINO VALIDADO').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Respondidas').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Acertos').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Erros').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Aproveitamento').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Diagnóstico do treino').count());
+
+  await page.waitForFunction(()=>Number(window.GABARITO_APP?.practiceQuestionCount||0)>0,{timeout:10000});
+  assert.ok(Number(await page.evaluate(()=>window.GABARITO_APP.practiceQuestionCount))>=1,'o Banco V3 deve carregar ao menos uma questão publicada');
+  await page.waitForSelector('[data-pv3-answer="A"]',{state:'visible',timeout:10000});
 
   const after=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   for(const needle of ['enem-official-v27.js','enem-history-v28.js','pism-history-v29.js']){

@@ -11,6 +11,14 @@ try{
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_v3',{timeout:8000});
 
+  const onboarding=page.locator('#v37Onboarding.open');
+  if(await onboarding.count()){
+    const skip=page.locator('#onSkipBtn');
+    assert.equal(await skip.count(),1,'onboarding deve oferecer a ação Agora não');
+    await skip.click();
+    await page.waitForSelector('#v37Onboarding.open',{state:'detached',timeout:3000});
+  }
+
   const before=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   assert.equal(before.some(x=>x.includes('enem-official-v27.js')),false,'runner ENEM não deve carregar no boot');
   assert.equal(before.some(x=>x.includes('pism-history-v29.js')),false,'runner PISM não deve carregar no boot');

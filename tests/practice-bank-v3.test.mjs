@@ -10,7 +10,7 @@ const js=fs.readFileSync(path.join(root,'js/official-question-bank-v1.js'),'utf8
 
 test('Banco V3 é uma experiência de treino independente dos Simulados',()=>{
   assert.doesNotThrow(()=>new vm.Script(js,{filename:'js/official-question-bank-v1.js'}));
-  assert.match(js,/const VERSION='3\.0\.0'/);
+  assert.match(js,/const VERSION='3\.0\.1'/);
   assert.match(js,/practice_questions/);
   assert.match(js,/practice_question_sources/);
   assert.match(js,/practice_attempts/);
@@ -23,6 +23,18 @@ test('Banco V3 é uma experiência de treino independente dos Simulados',()=>{
   assert.doesNotMatch(js,/window\.go\s*=/);
   assert.doesNotMatch(js,/MutationObserver/);
   assert.doesNotMatch(js,/setInterval\s*\(/);
+});
+
+test('Banco V3 pagina o catálogo validado sem teto de 1000 itens',()=>{
+  assert.match(js,/const REST_PAGE_SIZE=500/);
+  assert.match(js,/async function restPaged/);
+  assert.match(js,/offset\+=pageSize/);
+  assert.match(js,/limit:pageSize,offset/);
+  assert.match(js,/if\(page\.length<pageSize\)break/);
+  assert.match(js,/restPaged\('practice_questions'/);
+  assert.match(js,/restPaged\('practice_question_sources'/);
+  assert.doesNotMatch(js,/status:'eq\.published',order:'year\.desc,original_number\.asc',limit:1000/);
+  assert.match(js,/practiceBankPageSize=REST_PAGE_SIZE/);
 });
 
 test('Banco V3 oferece filtros pedagógicos, feedback, diagnóstico e revisão',()=>{

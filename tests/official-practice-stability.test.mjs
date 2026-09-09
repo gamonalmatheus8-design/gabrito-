@@ -8,25 +8,29 @@ import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 
-test('rota Questões 2.1 tem sintaxe válida, isola Simulados e não cria ciclo de wrappers',()=>{
-  const js=read('js/official-practice-stability-v1.js');
-  assert.doesNotThrow(()=>new vm.Script(js,{filename:'js/official-practice-stability-v1.js'}));
-  assert.match(js,/const VERSION='2\.1\.0'/);
-  assert.match(js,/page-mocks'\)\?\.classList\.remove\('active'\)/);
-  assert.match(js,/shim\.__officialQuestionBankBaseGo=page=>page==='questions'\?activateQuestions\(\):undefined/);
-  assert.match(js,/window\.go=shim/);
-  assert.match(js,/finally\s*\{\s*window\.go=outerGo/);
-  assert.match(js,/const base=current/);
-  assert.doesNotMatch(js,/wrappedGoBase/);
-  assert.doesNotMatch(js,/MutationObserver/);
-  assert.doesNotMatch(js,/setInterval/);
-  assert.doesNotMatch(js,/interceptQuestionClick/);
-  assert.match(js,/questionRouteOwner='official-practice-safe'/);
+test('Questões V3 usa a navegação nativa do app sem wrappers, polling ou observers',()=>{
+  const bank=read('js/official-question-bank-v1.js');
+  const nav=read('js/official-practice-navigation-v1.js');
+  const stability=read('js/official-practice-stability-v1.js');
+  for(const [name,js] of [['bank',bank],['nav',nav],['stability',stability]])assert.doesNotThrow(()=>new vm.Script(js,{filename:name}));
+  assert.match(bank,/const VERSION='3\.0\.0'/);
+  assert.match(bank,/window\.renderQuestionPage=open/);
+  assert.match(nav,/window\.v42OpenQuestions=\(\)=>window\.go\?\.\('questions'\)/);
+  assert.match(nav,/window\.v40OpenFocusedQuestions=\(\)=>window\.go\?\.\('questions'\)/);
+  assert.match(stability,/questionRouteOwner='app-go-direct'/);
+  for(const js of [bank,nav,stability]){
+    assert.doesNotMatch(js,/window\.go\s*=/);
+    assert.doesNotMatch(js,/MutationObserver/);
+    assert.doesNotMatch(js,/setInterval\s*\(/);
+    assert.doesNotMatch(js,/interceptQuestionClick/);
+  }
 });
 
-test('loader aplica estabilidade segura somente depois do wrapper da escola',()=>{
+test('compatibilidade da área Escola não assume a rota Questões',()=>{
   const loader=read('js/classrooms-v1.js');
+  const stability=read('js/official-practice-stability-v1.js');
   assert.match(loader,/coordinator-school-v1\.js/);
-  assert.match(loader,/official-practice-stability-v1\.js\?v=2\.1\.0-20260908-unfreeze/);
-  assert.ok(loader.indexOf('coordinator-school-v1.js')<loader.indexOf('official-practice-stability-v1.js'));
+  assert.match(loader,/official-practice-stability-v1\.js/);
+  assert.doesNotMatch(stability,/window\.go\s*=/);
+  assert.match(stability,/questionPracticeSeparatedFromMocks=true/);
 });

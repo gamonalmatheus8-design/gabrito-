@@ -6,35 +6,47 @@ import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const fast=fs.readFileSync(path.join(root,'js/practice-fast-render-v32.js'),'utf8');
+const standalone=fs.readFileSync(path.join(root,'js/practice-standalone-v33.js'),'utf8');
 const compat=fs.readFileSync(path.join(root,'js/official-practice-v1.js'),'utf8');
 
-test('renderizador rápido tem sintaxe válida e é carregado pela prática oficial',()=>{
-  assert.doesNotThrow(()=>new vm.Script(fast,{filename:'js/practice-fast-render-v32.js'}));
-  assert.match(fast,/const VERSION='3\.2\.0'/);
-  assert.match(compat,/practice-fast-render-v32\.js\?v=\$\{FAST_RENDER_VERSION\}/);
-  assert.match(compat,/FAST_RENDER_VERSION='3\.2\.0-20260909'/);
+test('área standalone tem sintaxe válida e é carregada pela prática oficial',()=>{
+  assert.doesNotThrow(()=>new vm.Script(standalone,{filename:'js/practice-standalone-v33.js'}));
+  assert.match(standalone,/const VERSION='3\.3\.0'/);
+  assert.match(compat,/practice-standalone-v33\.js\?v=\$\{STANDALONE_VERSION\}/);
+  assert.match(compat,/STANDALONE_VERSION='3\.3\.0-20260909'/);
+  assert.doesNotMatch(compat,/practice-fast-render-v32/);
 });
 
-test('localizador rápido prioriza página conhecida e evita varrer a prova inteira',()=>{
-  assert.match(fast,/source_page_number/);
-  assert.match(fast,/const check=async p/);
-  assert.match(fast,/estimate=Math\.max/);
-  assert.match(fast,/for\(let r=0;r<=9;r\+\+\)/);
-  assert.match(fast,/pageHeads:new Map\(\)/);
-  assert.match(fast,/located:new Map\(\)/);
+test('Questões deixa de usar a prova oficial como interface',()=>{
+  assert.match(standalone,/practiceUsesPdfAsInterface=false/);
+  assert.match(standalone,/practicePresentation='standalone-question'/);
+  assert.match(standalone,/Questões individuais, com enunciado e alternativas dentro do Gabarito\+/);
+  assert.doesNotMatch(standalone,/renderSegment\s*\(/);
+  assert.doesNotMatch(standalone,/createElement\(['"]canvas['"]\)/);
+  assert.doesNotMatch(standalone,/Trecho da questão oficial/);
 });
 
-test('PDF oficial usa streaming progressivo e mantém fallback seguro',()=>{
-  assert.match(fast,/disableRange:true,disableStream:false,disableAutoFetch:true/);
-  assert.match(fast,/Não foi possível abrir o recorte agora/);
-  assert.match(fast,/Abrir fonte oficial/);
-  assert.match(fast,/\/api\/enem-pdf\?url=/);
-  assert.match(fast,/\/api\/pism-pdf\?url=/);
+test('fonte oficial serve apenas para estruturar texto e alternativas',()=>{
+  assert.match(standalone,/getTextContent\(\)/);
+  assert.match(standalone,/function parseBlock/);
+  assert.match(standalone,/function normalizedOptions/);
+  assert.match(standalone,/statement_text,options/);
+  assert.match(standalone,/\/api\/enem-pdf\?url=/);
+  assert.match(standalone,/Fonte validada/);
 });
 
-test('experiência não fica com grande área vazia durante carregamento',()=>{
-  assert.match(fast,/min-height:180px/);
-  assert.match(fast,/pv32-spinner/);
-  assert.match(fast,/Localizando a página certa sem varrer a prova inteira/);
+test('contador usa somente o Banco de Treino validado',()=>{
+  assert.match(standalone,/function syncCounter/);
+  assert.match(standalone,/sideQCount/);
+  assert.match(standalone,/questionCounterSource='validated-practice-bank'/);
+  assert.match(standalone,/practiceQuestionCount=n/);
+  assert.doesNotMatch(standalone,/QUESTIONS\.length/);
+});
+
+test('treino preserva filtros, respostas, salvas e diagnóstico',()=>{
+  for(const token of ['Ano','Área','Disciplina','Assunto','Não respondidas','Meus erros','Salvas','Nova questão','Respondidas','Acertos','Erros','Aproveitamento'])assert.match(standalone,new RegExp(token));
+  assert.match(standalone,/toggleBookmark/);
+  assert.match(standalone,/saveCloudAttempt/);
+  assert.match(standalone,/renderDiagnosis/);
+  assert.match(standalone,/Gabarito:/);
 });

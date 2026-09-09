@@ -10,16 +10,18 @@ try{
   await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
   await page.waitForFunction(()=>Boolean(window.GABARITO_OFFICIAL_PRACTICE?.open),{timeout:5000});
+  await page.waitForFunction(()=>window.GABARITO_APP?.questionNavigationStability==='2.0.0',{timeout:12000});
 
   const before=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   assert.equal(before.some(x=>x.includes('enem-official-v27.js')),false,'runner ENEM não deve carregar no boot');
   assert.equal(before.some(x=>x.includes('pism-history-v29.js')),false,'runner PISM não deve carregar no boot');
 
-  await page.evaluate(()=>{window.v42OpenQuestions();});
+  await page.locator('[data-page="questions"]').click();
   await page.waitForSelector('#gplusPractice',{state:'visible',timeout:7000});
   await page.waitForSelector('#page-questions.active',{timeout:3000});
 
-  assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('active')),false,'Simulados deve permanecer fechado ao abrir Questões');
+  assert.equal(await page.evaluate(()=>document.querySelector('#page-mocks')?.classList.contains('active')),false,'Simulados deve permanecer fechado ao clicar em Questões');
+  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionRouteOwner),'official-practice-v2');
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionPracticeMode),'official-single-question');
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionPracticeSeparatedFromMocks),true);
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.authorialQuestionPractice),false);

@@ -7,6 +7,7 @@ on:
       - 'tools/structure-practice-bank.py'
       - 'tools/structure-practice-bank-v2.py'
       - 'tools/structure-practice-bank-v3.py'
+      - 'tools/curate-practice-bank-v4.py'
       - '.github/workflows/structure-practice-bank.yml'
   workflow_dispatch:
 
@@ -20,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Python
         uses: actions/setup-python@v5
@@ -32,17 +35,22 @@ jobs:
       - name: Estruturar questões publicadas
         run: python tools/structure-practice-bank-v3.py
 
-      - name: Mostrar cobertura
-        run: cat generated/practice-structured/report.json
+      - name: Curar e escolher conteúdo de alta confiança
+        run: python tools/curate-practice-bank-v4.py
+
+      - name: Mostrar cobertura final
+        run: |
+          cat generated/practice-structured/report.json
+          cat generated/practice-curated-v4/report.json
 
       - name: Salvar conteúdo estruturado e ativos individuais
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add generated/practice-structured assets/practice/structured
+          git add generated/practice-structured generated/practice-curated-v4 assets/practice/structured
           if git diff --cached --quiet; then
             echo 'Nenhuma alteração gerada.'
           else
-            git commit -m 'data: estrutura banco de treino validado v3 [skip ci]'
+            git commit -m 'data: publica banco de treino curado v4 [skip ci]'
             git push
           fi

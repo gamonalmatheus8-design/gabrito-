@@ -6,14 +6,14 @@ import vm from 'node:vm';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const standalone=fs.readFileSync(path.join(root,'js/practice-standalone-v33.js'),'utf8');
+const standalone=fs.readFileSync(path.join(root,'js/practice-standalone-v34.js'),'utf8');
 const compat=fs.readFileSync(path.join(root,'js/official-practice-v1.js'),'utf8');
 
 test('área standalone tem sintaxe válida e é carregada pela prática oficial',()=>{
-  assert.doesNotThrow(()=>new vm.Script(standalone,{filename:'js/practice-standalone-v33.js'}));
-  assert.match(standalone,/const VERSION='3\.3\.0'/);
-  assert.match(compat,/practice-standalone-v33\.js\?v=\$\{STANDALONE_VERSION\}/);
-  assert.match(compat,/STANDALONE_VERSION='3\.3\.0-20260909'/);
+  assert.doesNotThrow(()=>new vm.Script(standalone,{filename:'js/practice-standalone-v34.js'}));
+  assert.match(standalone,/const VERSION='3\.4\.0'/);
+  assert.match(compat,/practice-standalone-v34\.js\?v=\$\{STANDALONE_VERSION\}/);
+  assert.match(compat,/STANDALONE_VERSION='3\.4\.0-20260909'/);
   assert.doesNotMatch(compat,/practice-fast-render-v32/);
 });
 
@@ -26,12 +26,13 @@ test('Questões deixa de usar a prova oficial como interface',()=>{
   assert.doesNotMatch(standalone,/Trecho da questão oficial/);
 });
 
-test('fonte oficial serve apenas para estruturar texto e alternativas',()=>{
-  assert.match(standalone,/getTextContent\(\)/);
-  assert.match(standalone,/function parseBlock/);
+test('conteúdo vem pronto do banco e não baixa PDF no navegador',()=>{
   assert.match(standalone,/function normalizedOptions/);
-  assert.match(standalone,/statement_text,options/);
-  assert.match(standalone,/\/api\/enem-pdf\?url=/);
+  assert.match(standalone,/statement_text,options,asset_url/);
+  assert.match(standalone,/function storedContent/);
+  assert.match(standalone,/Questão aguardando conteúdo estruturado no Banco de Treino/);
+  assert.match(standalone,/q\.asset_url/);
+  assert.doesNotMatch(standalone,/pdfjs-dist|getTextContent\(|\/api\/enem-pdf\?url=|\/api\/pism-pdf\?url=/);
   assert.match(standalone,/Fonte validada/);
 });
 

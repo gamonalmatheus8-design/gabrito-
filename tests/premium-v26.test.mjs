@@ -30,12 +30,13 @@ test('acabamento premium cobre mobile, foco visível e movimento reduzido',()=>{
  assert.match(css,/v26-post-plan/);
 });
 
-test('release 3.8.0 preserva somente o CSS de acessibilidade da camada premium',()=>{
+test('release 3.8.0 preserva CSS acessível e cache da rota Questões v2',()=>{
  const boot=read('js/gabarito-bootstrap.js'),pkg=JSON.parse(read('package.json')),sw=read('service-worker.js');
  assert.equal(pkg.version,'3.8.0');
  assert.match(boot,/const VERSION='3\.8\.0'/);
  assert.match(boot,/assets\/premium-v26\.css/);
  assert.doesNotMatch(boot,/js\/premium-v26\.js/);
- assert.match(sw,/gabarito-mais-3-8-0-official-practice/);
+ assert.match(sw,/gabarito-mais-3-8-0-question-route-v2/);
  assert.match(sw,/const V='3\.8\.0'/);
+ assert.match(sw,/20260908-question-route-v2/);
 });

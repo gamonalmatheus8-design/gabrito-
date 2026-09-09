@@ -31,7 +31,7 @@ try{
  assert.equal(await page.locator('#v29Sheet [data-v29-letter]').count(),5);
  await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 2'),{timeout:6000});
  await page.locator('#v29PismOfficialRunner [data-v32-next]').click();
- await page.waitForTimeout(250);
+ await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 3'),{timeout:5000});
  assert.match(await page.locator('#v29PismOfficialRunner .v32-page-label').innerText(),/Página 3/);
  await page.locator('#v29Sheet [data-v29-q="2"]').click();
  await page.waitForFunction(()=>document.querySelector('#v29PismOfficialRunner .v32-page-label')?.textContent?.includes('Página 4'),{timeout:5000});

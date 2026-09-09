@@ -16,7 +16,9 @@ try{
   assert.equal(before.some(x=>x.includes('enem-official-v27.js')),false,'runner ENEM não deve carregar no boot');
   assert.equal(before.some(x=>x.includes('pism-history-v29.js')),false,'runner PISM não deve carregar no boot');
 
-  await page.locator('[data-page="questions"]').click();
+  const sidebarQuestions=page.locator('.sidebar [data-page="questions"]');
+  assert.equal(await sidebarQuestions.count(),1,'deve existir um único botão Questões na sidebar desktop');
+  await sidebarQuestions.click();
   await page.waitForSelector('#gplusPractice',{state:'visible',timeout:7000});
   await page.waitForSelector('#page-questions.active',{timeout:3000});
 

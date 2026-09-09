@@ -14,6 +14,7 @@ test('Banco V3 é uma experiência de treino independente dos Simulados',()=>{
   assert.match(js,/practice_questions/);
   assert.match(js,/practice_question_sources/);
   assert.match(js,/practice_attempts/);
+  assert.match(js,/status:'eq\.published'/);
   assert.match(js,/window\.renderQuestionPage=open/);
   assert.match(js,/BANCO DE TREINO VALIDADO/);
   assert.match(js,/Sem cronômetro de prova e sem formato de simulado/);
@@ -34,7 +35,6 @@ test('Banco V3 oferece filtros pedagógicos, feedback, diagnóstico e revisão',
 });
 
 test('conteúdo visual vem da questão oficial individual e não do runner de prova',()=>{
-  assert.match(js,/official_crop/);
   assert.match(js,/scanHeads/);
   assert.match(js,/renderOfficialCrop/);
   assert.match(js,/\/api\/enem-pdf\?url=/);

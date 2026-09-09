@@ -9,7 +9,7 @@ try{
   page.on('pageerror',e=>errors.push(e.message));
   await page.goto(base+'/index.html',{waitUntil:'domcontentloaded',timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
-  await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_v3',{timeout:8000});
+  await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_standalone_v33',{timeout:10000});
 
   async function dismissOnboarding(){
     try{await page.waitForSelector('#v37Onboarding.open',{state:'visible',timeout:1800})}catch{}
@@ -31,8 +31,9 @@ try{
   const sidebarQuestions=page.locator('.sidebar [data-page="questions"]');
   assert.equal(await sidebarQuestions.count(),1,'deve existir um único botão Questões na sidebar desktop');
   await sidebarQuestions.click();
-  await page.waitForSelector('#practiceV3',{state:'visible',timeout:8000});
+  await page.waitForSelector('#practiceV3[data-mode="standalone-v33"]',{state:'visible',timeout:8000});
   await page.waitForSelector('#page-questions.active',{timeout:3000});
+  await page.waitForSelector('#pv3Year',{state:'visible',timeout:3000});
   await page.waitForSelector('#pv3Area',{state:'visible',timeout:3000});
   await page.waitForSelector('#pv3Subject',{state:'visible',timeout:3000});
   await page.waitForSelector('#pv3Topic',{state:'visible',timeout:3000});
@@ -41,14 +42,23 @@ try{
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionRouteOwner),'app-go-direct');
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.questionPracticeSeparatedFromMocks),true);
   assert.equal(await page.evaluate(()=>window.GABARITO_APP?.authorialQuestionPractice),false);
-  assert.ok(await page.locator('#practiceV3').getByText('BANCO DE TREINO VALIDADO').count());
+  assert.equal(await page.evaluate(()=>window.GABARITO_APP?.practiceUsesPdfAsInterface),false);
+  assert.ok(await page.locator('#practiceV3').getByText('BANCO DE TREINO').count());
+  assert.ok(await page.locator('#practiceV3').getByText('Questões para praticar').count());
   assert.ok(await page.locator('#practiceV3').getByText('Respondidas').count());
   assert.ok(await page.locator('#practiceV3').getByText('Acertos').count());
   assert.ok(await page.locator('#practiceV3').getByText('Erros').count());
   assert.ok(await page.locator('#practiceV3').getByText('Aproveitamento').count());
   assert.ok(await page.locator('#practiceV3').getByText('Diagnóstico do treino').count());
+  assert.equal(await page.locator('#practiceV3 canvas').count(),0,'Questões não deve reutilizar a prova em canvas/PDF');
+
+  await page.waitForFunction(()=>window.GABARITO_APP?.questionCounterSource==='validated-practice-bank',{timeout:5000});
+  const counter=await page.locator('#sideQCount').textContent();
+  assert.notEqual(String(counter||'').trim(),'3598','contador legado não pode aparecer em Questões');
 
   const after=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
+  assert.equal(after.some(x=>x.includes('practice-fast-render-v32.js')),false,'renderizador antigo não deve ser carregado');
+  assert.equal(after.some(x=>x.includes('practice-standalone-v33.js')),true,'camada standalone deve ser carregada');
   for(const needle of ['enem-official-v27.js','enem-history-v28.js','pism-history-v29.js']){
     assert.equal(after.some(x=>x.includes(needle)),false,`${needle} não deve ser carregado ao abrir somente Questões`);
   }

@@ -1,0 +1,15 @@
+{
+  "curation_version": "curated-v4-20260909",
+  "input": 351,
+  "ready": 351,
+  "rejected": 0,
+  "text_ready": 298,
+  "visual_fallback": 53,
+  "coverage_percent": 100.0,
+  "sources": {
+    "v1": 104,
+    "v2": 194,
+    "v3-individual-image": 53
+  },
+  "rejected_keys": []
+}

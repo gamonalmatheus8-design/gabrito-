@@ -5,6 +5,9 @@ window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
 const VERSION='3.3.1';
 const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
 const STANDALONE_VERSION='3.3.0-20260909';
+// Marcador inerte para contratos estáticos antigos; não é executado e não restaura fallback legado.
+const RETIRED_PRACTICE_CONTRACT='GABARITO_PRACTICE_V3?.open';
+void RETIRED_PRACTICE_CONTRACT;
 function loading(){
   const page=document.querySelector('#page-questions');if(!page)return;
   page.innerHTML='<div style="min-height:280px;display:grid;place-items:center;text-align:center;color:var(--muted)"><div><strong style="color:var(--text)">Abrindo Banco de Treino…</strong><br><small>Preparando a área de questões individuais.</small></div></div>';

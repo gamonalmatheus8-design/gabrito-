@@ -2,9 +2,9 @@
 'use strict';
 if(window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__)return;
 window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
-const VERSION='3.3.2';
+const VERSION='3.4.0';
 const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
-const STANDALONE_VERSION='3.3.0-20260909';
+const STANDALONE_VERSION='3.4.0-20260909';
 const COUNT_PAGE_SIZE=500;
 // Marcador inerte para contratos estáticos antigos; não é executado e não restaura fallback legado.
 const RETIRED_PRACTICE_CONTRACT='GABARITO_PRACTICE_V3?.open';
@@ -57,7 +57,7 @@ function loadBookmarkSync(){
 function loadStandalone(){
   if(document.querySelector('script[data-gplus-practice-standalone]'))return;
   const s=document.createElement('script');
-  s.src=`/js/practice-standalone-v33.js?v=${STANDALONE_VERSION}`;
+  s.src=`/js/practice-standalone-v34.js?v=${STANDALONE_VERSION}`;
   s.defer=true;
   s.dataset.gplusPracticeStandalone='1';
   s.onload=()=>{void refreshPracticeCounter();setTimeout(()=>void refreshPracticeCounter(),900)};
@@ -66,7 +66,7 @@ function loadStandalone(){
 window.renderQuestionPage=open;
 window.GABARITO_OFFICIAL_PRACTICE={version:VERSION,open,newQuestion:next,get state(){return window.GABARITO_PRACTICE_STANDALONE?.state||{}}};
 window.GABARITO_APP=window.GABARITO_APP||{};
-window.GABARITO_APP.officialPractice='compat-v3.3.2';
+window.GABARITO_APP.officialPractice='compat-v3.4.0';
 window.GABARITO_APP.practiceUsesPdfAsInterface=false;
 const initialCounter=document.querySelector('#sideQCount');if(initialCounter)initialCounter.textContent='…';
 void refreshPracticeCounter();

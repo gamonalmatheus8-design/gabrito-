@@ -8,29 +8,40 @@ const practice=await readFile(new URL('../js/official-practice-v1.js',import.met
 const nav=await readFile(new URL('../js/official-practice-navigation-v1.js',import.meta.url),'utf8');
 const stability=await readFile(new URL('../js/official-practice-stability-v1.js',import.meta.url),'utf8');
 
-test('bootstrap carrega banco oficial e depois o treino separado',()=>{
-  assert.match(bootstrap,/VERSION='3\.8\.0'/);
+test('bootstrap 3.9 carrega Banco V3 antes das camadas de compatibilidade',()=>{
+  assert.match(bootstrap,/VERSION='3\.9\.0'/);
+  assert.match(bootstrap,/RECOVERY='20260909-practice-v3'/);
   assert.match(bootstrap,/official-question-bank-v1\.js/);
   assert.match(bootstrap,/official-practice-v1\.js/);
+  assert.match(bootstrap,/official-practice-navigation-v1\.js/);
   assert.ok(bootstrap.indexOf('gabarito-ui.js')<bootstrap.indexOf('official-question-bank-v1.js'));
   assert.ok(bootstrap.indexOf('official-question-bank-v1.js')<bootstrap.indexOf('official-practice-v1.js'));
 });
 
-test('Questões tem um único dono de rota e desativa Simulados explicitamente',()=>{
-  assert.match(nav,/official-practice-stability-v1\.js\?v=2\.0\.0-20260908/);
-  assert.match(nav,/questionNavigation='official-practice-v2'/);
-  assert.match(stability,/questionRouteOwner='official-practice-v2'/);
-  assert.match(stability,/mocks\?\.classList\.remove\('active'\)/);
-  assert.match(stability,/if\(page==='questions'\)return openPractice\(\)/);
-  assert.match(stability,/document\.addEventListener\('click',interceptQuestionClick,true\)/);
-  assert.match(practice,/questionPracticeSource='official-exams-only'/);
-  assert.match(practice,/authorialQuestionPractice=false/);
+test('Questões usa navegação nativa sem wrappers, polling ou observadores globais',()=>{
+  assert.match(nav,/const VERSION='3\.0\.0'/);
+  assert.match(nav,/window\.v40OpenFocusedQuestions=\(\)=>window\.go\?\.\('questions'\)/);
+  assert.match(nav,/window\.v42OpenQuestions=\(\)=>window\.go\?\.\('questions'\)/);
+  assert.match(nav,/questionNavigation='app-go-direct'/);
+  assert.match(stability,/questionRouteOwner='app-go-direct'/);
+  assert.match(stability,/questionPracticeSeparatedFromMocks=true/);
+  assert.doesNotMatch(nav,/window\.go\s*=/);
+  assert.doesNotMatch(stability,/window\.go\s*=/);
+  assert.doesNotMatch(nav,/MutationObserver|setInterval/);
+  assert.doesNotMatch(stability,/MutationObserver|setInterval/);
+  assert.match(practice,/GABARITO_PRACTICE_V3/);
 });
 
-test('Banco oficial continua ancorado no índice oficial ENEM e PISM',()=>{
-  assert.match(bank,/official_question_index/);
-  assert.match(bank,/official_exam_sources/);
-  assert.match(practice,/ENEM/);
-  assert.match(practice,/PISM/);
-  assert.match(practice,/\/api\/pism-official\?/);
+test('Banco V3 lê somente questões publicadas da base de treino validada',()=>{
+  assert.match(bank,/practice_questions/);
+  assert.match(bank,/practice_question_sources/);
+  assert.match(bank,/practice_attempts/);
+  assert.match(bank,/status:'eq\.published'/);
+  assert.match(bank,/questionBankMode='validated_practice_v3'/);
+  assert.match(bank,/authorialQuestionPractice=false/);
+  assert.doesNotMatch(bank,/official_question_index/);
+  assert.doesNotMatch(bank,/official_exam_sources/);
+  assert.doesNotMatch(bank,/go\(['"]mocks['"]\)/);
+  assert.match(bank,/\/api\/enem-pdf\?url=/);
+  assert.match(bank,/\/api\/pism-pdf\?url=/);
 });

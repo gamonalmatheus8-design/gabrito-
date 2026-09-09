@@ -2,9 +2,10 @@
 'use strict';
 if(window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__)return;
 window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
-const VERSION='3.3.1';
+const VERSION='3.3.2';
 const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
 const STANDALONE_VERSION='3.3.0-20260909';
+const COUNT_PAGE_SIZE=500;
 // Marcador inerte para contratos estáticos antigos; não é executado e não restaura fallback legado.
 const RETIRED_PRACTICE_CONTRACT='GABARITO_PRACTICE_V3?.open';
 void RETIRED_PRACTICE_CONTRACT;
@@ -17,6 +18,34 @@ function open(){
   loading();
 }
 function next(){return window.GABARITO_PRACTICE_STANDALONE?.next?.()}
+function paintPracticeCounter(total){
+  if(!Number.isFinite(total))return;
+  const value=Number(total).toLocaleString('pt-BR');
+  const side=document.querySelector('#sideQCount');
+  if(side){side.textContent=value;side.title=`${value} questões no Banco de Treino validado`}
+  const bank=document.querySelector('#bankCountText');if(bank)bank.textContent=value;
+  window.GABARITO_APP=window.GABARITO_APP||{};
+  window.GABARITO_APP.practiceQuestionCount=total;
+  window.GABARITO_APP.questionCounterSource='validated-practice-bank';
+}
+async function refreshPracticeCounter(){
+  const c=window.ESTUDOS_SUPABASE_CONFIG||{};
+  if(!c.url||!c.publishableKey)return;
+  let total=0;
+  for(let offset=0;;offset+=COUNT_PAGE_SIZE){
+    const url=new URL(`${String(c.url).replace(/\/$/,'')}/rest/v1/practice_questions`);
+    url.searchParams.set('select','id');
+    url.searchParams.set('status','eq.published');
+    url.searchParams.set('limit',String(COUNT_PAGE_SIZE));
+    url.searchParams.set('offset',String(offset));
+    const res=await fetch(url,{headers:{apikey:c.publishableKey,accept:'application/json'},cache:'no-store'});
+    if(!res.ok)return;
+    const rows=await res.json();if(!Array.isArray(rows))return;
+    total+=rows.length;
+    if(rows.length<COUNT_PAGE_SIZE)break;
+  }
+  paintPracticeCounter(total);
+}
 function loadBookmarkSync(){
   if(document.querySelector('script[data-gplus-practice-bookmark-sync]'))return;
   const s=document.createElement('script');
@@ -31,13 +60,17 @@ function loadStandalone(){
   s.src=`/js/practice-standalone-v33.js?v=${STANDALONE_VERSION}`;
   s.defer=true;
   s.dataset.gplusPracticeStandalone='1';
+  s.onload=()=>{void refreshPracticeCounter();setTimeout(()=>void refreshPracticeCounter(),900)};
   document.head.appendChild(s);
 }
 window.renderQuestionPage=open;
 window.GABARITO_OFFICIAL_PRACTICE={version:VERSION,open,newQuestion:next,get state(){return window.GABARITO_PRACTICE_STANDALONE?.state||{}}};
 window.GABARITO_APP=window.GABARITO_APP||{};
-window.GABARITO_APP.officialPractice='compat-v3.3.1';
+window.GABARITO_APP.officialPractice='compat-v3.3.2';
 window.GABARITO_APP.practiceUsesPdfAsInterface=false;
+const initialCounter=document.querySelector('#sideQCount');if(initialCounter)initialCounter.textContent='…';
+void refreshPracticeCounter();
 loadBookmarkSync();
 loadStandalone();
+setTimeout(()=>void refreshPracticeCounter(),2200);
 })();

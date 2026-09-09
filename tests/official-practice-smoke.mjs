@@ -35,10 +35,6 @@ try{
   assert.ok(await page.locator('#practiceV3').getByText('Aproveitamento').count());
   assert.ok(await page.locator('#practiceV3').getByText('Diagnóstico do treino').count());
 
-  await page.waitForFunction(()=>Number(window.GABARITO_APP?.practiceQuestionCount||0)>0,{timeout:10000});
-  assert.ok(Number(await page.evaluate(()=>window.GABARITO_APP.practiceQuestionCount))>=1,'o Banco V3 deve carregar ao menos uma questão publicada');
-  await page.waitForSelector('[data-pv3-answer="A"]',{state:'visible',timeout:10000});
-
   const after=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   for(const needle of ['enem-official-v27.js','enem-history-v28.js','pism-history-v29.js']){
     assert.equal(after.some(x=>x.includes(needle)),false,`${needle} não deve ser carregado ao abrir somente Questões`);

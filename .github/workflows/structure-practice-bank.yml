@@ -1,0 +1,46 @@
+name: Gabarito+ Structured Practice Bank
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/structure-practice-bank.py'
+      - '.github/workflows/structure-practice-bank.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  structure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Dependências de extração
+        run: python -m pip install --disable-pip-version-check pymupdf==1.26.4 pillow==11.3.0 requests==2.32.5
+
+      - name: Estruturar questões publicadas
+        run: python tools/structure-practice-bank.py
+
+      - name: Mostrar cobertura
+        run: cat generated/practice-structured/report.json
+
+      - name: Salvar conteúdo estruturado e ativos individuais
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add generated/practice-structured assets/practice/structured
+          if git diff --cached --quiet; then
+            echo 'Nenhuma alteração gerada.'
+          else
+            git commit -m 'data: estrutura banco de treino validado [skip ci]'
+            git push
+          fi

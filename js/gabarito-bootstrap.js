@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.8.0';
-const RECOVERY='20260908-official-practice-v1';
+const VERSION='3.9.0';
+const RECOVERY='20260909-practice-v3';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 const perfNow=()=>typeof performance!=='undefined'&&performance.now?performance.now():Date.now();
@@ -36,7 +36,7 @@ async function boot(){try{
  await timed('simulatorShellMs',async()=>{await loadScript('js/official-simulators-host.js',2500);await loadScript('js/lazy-simulators-v32.js',2500)});
  await timed('publicUiMs',()=>loadScript('js/gabarito-ui.js',3000));
  await timed('officialQuestionBankMs',()=>loadScript('js/official-question-bank-v1.js',3000));
- await timed('officialPracticeMs',async()=>{await loadScript('js/official-practice-v1.js',4500);await loadScript('js/official-practice-navigation-v1.js',2500)});
+ await timed('officialPracticeMs',async()=>{await loadScript('js/official-practice-v1.js',2500);await loadScript('js/official-practice-navigation-v1.js',2500)});
  try{await loadStyle('assets/premium-v26.css')}catch(e){console.warn('[Gabarito+] Estilos de acessibilidade indisponíveis:',e.message)}
  try{await loadStyle('assets/theme-v29.css')}catch(e){console.warn('[Gabarito+] Paleta visual indisponível:',e.message)}
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();

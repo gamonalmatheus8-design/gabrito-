@@ -11,18 +11,23 @@ try{
   await page.waitForFunction(()=>window.GABARITO_APP?.ready===true,{timeout:20000});
   await page.waitForFunction(()=>window.GABARITO_APP?.questionBankMode==='validated_practice_v3',{timeout:8000});
 
-  const onboarding=page.locator('#v37Onboarding.open');
-  if(await onboarding.count()){
-    const skip=page.locator('#onSkipBtn');
-    assert.equal(await skip.count(),1,'onboarding deve oferecer a ação Agora não');
-    await skip.click();
-    await page.waitForSelector('#v37Onboarding.open',{state:'detached',timeout:3000});
+  async function dismissOnboarding(){
+    try{await page.waitForSelector('#v37Onboarding.open',{state:'visible',timeout:1800})}catch{}
+    const onboarding=page.locator('#v37Onboarding.open');
+    if(await onboarding.count()){
+      const skip=page.locator('#onSkipBtn');
+      assert.equal(await skip.count(),1,'onboarding deve oferecer a ação Agora não');
+      await skip.click();
+      await page.waitForSelector('#v37Onboarding.open',{state:'hidden',timeout:3000});
+    }
   }
+  await dismissOnboarding();
 
   const before=await page.evaluate(()=>performance.getEntriesByType('resource').map(x=>x.name));
   assert.equal(before.some(x=>x.includes('enem-official-v27.js')),false,'runner ENEM não deve carregar no boot');
   assert.equal(before.some(x=>x.includes('pism-history-v29.js')),false,'runner PISM não deve carregar no boot');
 
+  await dismissOnboarding();
   const sidebarQuestions=page.locator('.sidebar [data-page="questions"]');
   assert.equal(await sidebarQuestions.count(),1,'deve existir um único botão Questões na sidebar desktop');
   await sidebarQuestions.click();

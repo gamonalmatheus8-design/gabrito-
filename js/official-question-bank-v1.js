@@ -3,7 +3,8 @@
 if(window.__GABARITO_PRACTICE_BANK_V3__)return;
 window.__GABARITO_PRACTICE_BANK_V3__=true;
 
-const VERSION='3.0.0';
+const VERSION='3.0.1';
+const REST_PAGE_SIZE=500;
 const LOCAL_ATTEMPTS='gplus_practice_v3_attempts';
 const LOCAL_BOOKMARKS='gplus_practice_v3_bookmarks';
 const PDFJS='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';
@@ -41,18 +42,29 @@ async function rest(table,params={}){
   return res.json();
 }
 
+async function restPaged(table,params={},pageSize=REST_PAGE_SIZE){
+  const rows=[];
+  for(let offset=0;;offset+=pageSize){
+    const page=await rest(table,{...params,limit:pageSize,offset});
+    if(!Array.isArray(page))break;
+    rows.push(...page);
+    if(page.length<pageSize)break;
+  }
+  return rows;
+}
+
 async function loadCatalog(force=false){
   if(state.loaded&&!force)return;
   if(state.loading&&!force)return state.loading;
   state.loading=(async()=>{
     const [questions,sources]=await Promise.all([
-      rest('practice_questions',{
+      restPaged('practice_questions',{
         select:'id,source_id,exam,year,application,module,day,original_number,variant,area,subject,topic,skill,content_mode,source_page_number,source_crop,asset_url,correct_answer,difficulty_label,difficulty_value,difficulty_basis,taxonomy_basis,provenance',
-        status:'eq.published',order:'year.desc,original_number.asc',limit:1000
+        status:'eq.published',order:'year.desc,original_number.asc'
       }),
-      rest('practice_question_sources',{
+      restPaged('practice_question_sources',{
         select:'id,source_key,exam,institution,year,application,module,day,booklet,source_page_url,source_pdf_url,answer_key_url,rights_status,rights_note,verified_at',
-        order:'year.desc,day.asc',limit:250
+        order:'year.desc,day.asc'
       })
     ]);
     state.catalog=Array.isArray(questions)?questions:[];
@@ -63,6 +75,7 @@ async function loadCatalog(force=false){
     window.GABARITO_APP=window.GABARITO_APP||{};
     window.GABARITO_APP.practiceBank='validated-v3';
     window.GABARITO_APP.practiceQuestionCount=state.catalog.length;
+    window.GABARITO_APP.practiceBankPageSize=REST_PAGE_SIZE;
     window.GABARITO_APP.authorialQuestionPractice=false;
     await loadCloudHistory().catch(()=>{});
   })().finally(()=>{state.loading=null});

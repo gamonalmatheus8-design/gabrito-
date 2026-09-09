@@ -1,28 +1,38 @@
 {
-  "extraction_version": "structured-v1-20260909",
+  "extraction_version": "structured-v2-20260909",
   "published_questions": 351,
-  "structured": 174,
-  "failed": 177,
-  "with_visual_asset": 138,
-  "coverage_percent": 49.57,
+  "structured": 315,
+  "failed": 36,
+  "with_visual_asset": 243,
+  "coverage_percent": 89.74,
   "per_source": [
+    {
+      "source_key": "enem-2024-d1-yellow",
+      "questions": 95,
+      "structured": 87,
+      "failed": 8,
+      "download_url_used": "https://riep.inep.gov.br/bitstreams/71aaf57d-a5b7-4300-bd8b-fcf2ec490570/download"
+    },
     {
       "source_key": "enem-2024-d2-yellow",
       "questions": 74,
-      "structured": 49,
-      "failed": 25
+      "structured": 61,
+      "failed": 13,
+      "download_url_used": "https://riep.inep.gov.br/bitstreams/00b05856-bf94-4bfb-b209-65758a35b81b/download"
     },
     {
       "source_key": "enem-2025-d1-yellow",
       "questions": 95,
-      "structured": 70,
-      "failed": 25
+      "structured": 88,
+      "failed": 7,
+      "download_url_used": "https://riep.inep.gov.br/bitstreams/a11f89c6-3693-49f0-8164-2794b5dac372/download"
     },
     {
       "source_key": "enem-2025-d2-yellow",
       "questions": 87,
-      "structured": 55,
-      "failed": 32
+      "structured": 79,
+      "failed": 8,
+      "download_url_used": "https://riep.inep.gov.br/bitstreams/d43be9d0-2316-42bf-9ea7-dc4475645c52/download"
     }
   ]
 }

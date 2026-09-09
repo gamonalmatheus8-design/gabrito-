@@ -2,11 +2,18 @@
 'use strict';
 if(window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__)return;
 window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
-const VERSION='3.3.0';
+const VERSION='3.3.1';
 const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
 const STANDALONE_VERSION='3.3.0-20260909';
-function open(){return window.GABARITO_PRACTICE_STANDALONE?.open?.()||window.GABARITO_PRACTICE_V3?.open?.()||window.go?.('questions')}
-function next(){return window.GABARITO_PRACTICE_STANDALONE?.next?.()||window.GABARITO_PRACTICE_V3?.next?.()}
+function loading(){
+  const page=document.querySelector('#page-questions');if(!page)return;
+  page.innerHTML='<div style="min-height:280px;display:grid;place-items:center;text-align:center;color:var(--muted)"><div><strong style="color:var(--text)">Abrindo Banco de Treino…</strong><br><small>Preparando a área de questões individuais.</small></div></div>';
+}
+function open(){
+  if(window.GABARITO_PRACTICE_STANDALONE?.open)return window.GABARITO_PRACTICE_STANDALONE.open();
+  loading();
+}
+function next(){return window.GABARITO_PRACTICE_STANDALONE?.next?.()}
 function loadBookmarkSync(){
   if(document.querySelector('script[data-gplus-practice-bookmark-sync]'))return;
   const s=document.createElement('script');
@@ -23,9 +30,11 @@ function loadStandalone(){
   s.dataset.gplusPracticeStandalone='1';
   document.head.appendChild(s);
 }
-window.GABARITO_OFFICIAL_PRACTICE={version:VERSION,open,newQuestion:next,get state(){return window.GABARITO_PRACTICE_STANDALONE?.state||window.GABARITO_PRACTICE_V3?.state||{}}};
+window.renderQuestionPage=open;
+window.GABARITO_OFFICIAL_PRACTICE={version:VERSION,open,newQuestion:next,get state(){return window.GABARITO_PRACTICE_STANDALONE?.state||{}}};
 window.GABARITO_APP=window.GABARITO_APP||{};
-window.GABARITO_APP.officialPractice='compat-v3.3.0';
+window.GABARITO_APP.officialPractice='compat-v3.3.1';
+window.GABARITO_APP.practiceUsesPdfAsInterface=false;
 loadBookmarkSync();
 loadStandalone();
 })();

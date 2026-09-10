@@ -1,4 +1,4 @@
-const CACHE='gabarito-mais-3-9-0-practice-v3';
+const CACHE='gabarito-mais-3-9-0-practice-v3-curated-r2';
 const V='3.9.0';
 const RECOVERY='20260909-practice-v3';
 const stamp=u=>`${u}${u.includes('?')?'&':'?'}v=${V}&r=${RECOVERY}`;

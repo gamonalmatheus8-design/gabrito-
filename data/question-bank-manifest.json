@@ -1,0 +1,14 @@
+{
+  "version": "autoral-curadoria-2026-09-10-r2",
+  "before": 716,
+  "published": 406,
+  "archived": 316,
+  "contentCorrected": 30,
+  "byExam": {
+    "ENEM": 238,
+    "PISM": 168
+  },
+  "scope": "Revisão técnica/editorial assistida por IA; sem certificação humana, curricular integral ou psicométrica. Todos os apontamentos conhecidos foram tratados por correção ou retirada da publicação.",
+  "sha256": "5fc715513c20a7e17f0c039b4036781d736ebe3bf56f32cc4e3163ec99a04da3",
+  "added": 6
+}

@@ -1,0 +1,72 @@
+/* Gabarito+ V9.2 — estabilidade visual dos módulos críticos */
+.v92-save-state{color:var(--primary,#0f625c);font-weight:700}
+.v92-resume-card{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:16px 0;border-color:color-mix(in srgb,var(--primary,#0f625c) 24%,var(--border,#e2e8f0));background:color-mix(in srgb,var(--card,#fff) 96%,var(--primary,#0f625c) 4%)}
+.v92-resume-card strong{display:block;margin-top:3px;font-size:17px}.v92-resume-card p{margin:5px 0 0;color:var(--muted,#64748b);font-size:13px}.v92-resume-actions{display:flex;gap:8px;flex:0 0 auto}
+.v92-plan-item{align-items:center}.v92-plan-item .btn{white-space:nowrap}.v92-essay-history{align-items:center}.v92-essay-history .btn{flex:0 0 auto}
+#page-essay.v92-manual-essay .ai-correction-card{display:none!important}
+#v9AiCoach{display:none!important}
+
+/* Questões */
+#page-questions .filter-panel{overflow:visible}
+#page-questions .filters.v3{align-items:stretch}
+#page-questions .filters.v3 .select,#page-questions .filters.v3 .field{min-height:44px}
+#page-questions .option{min-height:48px;text-align:left;line-height:1.45}
+#page-questions .question-card{min-width:0}
+#page-questions .q-text{overflow-wrap:anywhere}
+#page-questions .q-toolbar{gap:10px}
+
+/* Revisões */
+#page-reviews .review-row{gap:14px}
+#page-reviews .review-row>div:first-child{min-width:0}
+#page-reviews .review-row b,#page-reviews .review-row p{overflow-wrap:anywhere}
+
+/* Plano */
+#page-plan #weeklyPlan{display:grid;gap:8px}
+#page-plan .v92-plan-item{border:1px solid var(--border,#e2e8f0);border-radius:16px;padding:13px 14px;background:color-mix(in srgb,var(--card,#fff) 97%,var(--primary,#0f625c) 3%)}
+#page-plan .v92-plan-item .plan-num{flex:0 0 auto}
+
+/* Simulados */
+#page-mocks .mock-card{min-width:0}
+#page-mocks #mockConfig .select{min-height:44px}
+
+/* Redação */
+#page-essay .textarea{min-height:420px;line-height:1.65}
+#page-essay .essay-score-input{min-height:42px}
+#page-essay .v92-essay-history{gap:12px}
+
+@media(max-width:980px){
+ #page-questions .q-layout{grid-template-columns:1fr!important}
+ #page-questions .q-sidebar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ #page-questions .v42-q-help{display:none}
+ #page-mocks .mock-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #page-essay .essay-layout{grid-template-columns:1fr!important}
+}
+@media(max-width:760px){
+ .header-row{gap:12px}.header-actions{width:100%;display:flex;flex-wrap:wrap}.header-actions .btn{min-height:44px}
+ #page-questions .filters.v3{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ #page-questions #qSearch{grid-column:1/-1}
+ #page-questions .q-sidebar{grid-template-columns:1fr}
+ #page-questions .q-toolbar{flex-direction:column;align-items:stretch!important}
+ #page-questions .q-toolbar>div:last-child{display:grid!important;grid-template-columns:1fr 1fr;width:100%}
+ #page-questions .q-toolbar .btn{min-height:44px;justify-content:center}
+ #page-questions .option{padding:13px 12px}
+ #page-reviews .review-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #page-reviews .grid.grid-2{grid-template-columns:1fr!important}
+ #page-reviews .review-row{align-items:flex-start}
+ #page-reviews .review-row>div:last-child{flex:0 0 auto}
+ #page-plan .v92-plan-item{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px}
+ #page-plan .v92-plan-item .btn{grid-column:1/-1;width:100%;min-height:42px}
+ #page-mocks .mock-cards{grid-template-columns:1fr!important}
+ #page-mocks #mockConfig .grid{grid-template-columns:1fr!important}
+ .v92-resume-card{align-items:stretch;flex-direction:column}.v92-resume-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.v92-resume-actions .btn{min-height:44px}
+ #page-essay .textarea{min-height:52vh}
+ #page-essay .essay-score-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #page-essay .v92-essay-history{display:grid;grid-template-columns:minmax(0,1fr) auto}
+}
+@media(max-width:460px){
+ #page-questions .filters.v3{grid-template-columns:1fr}
+ #page-questions #qSearch{grid-column:auto}
+ #page-reviews .review-summary-grid{grid-template-columns:1fr 1fr!important}
+ #page-essay .essay-score-grid{grid-template-columns:1fr 1fr!important}
+ .v92-resume-actions{grid-template-columns:1fr}
+}

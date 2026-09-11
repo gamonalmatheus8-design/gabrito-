@@ -1,6 +1,6 @@
-const CACHE='gabarito-mais-3-9-0-practice-v3-curated-r2';
-const V='3.9.0';
-const RECOVERY='20260909-practice-v3';
+const CACHE='gabarito-mais-v9-20260911-1';
+const V='9.0.0';
+const RECOVERY='20260911-v9-home';
 const stamp=u=>`${u}${u.includes('?')?'&':'?'}v=${V}&r=${RECOVERY}`;
 const CORE=['/offline.html','/manifest.webmanifest','/assets/icons/icon-192.png','/assets/icons/icon-512.png'];
 self.addEventListener('install',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)));const cache=await caches.open(CACHE);await Promise.allSettled(CORE.map(u=>cache.add(stamp(u))));await self.skipWaiting()})())});

@@ -1,0 +1,35 @@
+/* Gabarito+ V9.2.2 — acabamento final */
+.ai-correction-card,#v9AiCoach{display:none!important}
+#mainContent{scroll-margin-top:88px;min-width:0}
+.page.active{min-width:0}
+:where(button,a,input,select,textarea):focus-visible{outline:3px solid color-mix(in srgb,var(--primary,#0f625c) 55%,transparent);outline-offset:2px}
+.nav-btn[aria-current="page"]{font-weight:800}
+.exam-switch button[aria-pressed="true"],[data-qexam-switch][aria-pressed="true"]{font-weight:800}
+.select:disabled,.field:disabled{opacity:.62;cursor:not-allowed}
+.btn:disabled,.option:disabled{cursor:not-allowed}
+.empty{line-height:1.55}
+#page-questions .question-card,#page-reviews .card,#page-plan .card,#page-mocks .card,#page-essay .card{overflow-wrap:anywhere}
+#page-mocks #mockSubject{min-width:0}
+@media(max-width:760px){
+ .app-top{min-width:0}
+ .app-top .brand-sub{display:none}
+ .exam-switch{flex:0 0 auto}
+ .top-actions{flex:0 0 auto}
+ main{min-width:0}
+ .page{min-width:0}
+ .header-row h1{font-size:clamp(26px,8vw,34px)}
+ .header-row .sub{max-width:100%}
+ #page-questions .question-card{padding-left:14px;padding-right:14px}
+ #page-questions .q-text{font-size:15px;line-height:1.6}
+ #page-questions .option{width:100%}
+ #page-reviews .review-row{display:grid;grid-template-columns:minmax(0,1fr) auto}
+ #page-mocks .mock-card .btn{width:100%;min-height:44px}
+ #page-essay .header-actions{display:grid;grid-template-columns:1fr 1fr}
+ #page-essay .header-actions .btn{width:100%;justify-content:center}
+}
+@media(max-width:420px){
+ .app-top{padding-left:8px;padding-right:8px;gap:6px}
+ .brand-name{font-size:15px}
+ .exam-switch button{padding-left:9px;padding-right:9px}
+ #page-essay .header-actions{grid-template-columns:1fr}
+}

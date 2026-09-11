@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const VERSION='3.9.0';
-const RECOVERY='20260909-practice-v3';
+const RECOVERY='20260911-interior-brand-v40';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 const perfNow=()=>typeof performance!=='undefined'&&performance.now?performance.now():Date.now();
@@ -11,6 +11,7 @@ document.title='Gabarito+ — ENEM & PISM';
 const asset=src=>/^https?:/i.test(src)?src:`${src}${src.includes('?')?'&':'?'}v=${encodeURIComponent(VERSION)}&r=${RECOVERY}`;
 function loadScript(src,timeoutMs=5000){return new Promise((resolve,reject)=>{const s=document.createElement('script');let done=false,timer=null;const finish=err=>{if(done)return;done=true;if(timer)clearTimeout(timer);err?reject(err):resolve()};s.src=asset(src);s.async=false;s.onload=()=>finish();s.onerror=()=>finish(new Error('Falha ao carregar '+src));if(timeoutMs>0)timer=setTimeout(()=>finish(new Error('Tempo esgotado ao carregar '+src)),timeoutMs);document.head.appendChild(s)})}
 function loadStyle(src){return new Promise((resolve,reject)=>{if(document.querySelector(`link[data-gplus-style="${src}"]`))return resolve();const l=document.createElement('link');l.rel='stylesheet';l.href=asset(src);l.dataset.gplusStyle=src;l.onload=resolve;l.onerror=()=>reject(new Error('Falha ao carregar '+src));document.head.appendChild(l)})}
+async function loadBrandLayer(){const src='assets/interior-brand-v40.css';const existing=document.querySelector(`link[data-gplus-style="${src}"]`);if(existing){document.head.appendChild(existing);window.GABARITO_APP.brandTheme='sand-petrol-copper-v4';return}await loadStyle(src);window.GABARITO_APP.brandTheme='sand-petrol-copper-v4'}
 async function timed(name,task){const t=perfNow();try{return await task()}finally{PERF.timings[name]=Math.round((perfNow()-t)*10)/10}}
 function show(text){const el=document.getElementById('v7BootStatus');if(el)el.textContent=text}
 function accountMessage(text){const el=document.getElementById('v5AuthError');if(el)el.textContent=text}
@@ -22,11 +23,11 @@ function applyBank(result,source='supabase-cache-fast'){window.ENEM_QUESTIONS=re
 async function loadInitialBank(){if(configured){try{await ensureQuestionSource();const cached=await window.GabaritoQuestionSource.loadCachedOnly();if(cached){show('Abrindo conteúdo em cache…');applyBank(cached);PERF.cacheHit=true;return}}catch(e){window.GABARITO_APP.cacheReadError=e?.message||String(e);console.warn('[Gabarito+] Cache rápido indisponível:',e?.message||e)}}PERF.cacheHit=false;await loadLocalBank()}
 async function primeBankCache(){if(!configured)return;const t=perfNow();try{await ensureQuestionSource();const result=await window.GabaritoQuestionSource.refreshCacheIfChanged(cfg,{timeoutMs:12000});window.GABARITO_APP.cachePrimeDone=true;window.GABARITO_APP.cachePrimeChanged=Boolean(result?.changed);window.GABARITO_APP.cachePrimeVersion=result?.version||null;PERF.cachePrime={ok:true,changed:Boolean(result?.changed),ms:Math.round((perfNow()-t)*10)/10}}catch(e){window.GABARITO_APP.cachePrimeDone=true;window.GABARITO_APP.cachePrimeError=e?.message||String(e);PERF.cachePrime={ok:false,error:e?.message||String(e),ms:Math.round((perfNow()-t)*10)/10}}}
 async function connectAccountLayer(){try{if(!configured)return;await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',4500);if(!window.supabase?.createClient)throw new Error('Biblioteca de conta indisponível.');window.estudosSupabase=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});await loadScript('js/gabarito-supabase.js',5000)}catch(e){console.warn('[Gabarito+] Camada de conta indisponível:',e.message);window.GABARITO_APP.cloudStatus='offline'}}
-async function loadQualityLayer(){try{await loadStyle('assets/quality-v22.css');await loadScript('js/quality-v22.js',3500)}catch(e){console.warn('[Gabarito+] Camada de qualidade indisponível:',e.message)}}
+async function loadQualityLayer(){try{await loadStyle('assets/quality-v22.css');await loadScript('js/quality-v22.js',3500)}catch(e){console.warn('[Gabarito+] Camada de qualidade indisponível:',e.message)}finally{try{await loadBrandLayer()}catch(e){console.warn('[Gabarito+] Identidade visual interna indisponível:',e.message)}}}
 function resourceSummary(){try{const rows=performance.getEntriesByType('resource').map(r=>({name:r.name.split('?')[0],duration:Math.round(r.duration*10)/10,transferSize:Number(r.transferSize||0),encodedBodySize:Number(r.encodedBodySize||0),decodedBodySize:Number(r.decodedBodySize||0)}));const sum=arr=>arr.reduce((a,x)=>a+(x.encodedBodySize||x.transferSize||0),0);const data=rows.filter(x=>/\/data\/(enem-questions|pism-questions)/.test(x.name));const app=rows.find(x=>/\/js\/app\.js$/.test(x.name));return{eagerResourceCount:rows.length,eagerEncodedBytes:sum(rows),questionDataEncodedBytes:sum(data),questionDataResources:data.length,appJsEncodedBytes:app?.encodedBodySize||app?.transferSize||0,appJsDurationMs:app?.duration||0}}catch{return{}}}
 function finalizePerformance(){PERF.timings.bootReadyMs=Math.round((perfNow()-PERF.startedAt)*10)/10;PERF.resources=resourceSummary();PERF.readyAt=Date.now();window.GABARITO_APP.performance=PERF;window.GABARITO_PERF={version:VERSION,snapshot:()=>JSON.parse(JSON.stringify(PERF))};try{window.dispatchEvent(new CustomEvent('gplus:ready',{detail:PERF}))}catch{}}
 function scheduleIdle(fn,delay=0){setTimeout(()=>{if('requestIdleCallback'in window)requestIdleCallback(()=>fn(),{timeout:1500});else setTimeout(fn,0)},delay)}
-async function loadNonCriticalLayers(){const t=perfNow();try{try{await loadScript('js/v6-release.js',3500)}catch(e){console.warn('[Gabarito+] Camada PWA indisponível:',e.message)}try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',4500)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}try{await loadScript('js/theme-v29.js',2500)}catch(e){console.warn('[Gabarito+] Controle de tema indisponível:',e.message)}}finally{PERF.timings.nonCriticalLayersMs=Math.round((perfNow()-t)*10)/10}}
+async function loadNonCriticalLayers(){const t=perfNow();try{try{await loadScript('js/v6-release.js',3500)}catch(e){console.warn('[Gabarito+] Camada PWA indisponível:',e.message)}try{await loadStyle('assets/commercial-v2.css');await loadScript('js/commercial-v2.js',4500)}catch(e){console.warn('[Gabarito+] Acabamento comercial indisponível:',e.message)}try{await loadScript('js/theme-v29.js',2500)}catch(e){console.warn('[Gabarito+] Controle de tema indisponível:',e.message)}try{await loadBrandLayer()}catch(e){console.warn('[Gabarito+] Identidade visual interna indisponível:',e.message)}}finally{PERF.timings.nonCriticalLayersMs=Math.round((perfNow()-t)*10)/10}}
 async function boot(){try{
  installCloudPlaceholders();
  show('Abrindo aplicativo…');
@@ -39,6 +40,7 @@ async function boot(){try{
  await timed('officialPracticeMs',async()=>{await loadScript('js/official-practice-v1.js',2500);await loadScript('js/official-practice-navigation-v1.js',2500)});
  try{await loadStyle('assets/premium-v26.css')}catch(e){console.warn('[Gabarito+] Estilos de acessibilidade indisponíveis:',e.message)}
  try{await loadStyle('assets/theme-v29.css')}catch(e){console.warn('[Gabarito+] Paleta visual indisponível:',e.message)}
+ try{await loadBrandLayer()}catch(e){console.warn('[Gabarito+] Identidade visual interna indisponível:',e.message)}
  const overlay=document.getElementById('v7Boot');if(overlay)overlay.remove();
  window.GABARITO_APP.ready=true;
  finalizePerformance();

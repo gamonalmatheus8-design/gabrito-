@@ -1,8 +1,8 @@
 (function(){
 'use strict';
-const V9_VERSION='9.0.0-alpha.1';
+const V9_VERSION='9.1.0';
 function polishPublicShell(){
- document.title='Gabarito+ — ENEM & PISM';
+ document.title='Gabarito+ V9 — ENEM & PISM';
  document.getElementById('adminLink')?.remove();
  const foot=document.querySelector('.sidebar-foot');
  if(foot){
@@ -12,12 +12,22 @@ function polishPublicShell(){
   if(source&&!source.dataset.gplusReady)source.textContent='Conteúdo disponível';
  }
 }
+function loadStyle(src,key){
+ if(document.querySelector(`link[data-gplus-layer="${key}"]`))return;
+ const link=document.createElement('link');link.rel='stylesheet';link.href=`${src}?v=${encodeURIComponent(V9_VERSION)}`;link.dataset.gplusLayer=key;document.head.appendChild(link);
+}
+function loadAiLayer(){
+ loadStyle('/assets/v9-refine.css','v9-refine-style');
+ if(window.GabaritoV9AI||document.querySelector('script[data-gplus-layer="v9-ai-script"]'))return;
+ const ai=document.createElement('script');ai.src=`/js/v9-coach-ai.js?v=${encodeURIComponent(V9_VERSION)}`;ai.async=false;ai.dataset.gplusLayer='v9-ai-script';ai.onerror=()=>console.warn('[Gabarito+] O Coach avançado não pôde ser carregado.');document.head.appendChild(ai);
+}
 function loadV9Layer(){
- if(!document.querySelector('link[data-gplus-v9]')){
-  const link=document.createElement('link');link.rel='stylesheet';link.href=`/assets/v9-adaptive.css?v=${encodeURIComponent(V9_VERSION)}`;link.dataset.gplusV9='style';document.head.appendChild(link);
- }
- if(window.GabaritoV9||document.querySelector('script[data-gplus-v9]'))return;
- const script=document.createElement('script');script.src=`/js/v9-adaptive.js?v=${encodeURIComponent(V9_VERSION)}`;script.async=false;script.dataset.gplusV9='script';script.onerror=()=>console.warn('[Gabarito+] A camada adaptativa V9 não pôde ser carregada.');document.head.appendChild(script);
+ loadStyle('/assets/v9-adaptive.css','v9-base-style');
+ loadStyle('/assets/v9-refine.css','v9-refine-style');
+ if(window.GabaritoV9){loadAiLayer();return}
+ const existing=document.querySelector('script[data-gplus-layer="v9-base-script"]');
+ if(existing){existing.addEventListener('load',loadAiLayer,{once:true});setTimeout(()=>{if(window.GabaritoV9)loadAiLayer()},120);return}
+ const script=document.createElement('script');script.src=`/js/v9-adaptive.js?v=${encodeURIComponent(V9_VERSION)}`;script.async=false;script.dataset.gplusLayer='v9-base-script';script.onload=loadAiLayer;script.onerror=()=>console.warn('[Gabarito+] A camada adaptativa V9 não pôde ser carregada.');document.head.appendChild(script);
 }
 function initMore(){
  polishPublicShell();

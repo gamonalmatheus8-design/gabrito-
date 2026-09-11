@@ -1,0 +1,9 @@
+Gabarito+ V9.2.3 — critérios de aceite da área de Questões
+- ENEM/PISM visível e alternável no topo.
+- Filtros avançados recolhidos por padrão.
+- Atalhos Todas/Inéditas/Erros/Salvas sempre visíveis.
+- Enunciado e alternativas são o foco visual principal.
+- Feedback da resposta não depende de IA.
+- Gabaritos e banco de questões não são alterados pela camada visual.
+- Sidebar desaparece no mobile e vira resumo compacto.
+- Área permanece utilizável caso a camada premium falhe.

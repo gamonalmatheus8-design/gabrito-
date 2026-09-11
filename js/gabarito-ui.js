@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const V9_VERSION='9.2.2';
+const V9_VERSION='9.2.3';
 function polishPublicShell(){
  document.title='Gabarito+ V9 — ENEM & PISM';
  document.getElementById('adminLink')?.remove();
@@ -27,11 +27,16 @@ function loadStabilityLayer(){
  if(!window.GabaritoV92&&!document.querySelector('script[data-gplus-layer="v9-stability-core-script"]'))loadScript('/js/v9-stability-core.js','v9-stability-core-script',null,()=>console.warn('[Gabarito+] A camada de estabilidade da V9 não pôde ser carregada.'));
  if(!window.GabaritoV92QuestionSpeed&&!document.querySelector('script[data-gplus-layer="v9-question-speed-script"]'))loadScript('/js/v9-question-speed.js','v9-question-speed-script',null,()=>console.warn('[Gabarito+] O caminho rápido de questões não pôde ser carregado.'));
 }
-function loadPostLayers(){/* IA externa congelada nesta fase. */loadFinalQa(()=>{loadProductLayer();loadStabilityLayer()})}
+function loadQuestionsLayer(){
+ loadStyle('/assets/v9-questions-premium.css','v9-questions-premium-style');
+ if(window.GabaritoV923Questions||document.querySelector('script[data-gplus-layer="v9-questions-premium-script"]'))return;
+ loadScript('/js/v9-questions-premium.js','v9-questions-premium-script',null,()=>console.warn('[Gabarito+] A nova experiência de Questões não pôde ser carregada.'));
+}
+function loadPostLayers(){/* IA externa congelada nesta fase. */loadFinalQa(()=>{loadProductLayer();loadStabilityLayer();setTimeout(loadQuestionsLayer,80)})}
 async function loadV9Layer(){
  loadStyle('/assets/v9-final-qa.css','v9-final-qa-style');
  await loadGuard();
- loadStyle('/assets/v9-adaptive.css','v9-base-style');loadStyle('/assets/v9-refine.css','v9-refine-style');loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');loadStyle('/assets/v9-stability.css','v9-stability-style');
+ loadStyle('/assets/v9-adaptive.css','v9-base-style');loadStyle('/assets/v9-refine.css','v9-refine-style');loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');loadStyle('/assets/v9-stability.css','v9-stability-style');loadStyle('/assets/v9-questions-premium.css','v9-questions-premium-style');
  if(window.GabaritoV9){setTimeout(()=>window.GabaritoV9HomeGuard?.check?.(),0);loadPostLayers();return}
  const existing=document.querySelector('script[data-gplus-layer="v9-base-script"]');
  if(existing){existing.addEventListener('load',()=>{setTimeout(()=>window.GabaritoV9HomeGuard?.check?.(),0);loadPostLayers()},{once:true});setTimeout(()=>{window.GabaritoV9HomeGuard?.check?.();if(window.GabaritoV9)loadPostLayers()},300);return}

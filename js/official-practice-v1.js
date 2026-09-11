@@ -2,9 +2,10 @@
 'use strict';
 if(window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__)return;
 window.__GABARITO_OFFICIAL_PRACTICE_COMPAT_V3__=true;
-const VERSION='3.4.0';
+const VERSION='3.4.1';
 const BOOKMARK_SYNC_VERSION='3.1.1-20260909';
-const STANDALONE_VERSION='3.4.0-20260909';
+const STANDALONE_VERSION='3.4.0-20260911-v925';
+const POLISH_VERSION='9.2.5';
 const COUNT_PAGE_SIZE=500;
 // Marcador inerte para contratos estáticos antigos; não é executado e não restaura fallback legado.
 const RETIRED_PRACTICE_CONTRACT='GABARITO_PRACTICE_V3?.open';
@@ -54,23 +55,31 @@ function loadBookmarkSync(){
   s.dataset.gplusPracticeBookmarkSync='1';
   document.head.appendChild(s);
 }
+function loadPracticePolish(){
+  if(!document.querySelector('link[data-gplus-practice-v9-polish]')){
+    const l=document.createElement('link');l.rel='stylesheet';l.href=`/assets/practice-v9-premium.css?v=${POLISH_VERSION}`;l.dataset.gplusPracticeV9Polish='1';document.head.appendChild(l);
+  }
+  if(window.GabaritoV925Practice||document.querySelector('script[data-gplus-practice-v9-polish]'))return;
+  const s=document.createElement('script');s.src=`/js/practice-v9-premium.js?v=${POLISH_VERSION}`;s.defer=true;s.dataset.gplusPracticeV9Polish='1';document.head.appendChild(s);
+}
 function loadStandalone(){
   if(document.querySelector('script[data-gplus-practice-standalone]'))return;
   const s=document.createElement('script');
   s.src=`/js/practice-standalone-v34.js?v=${STANDALONE_VERSION}`;
   s.defer=true;
   s.dataset.gplusPracticeStandalone='1';
-  s.onload=()=>{void refreshPracticeCounter();setTimeout(()=>void refreshPracticeCounter(),900)};
+  s.onload=()=>{loadPracticePolish();window.GabaritoV925Practice?.enhance?.();void refreshPracticeCounter();setTimeout(()=>{window.GabaritoV925Practice?.enhance?.();void refreshPracticeCounter()},900)};
   document.head.appendChild(s);
 }
 window.renderQuestionPage=open;
 window.GABARITO_OFFICIAL_PRACTICE={version:VERSION,open,newQuestion:next,get state(){return window.GABARITO_PRACTICE_STANDALONE?.state||{}}};
 window.GABARITO_APP=window.GABARITO_APP||{};
-window.GABARITO_APP.officialPractice='compat-v3.4.0';
+window.GABARITO_APP.officialPractice='compat-v3.4.1';
 window.GABARITO_APP.practiceUsesPdfAsInterface=false;
 const initialCounter=document.querySelector('#sideQCount');if(initialCounter)initialCounter.textContent='…';
 void refreshPracticeCounter();
 loadBookmarkSync();
+loadPracticePolish();
 loadStandalone();
 setTimeout(()=>void refreshPracticeCounter(),2200);
 })();

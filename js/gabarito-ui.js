@@ -1,9 +1,10 @@
 (function(){
 'use strict';
-const V9_VERSION='9.2.1';
+const V9_VERSION='9.2.2';
 function polishPublicShell(){
  document.title='Gabarito+ V9 — ENEM & PISM';
  document.getElementById('adminLink')?.remove();
+ const main=document.querySelector('main');if(main&&!main.id)main.id='mainContent';
  const foot=document.querySelector('.sidebar-foot');
  if(foot){
   const title=foot.querySelector('strong');
@@ -15,14 +16,20 @@ function polishPublicShell(){
 function loadStyle(src,key){if(document.querySelector(`link[data-gplus-layer="${key}"]`))return;const link=document.createElement('link');link.rel='stylesheet';link.href=`${src}?v=${encodeURIComponent(V9_VERSION)}`;link.dataset.gplusLayer=key;document.head.appendChild(link)}
 function loadScript(src,key,onload,onerror){const existing=document.querySelector(`script[data-gplus-layer="${key}"]`);if(existing){if(onload)existing.addEventListener('load',onload,{once:true});return existing}const script=document.createElement('script');script.src=`${src}?v=${encodeURIComponent(V9_VERSION)}`;script.async=false;script.dataset.gplusLayer=key;if(onload)script.onload=onload;if(onerror)script.onerror=onerror;document.head.appendChild(script);return script}
 function loadGuard(){loadStyle('/assets/v9-home-guard.css','v9-home-guard-style');if(window.GabaritoV9HomeGuard)return Promise.resolve();return new Promise(resolve=>{const existing=document.querySelector('script[data-gplus-layer="v9-home-guard-script"]');if(existing){if(window.GabaritoV9HomeGuard)return resolve();existing.addEventListener('load',()=>resolve(),{once:true});existing.addEventListener('error',()=>resolve(),{once:true});setTimeout(resolve,800);return}loadScript('/js/v9-home-guard.js','v9-home-guard-script',()=>resolve(),()=>resolve())})}
+function loadFinalQa(done){
+ loadStyle('/assets/v9-final-qa.css','v9-final-qa-style');
+ if(window.GabaritoV92Final){done?.();return}
+ loadScript('/js/v9-final-qa.js','v9-final-qa-script',()=>done?.(),()=>{console.warn('[Gabarito+] O QA final não pôde ser carregado.');done?.()});
+}
 function loadProductLayer(){loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');if(window.GabaritoV9Product||document.querySelector('script[data-gplus-layer="v9-product-polish-script"]'))return;loadScript('/js/v9-product-polish.js','v9-product-polish-script',null,()=>console.warn('[Gabarito+] O acabamento visual da V9 não pôde ser carregado.'))}
 function loadStabilityLayer(){
  loadStyle('/assets/v9-stability.css','v9-stability-style');
  if(!window.GabaritoV92&&!document.querySelector('script[data-gplus-layer="v9-stability-core-script"]'))loadScript('/js/v9-stability-core.js','v9-stability-core-script',null,()=>console.warn('[Gabarito+] A camada de estabilidade da V9 não pôde ser carregada.'));
  if(!window.GabaritoV92QuestionSpeed&&!document.querySelector('script[data-gplus-layer="v9-question-speed-script"]'))loadScript('/js/v9-question-speed.js','v9-question-speed-script',null,()=>console.warn('[Gabarito+] O caminho rápido de questões não pôde ser carregado.'));
 }
-function loadPostLayers(){/* IA externa congelada nesta fase. */loadProductLayer();loadStabilityLayer()}
+function loadPostLayers(){/* IA externa congelada nesta fase. */loadFinalQa(()=>{loadProductLayer();loadStabilityLayer()})}
 async function loadV9Layer(){
+ loadStyle('/assets/v9-final-qa.css','v9-final-qa-style');
  await loadGuard();
  loadStyle('/assets/v9-adaptive.css','v9-base-style');loadStyle('/assets/v9-refine.css','v9-refine-style');loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');loadStyle('/assets/v9-stability.css','v9-stability-style');
  if(window.GabaritoV9){setTimeout(()=>window.GabaritoV9HomeGuard?.check?.(),0);loadPostLayers();return}

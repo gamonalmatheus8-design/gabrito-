@@ -2,7 +2,7 @@
 'use strict';
 const root=document;
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
-const VERSION='3.0.0';
+const VERSION='3.0.1';
 const ANON_KEY='gplus_v2_anon_id';
 
 function anonId(){

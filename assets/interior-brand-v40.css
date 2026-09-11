@@ -1,0 +1,248 @@
+/* Gabarito+ 4.0 — identidade interna alinhada à landing: areia, petróleo e cobre */
+:root{
+  --bg:#efe9df;
+  --surface:#faf7f1;
+  --surface-2:#f3eee5;
+  --surface-3:#e8e1d7;
+  --text:#17231e;
+  --muted:#68736c;
+  --line:#d8d0c4;
+  --line-2:#c6bbac;
+  --primary:#1f5d4a;
+  --primary-2:#174638;
+  --primary-soft:#dce8e1;
+  --pism:#a95f3c;
+  --pism-soft:#f0dfd4;
+  --accent:#a95f3c;
+  --copper:#a95f3c;
+  --copper-soft:#f0dfd4;
+  --success:#2f765b;
+  --warning:#b8794d;
+  --danger:#a64a4a;
+  --shadow:0 18px 50px rgba(37,48,42,.09);
+  --shadow-sm:0 4px 16px rgba(37,48,42,.065);
+  --border:var(--line);
+  --card:var(--surface);
+  --premium-shadow:0 22px 58px rgba(37,48,42,.09);
+  --premium-border:color-mix(in srgb,var(--line) 92%,transparent);
+}
+body.dark{
+  --bg:#0f1d18;
+  --surface:#162821;
+  --surface-2:#1c332a;
+  --surface-3:#263f35;
+  --text:#f3ede4;
+  --muted:#aeb9b2;
+  --line:#355147;
+  --line-2:#49685d;
+  --primary:#79b59e;
+  --primary-2:#98c8b5;
+  --primary-soft:#234236;
+  --pism:#df9875;
+  --pism-soft:#4a3026;
+  --accent:#df9875;
+  --copper:#df9875;
+  --copper-soft:#4a3026;
+  --success:#82c4a8;
+  --warning:#dfac78;
+  --danger:#e58a8a;
+  --shadow:0 20px 55px rgba(0,0,0,.28);
+  --shadow-sm:0 4px 16px rgba(0,0,0,.2);
+}
+body.mode-enem{--exam-accent:var(--primary);--exam-accent-soft:var(--primary-soft);--exam-accent-2:var(--copper);--exam-text:var(--primary-2)}
+body.mode-pism{--exam-accent:var(--pism);--exam-accent-soft:var(--pism-soft);--exam-accent-2:#d38a68;--exam-text:#81452f}
+body.dark.mode-pism{--exam-text:#f0b293}
+
+body{
+  background:
+    radial-gradient(circle at 84% -8%,color-mix(in srgb,var(--primary) 9%,transparent),transparent 28%),
+    radial-gradient(circle at 8% 20%,color-mix(in srgb,var(--copper) 6%,transparent),transparent 23%),
+    var(--bg)!important;
+  color:var(--text);
+}
+body::before{
+  background:
+    radial-gradient(circle at 8% 14%,color-mix(in srgb,var(--copper) 5%,transparent),transparent 18%),
+    radial-gradient(circle at 88% 12%,color-mix(in srgb,var(--primary) 7%,transparent),transparent 18%),
+    radial-gradient(circle at 72% 74%,color-mix(in srgb,var(--primary) 3%,transparent),transparent 19%)!important;
+}
+
+/* Estrutura */
+.app-top{
+  background:color-mix(in srgb,var(--bg) 78%,var(--surface) 22%)!important;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 92%,transparent)!important;
+  box-shadow:0 8px 28px rgba(37,48,42,.045)!important;
+}
+.sidebar{
+  background:color-mix(in srgb,var(--surface) 92%,var(--bg))!important;
+  border-right-color:var(--line)!important;
+}
+.brand-mark{
+  background:linear-gradient(145deg,#173f34 0%,#225744 100%)!important;
+  color:#fffaf3!important;
+  box-shadow:0 8px 22px rgba(23,63,52,.16)!important;
+}
+.brand-mark:after{background:rgba(233,190,164,.2)!important}
+.brand-name span{color:var(--copper)!important}
+.brand-sub{color:var(--muted)!important}
+.sidebar-foot{background:var(--surface-2)!important;border-color:var(--line)!important}
+.bottom-nav{background:color-mix(in srgb,var(--surface) 96%,transparent)!important;border-top-color:var(--line)!important;box-shadow:0 -12px 36px rgba(37,48,42,.06)!important}
+
+/* Navegação */
+.nav-btn{color:color-mix(in srgb,var(--muted) 92%,var(--text))!important}
+.nav-btn:hover{background:var(--surface-2)!important;color:var(--text)!important}
+.mode-enem .nav-btn.active,.nav-btn.active{
+  background:color-mix(in srgb,var(--primary-soft) 84%,var(--surface))!important;
+  color:var(--primary)!important;
+  box-shadow:inset 3px 0 0 var(--primary)!important;
+}
+.mode-pism .nav-btn.active{
+  background:color-mix(in srgb,var(--pism-soft) 78%,var(--surface))!important;
+  color:var(--pism)!important;
+  box-shadow:inset 3px 0 0 var(--pism)!important;
+}
+.exam-switch{background:var(--surface-3)!important;border:1px solid var(--line)!important}
+.exam-switch button.active[data-exam="ENEM"]{background:var(--surface)!important;color:var(--primary)!important;box-shadow:0 3px 10px rgba(37,48,42,.08)!important}
+.exam-switch button.active[data-exam="PISM"]{background:var(--surface)!important;color:var(--pism)!important;box-shadow:0 3px 10px rgba(37,48,42,.08)!important}
+.icon-btn,.v5-account-btn{background:var(--surface)!important;border-color:var(--line)!important;color:var(--muted)!important}
+.icon-btn:hover,.v5-account-btn:hover{border-color:var(--line-2)!important;color:var(--text)!important}
+
+/* Superfícies e tipografia */
+.card,.v39-metric,.v39-action,.v39-panel,.filter-panel,.question-card,.mock-card,.setting,.review-row,.topic-row,.result-box,.notice,.feedback{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.card{box-shadow:0 3px 14px rgba(37,48,42,.045)!important}
+body.dark .card{box-shadow:0 3px 15px rgba(0,0,0,.15)!important}
+.page .eyebrow,.section-title .icon,.v22-kicker{color:var(--exam-accent,var(--primary))!important}
+.page h1,.page h2,.page h3,.page h4{color:var(--text)}
+.sub,.muted,.small,.tiny{color:var(--muted)}
+
+/* Botões */
+.btn-primary,.mode-enem .btn-primary{
+  background:linear-gradient(135deg,#1f5d4a,#174638)!important;
+  color:#fffaf3!important;
+  box-shadow:0 8px 20px rgba(23,63,52,.14)!important;
+}
+.btn-primary:hover,.mode-enem .btn-primary:hover{background:linear-gradient(135deg,#194d3d,#10362b)!important}
+.mode-pism .btn-primary,.btn-pism{
+  background:linear-gradient(135deg,#a95f3c,#88482f)!important;
+  color:#fffaf3!important;
+  box-shadow:0 8px 20px rgba(132,72,47,.14)!important;
+}
+.mode-pism .btn-primary:hover,.btn-pism:hover{background:linear-gradient(135deg,#934f33,#743b28)!important}
+.btn-secondary{background:var(--surface)!important;border-color:var(--line-2)!important;color:var(--text)!important}
+.btn-secondary:hover{background:var(--surface-2)!important;border-color:color-mix(in srgb,var(--exam-accent) 30%,var(--line-2))!important}
+.btn-ghost{border-color:var(--line)!important;color:var(--muted)!important}
+.link-btn{color:var(--exam-accent,var(--primary))!important}
+
+/* Dashboard */
+.v39-hero{
+  background:linear-gradient(135deg,var(--surface) 0%,color-mix(in srgb,var(--primary-soft) 40%,var(--surface)) 72%,color-mix(in srgb,var(--copper-soft) 18%,var(--surface)) 100%)!important;
+  border-color:color-mix(in srgb,var(--primary) 13%,var(--line))!important;
+}
+.mode-pism .v39-hero{background:linear-gradient(135deg,var(--surface) 0%,color-mix(in srgb,var(--pism-soft) 38%,var(--surface)) 100%)!important}
+.v39-badge{background:var(--surface-2)!important;border-color:var(--line)!important;color:var(--exam-accent,var(--primary))!important}
+.v39-metric,.v39-action,.v39-panel{box-shadow:0 3px 12px rgba(37,48,42,.035)!important}
+.v39-action:hover,.v39-route:hover{background:var(--surface-2)!important;border-color:var(--line-2)!important}
+.v39-action .icon{color:var(--exam-accent,var(--primary))}
+.v39-route{background:var(--surface-2)!important;border-color:var(--line)!important}
+.focus-timer-card{background:var(--surface)!important}
+.focus-presets button{background:var(--surface-2)!important;border-color:var(--line)!important;color:var(--muted)!important}
+.focus-presets button.active{background:var(--primary-soft)!important;color:var(--primary)!important;border-color:color-mix(in srgb,var(--primary) 30%,var(--line))!important}
+.timer{color:var(--text)}
+
+/* Campos, filtros e questões */
+.field,.select,.textarea,.pv3-field select{
+  background:color-mix(in srgb,var(--surface-2) 76%,var(--surface))!important;
+  border-color:var(--line)!important;
+  color:var(--text)!important;
+}
+.field:focus,.select:focus,.textarea:focus,.pv3-field select:focus{
+  border-color:color-mix(in srgb,var(--exam-accent) 62%,var(--line))!important;
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--exam-accent) 10%,transparent)!important;
+}
+.option,.pv33-option{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.option:hover:not(:disabled),.pv33-option:hover{
+  border-color:color-mix(in srgb,var(--exam-accent) 52%,var(--line))!important;
+  background:color-mix(in srgb,var(--exam-accent-soft) 46%,var(--surface))!important;
+}
+.option-letter,.pv33-letter{background:var(--surface-2)!important;border-color:var(--line-2)!important}
+.tag.enem,.pv3-chip.primary{background:var(--primary-soft)!important;color:var(--primary)!important}
+.tag.pism{background:var(--pism-soft)!important;color:var(--pism)!important}
+.question-mode-banner{background:linear-gradient(90deg,color-mix(in srgb,var(--exam-accent-soft) 58%,var(--surface)),var(--surface))!important;border-color:var(--line)!important}
+.question-mode-banner:before{background:linear-gradient(90deg,color-mix(in srgb,var(--exam-accent) 5%,transparent),transparent 48%,color-mix(in srgb,var(--copper) 4%,transparent))!important}
+.v42-tools-pop{background:var(--surface)!important;border-color:var(--line)!important;box-shadow:0 16px 36px rgba(37,48,42,.13)!important}
+
+/* Banco de treino standalone */
+.pv3-hero,.pv3-filter,.pv3-card,.pv3-side,.pv3-metric{background:var(--surface)!important;border-color:var(--line)!important}
+.pv3-kicker{color:var(--copper)!important}
+.pv3-exams button.active{background:var(--exam-accent,var(--primary))!important;border-color:var(--exam-accent,var(--primary))!important;color:#fffaf3!important}
+.pv3-chip{border-color:var(--line)!important}
+.pv3-bar{background:var(--surface-3)!important}.pv3-bar i{background:linear-gradient(90deg,var(--primary),#397760)!important}
+.pv33-feedback{background:var(--surface-2)!important}
+.pv33-source{border-top-color:var(--line)!important}.pv33-source a{color:var(--primary)!important}
+.pv3-bookmarked{color:var(--copper)!important;border-color:var(--copper)!important}
+
+/* Progresso */
+.progress{background:var(--surface-3)!important}
+.progress>span{background:linear-gradient(90deg,var(--primary),#4c876f)!important}
+.progress.pism>span{background:linear-gradient(90deg,var(--pism),#cb8260)!important}
+.daybar-fill{background:var(--primary)!important}
+
+/* Cards e experiências antigas que tinham gradientes roxos/azuis */
+.hero-card,.mode-enem .v28-command-hero,.v37-radar-action{
+  background:linear-gradient(135deg,#12362c 0%,#1b4b3c 58%,#2b6a53 100%)!important;
+  color:#fffaf4!important;
+}
+.mode-pism .v28-command-hero{
+  background:linear-gradient(135deg,#3d261f 0%,#6d3c2c 58%,#a95f3c 100%)!important;
+  color:#fffaf4!important;
+}
+.hero-card p,.v37-radar-action p{color:#c9d6cf!important}
+.v37-radar-action .btn{background:#f6ede2!important;color:#173f34!important;border-color:#eadaca!important}
+.v37-premium-card{background:linear-gradient(160deg,color-mix(in srgb,var(--primary-soft) 74%,var(--surface)),var(--surface))!important;border-color:color-mix(in srgb,var(--primary) 24%,var(--line))!important}
+.v37-premium-badge{background:var(--primary)!important;color:#fffaf3!important}
+.v37-onboarding-progress span.active{background:linear-gradient(90deg,var(--primary),var(--copper))!important}
+.v37-choice-grid button.active{background:var(--primary-soft)!important;border-color:var(--primary)!important}
+.v37-choice-grid button .icon{color:var(--primary)!important}
+.v37-step-kicker{color:var(--copper)!important}
+
+/* Rotas e universo */
+.v33-stage-main{background:linear-gradient(135deg,color-mix(in srgb,var(--exam-accent-soft) 62%,var(--surface)) 0%,var(--surface) 58%,color-mix(in srgb,var(--copper-soft) 16%,var(--surface)) 100%)!important}
+.v33-stage-main:before{background:radial-gradient(circle at 88% 12%,color-mix(in srgb,var(--exam-accent) 10%,transparent),transparent 18%),radial-gradient(circle at 82% 84%,color-mix(in srgb,var(--copper) 8%,transparent),transparent 22%)!important}
+.v33-stage-kicker,.v33-brand-emblem,.v33-signal-card,.v33-chip-row .chip,.v33-plan-bullets .point{background:color-mix(in srgb,var(--surface) 88%,transparent)!important}
+.v33-universe-card.enem{background:linear-gradient(180deg,color-mix(in srgb,var(--primary-soft) 74%,var(--surface)),var(--surface))!important}
+.v33-universe-card.pism{background:linear-gradient(180deg,color-mix(in srgb,var(--pism-soft) 72%,var(--surface)),var(--surface))!important}
+.v34-approval-routes:before,.v37-radar:before{background:linear-gradient(90deg,var(--exam-accent),var(--copper))!important}
+.v37-radar-bar .track span{background:linear-gradient(90deg,var(--exam-accent),color-mix(in srgb,var(--exam-accent) 68%,var(--copper)))!important}
+
+/* Simulados */
+.v24-exam-top,.v25p-top,.v37-exam-dock{background:color-mix(in srgb,var(--surface) 94%,transparent)!important;border-color:var(--line)!important}
+.v24-paper,.v25p-paper,.v37-premium-question,.v37-premium-nav{background:var(--surface)!important;border-color:var(--line)!important}
+.v24-option,.v25p-option{background:var(--surface-2)!important;border-color:var(--line)!important}
+.v24-option:hover,.v25p-option:hover{border-color:var(--exam-accent)!important;background:color-mix(in srgb,var(--exam-accent-soft) 50%,var(--surface))!important}
+.v25p-result .v26-kicker{color:var(--pism)!important}
+.v25p-result .v26-post-plan{border-color:color-mix(in srgb,var(--pism) 28%,var(--line))!important;background:linear-gradient(145deg,color-mix(in srgb,var(--pism-soft) 52%,var(--surface)),var(--surface))!important}
+.v25p-result .v26-plan-card.priority{border-color:color-mix(in srgb,var(--pism) 40%,var(--line))!important;box-shadow:inset 3px 0 0 var(--pism)!important}
+
+/* Conta, modais e estados */
+.v37-onboarding-shell,.modal-card,.v5-account-card,.v5-account-modal .modal,.dialog,.popover{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+}
+.v22-confidence,.v22-evidence span,.v22-question-trust,.v22-model{border-color:var(--line)!important;background:var(--surface-2)!important}
+
+/* Dark mode: mantém a linguagem petróleo/cobre */
+body.dark .app-top{background:color-mix(in srgb,var(--bg) 86%,var(--surface))!important}
+body.dark .sidebar{background:color-mix(in srgb,var(--surface) 96%,var(--bg))!important}
+body.dark .brand-mark{background:linear-gradient(145deg,#173f34,#2b6652)!important}
+body.dark .v39-hero{background:linear-gradient(135deg,var(--surface),color-mix(in srgb,var(--primary-soft) 46%,var(--surface)))!important}
+body.dark .btn-secondary,body.dark .icon-btn{background:var(--surface)!important}
+body.dark .v33-stage-kicker,body.dark .v33-brand-emblem,body.dark .v33-signal-card,body.dark .v33-chip-row .chip,body.dark .v33-plan-bullets .point{background:color-mix(in srgb,var(--surface) 90%,#0f1d18)!important}
+
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline-color:color-mix(in srgb,var(--exam-accent,var(--primary)) 48%,transparent)!important}
+@media(prefers-reduced-motion:reduce){.nav-btn,.card,.v39-action,.btn{transition:none!important}}

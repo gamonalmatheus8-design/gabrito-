@@ -14,8 +14,8 @@ const vercel=fs.readFileSync(path.join(root,'vercel.json'),'utf8');
 test('landing v3 é a página pública servida na raiz',()=>{
   assert.match(vercel,/"src": "\^\/\$"/);
   assert.match(vercel,/"dest": "\/landing-clean\.html"/);
-  assert.match(html,/landing-clean\.css\?v=3\.0\.0/);
-  assert.match(html,/landing-clean\.js\?v=3\.0\.0/);
+  assert.match(html,/landing-clean\.css\?v=3\.0\.1/);
+  assert.match(html,/landing-clean\.js\?v=3\.0\.1/);
 });
 
 test('landing v3 preserva direção minimalista e estrutura comercial curta',()=>{
@@ -41,9 +41,16 @@ test('interações ENEM e PISM permanecem funcionais e acessíveis',()=>{
   assert.match(js,/landing_route_view/);
 });
 
+test('landing mantém transparência editorial e sincronização honesta',()=>{
+  assert.match(html,/id="metodologia"/);
+  assert.match(html,/id="editorial"/);
+  assert.match(html,/Ao entrar, a sincronização entre dispositivos fica disponível/i);
+  assert.match(html,/Depoimentos só entram com evidência verificável/i);
+});
+
 test('javascript da landing v3 tem sintaxe válida',()=>{
   assert.doesNotThrow(()=>new vm.Script(js,{filename:'js/landing-clean.js'}));
-  assert.match(js,/const VERSION='3\.0\.0'/);
+  assert.match(js,/const VERSION='3\.0\.1'/);
 });
 
 test('css da landing tem responsividade e redução de movimento',()=>{
@@ -51,4 +58,5 @@ test('css da landing tem responsividade e redução de movimento',()=>{
   assert.match(css,/@media \(prefers-reduced-motion:reduce\)/);
   assert.match(css,/\.live-demo/);
   assert.match(css,/\.benefit-grid/);
+  assert.match(css,/\.transparency-card/);
 });

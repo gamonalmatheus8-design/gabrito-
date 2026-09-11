@@ -1,5 +1,6 @@
 (function(){
 'use strict';
+const V9_VERSION='9.0.0-alpha.1';
 function polishPublicShell(){
  document.title='Gabarito+ — ENEM & PISM';
  document.getElementById('adminLink')?.remove();
@@ -11,11 +12,18 @@ function polishPublicShell(){
   if(source&&!source.dataset.gplusReady)source.textContent='Conteúdo disponível';
  }
 }
+function loadV9Layer(){
+ if(!document.querySelector('link[data-gplus-v9]')){
+  const link=document.createElement('link');link.rel='stylesheet';link.href=`/assets/v9-adaptive.css?v=${encodeURIComponent(V9_VERSION)}`;link.dataset.gplusV9='style';document.head.appendChild(link);
+ }
+ if(window.GabaritoV9||document.querySelector('script[data-gplus-v9]'))return;
+ const script=document.createElement('script');script.src=`/js/v9-adaptive.js?v=${encodeURIComponent(V9_VERSION)}`;script.async=false;script.dataset.gplusV9='script';script.onerror=()=>console.warn('[Gabarito+] A camada adaptativa V9 não pôde ser carregada.');document.head.appendChild(script);
+}
 function initMore(){
  polishPublicShell();
  const nav=document.getElementById('v42MoreNav'),btn=document.getElementById('v42MoreToggle');
- if(!nav||!btn)return;
- const open=nav.classList.contains('open');btn.setAttribute('aria-expanded',String(open));nav.hidden=!open;nav.style.display=open?'block':'none';
+ if(nav&&btn){const open=nav.classList.contains('open');btn.setAttribute('aria-expanded',String(open));nav.hidden=!open;nav.style.display=open?'block':'none'}
+ loadV9Layer();
 }
 window.toggleMoreNav=function(force){
  polishPublicShell();
@@ -34,5 +42,6 @@ setTimeout(()=>{
   source.title=String(s).startsWith('supabase')?'Seu banco de estudos está atualizado.':'O conteúdo essencial continua disponível neste dispositivo.';
   source.dataset.gplusReady='true';
  }
+ loadV9Layer();
 },0);
 })();

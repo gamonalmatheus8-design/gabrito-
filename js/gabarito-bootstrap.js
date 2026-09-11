@@ -1,7 +1,7 @@
 (function(){
 'use strict';
-const VERSION='3.9.0';
-const RECOVERY='20260909-practice-v3';
+const VERSION='9.2.4';
+const RECOVERY='20260911-v924-questions-direct';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 const perfNow=()=>typeof performance!=='undefined'&&performance.now?performance.now():Date.now();
@@ -24,6 +24,7 @@ async function loadInitialBank(){if(configured){try{await ensureQuestionSource()
 async function primeBankCache(){if(!configured)return;const t=perfNow();try{await ensureQuestionSource();const result=await window.GabaritoQuestionSource.refreshCacheIfChanged(cfg,{timeoutMs:12000});window.GABARITO_APP.cachePrimeDone=true;window.GABARITO_APP.cachePrimeChanged=Boolean(result?.changed);window.GABARITO_APP.cachePrimeVersion=result?.version||null;PERF.cachePrime={ok:true,changed:Boolean(result?.changed),ms:Math.round((perfNow()-t)*10)/10}}catch(e){window.GABARITO_APP.cachePrimeDone=true;window.GABARITO_APP.cachePrimeError=e?.message||String(e);PERF.cachePrime={ok:false,error:e?.message||String(e),ms:Math.round((perfNow()-t)*10)/10}}}
 async function connectAccountLayer(){try{if(!configured)return;await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',4500);if(!window.supabase?.createClient)throw new Error('Biblioteca de conta indisponível.');window.estudosSupabase=window.supabase.createClient(cfg.url,cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});await loadScript('js/gabarito-supabase.js',5000)}catch(e){console.warn('[Gabarito+] Camada de conta indisponível:',e.message);window.GABARITO_APP.cloudStatus='offline'}}
 async function loadQualityLayer(){try{await loadStyle('assets/quality-v22.css');await loadScript('js/quality-v22.js',3500)}catch(e){console.warn('[Gabarito+] Camada de qualidade indisponível:',e.message)}finally{try{await loadBrandLayer()}catch(e){console.warn('[Gabarito+] Identidade visual interna indisponível:',e.message)}}}
+async function loadQuestionsWorkspace(){try{await loadStyle('assets/v9-questions-premium.css');if(!window.GabaritoV923Questions)await loadScript('js/v9-questions-premium.js',3500);window.GABARITO_APP.questionsWorkspace=window.GabaritoV923Questions?.version||'loaded'}catch(e){window.GABARITO_APP.questionsWorkspaceError=e?.message||String(e);console.warn('[Gabarito+] Workspace de Questões indisponível:',e?.message||e)}}
 function resourceSummary(){try{const rows=performance.getEntriesByType('resource').map(r=>({name:r.name.split('?')[0],duration:Math.round(r.duration*10)/10,transferSize:Number(r.transferSize||0),encodedBodySize:Number(r.encodedBodySize||0),decodedBodySize:Number(r.decodedBodySize||0)}));const sum=arr=>arr.reduce((a,x)=>a+(x.encodedBodySize||x.transferSize||0),0);const data=rows.filter(x=>/\/data\/(enem-questions|pism-questions)/.test(x.name));const app=rows.find(x=>/\/js\/app\.js$/.test(x.name));return{eagerResourceCount:rows.length,eagerEncodedBytes:sum(rows),questionDataEncodedBytes:sum(data),questionDataResources:data.length,appJsEncodedBytes:app?.encodedBodySize||app?.transferSize||0,appJsDurationMs:app?.duration||0}}catch{return{}}}
 function finalizePerformance(){PERF.timings.bootReadyMs=Math.round((perfNow()-PERF.startedAt)*10)/10;PERF.resources=resourceSummary();PERF.readyAt=Date.now();window.GABARITO_APP.performance=PERF;window.GABARITO_PERF={version:VERSION,snapshot:()=>JSON.parse(JSON.stringify(PERF))};try{window.dispatchEvent(new CustomEvent('gplus:ready',{detail:PERF}))}catch{}}
 function scheduleIdle(fn,delay=0){setTimeout(()=>{if('requestIdleCallback'in window)requestIdleCallback(()=>fn(),{timeout:1500});else setTimeout(fn,0)},delay)}
@@ -34,6 +35,7 @@ async function boot(){try{
  await timed('bankMs',loadInitialBank);
  await timed('questionBankMs',()=>loadScript('js/question-bank.js',5000));
  await timed('appJsMs',()=>loadScript('js/app.js',5000));
+ await timed('questionsWorkspaceMs',loadQuestionsWorkspace);
  await timed('simulatorShellMs',async()=>{await loadScript('js/official-simulators-host.js',2500);await loadScript('js/lazy-simulators-v32.js',2500)});
  await timed('publicUiMs',()=>loadScript('js/gabarito-ui.js',3000));
  await timed('officialQuestionBankMs',()=>loadScript('js/official-question-bank-v1.js',3000));

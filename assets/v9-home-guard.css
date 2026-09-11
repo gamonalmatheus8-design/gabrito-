@@ -1,0 +1,5 @@
+/* Gabarito+ V9 — fallback visual seguro */
+#page-home.v9-adaptive-home:not(.v9-ready)>*:not(#v9AdaptiveHome){display:revert!important}
+#page-home:not(.v9-ready)>#v9AdaptiveHome,
+#page-home.v9-adaptive-home:not(.v9-ready)>#v9AdaptiveHome{display:none!important}
+#page-home.v9-ready>#v9AdaptiveHome{display:block!important}

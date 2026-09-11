@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const VERSION='3.9.0';
-const RECOVERY='20260911-interior-brand-v40';
+const RECOVERY='20260909-practice-v3';
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
 const configured=Boolean(cfg.url&&cfg.publishableKey&&!/SEU-PROJETO|COLE_SUA/i.test(String(cfg.url)+String(cfg.publishableKey)));
 const perfNow=()=>typeof performance!=='undefined'&&performance.now?performance.now():Date.now();

@@ -3,9 +3,9 @@
 'use strict';
 const VERSION='9.1.0';
 const CACHE_KEY='gplus_v9_ai_coach_cache';
-let busy=false,lastFingerprint='',lastResult=null,scheduled=false;
+let busy=false,scheduled=false;
 const safe=(fn,fallback)=>{try{return fn()}catch{return fallback}};
-const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[ch]));
+const esc=value=>String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const number=value=>Number.isFinite(Number(value))?Number(value):0;
 
 function payload(){
@@ -32,6 +32,7 @@ function readCache(fp){
 function writeCache(fp,result){try{localStorage.setItem(CACHE_KEY,JSON.stringify({fingerprint:fp,result,storedAt:Date.now()}))}catch{}}
 function modelName(model){const value=String(model||'');return /gpt-6-astra/i.test(value)?'GPT-6 Astra':(value||'IA')}
 function iconRefresh(){try{window.lucide?.createIcons?.()}catch{}}
+function setState(el,state){el.dataset.aiState=state}
 
 function slot(){
  const actions=document.querySelector('#v9AdaptiveHome .v9-actions');
@@ -40,14 +41,14 @@ function slot(){
  if(!el){el=document.createElement('section');el.id='v9AiCoach';el.className='v9-ai-card';actions.insertAdjacentElement('afterend',el)}
  return el;
 }
-function renderIdle(el){
+function renderIdle(el,fp=''){if(el.dataset.aiState===`idle:${fp}`)return;setState(el,`idle:${fp}`);
  el.innerHTML=`<div class="v9-ai-head"><span class="v9-ai-label"><i data-lucide="sparkles" class="icon"></i>Análise avançada</span><span class="v9-ai-chip">opcional</span></div><div class="v9-ai-idle"><div><strong>Aprofunde o plano com IA.</strong><p>O plano acima já funciona sozinho. A IA usa apenas dados agregados do seu estudo para explicar melhor a prioridade e refinar esta sessão.</p></div><button class="v9-ai-btn" type="button" onclick="GabaritoV9AI.run()"><i data-lucide="brain-circuit" class="icon"></i>Refinar com IA</button></div>`;
  iconRefresh();
 }
-function renderLoading(el){
+function renderLoading(el){setState(el,'loading');
  el.innerHTML=`<div class="v9-ai-head"><span class="v9-ai-label"><i data-lucide="sparkles" class="icon"></i>Análise avançada</span><span class="v9-ai-chip active">analisando</span></div><div class="v9-ai-loading"><i></i><div><strong>Cruzando seus sinais de estudo…</strong><p>Erros, revisões, domínio e ritmo entram nesta leitura.</p></div></div>`;
 }
-function renderUnavailable(el,message){
+function renderUnavailable(el,message){setState(el,'unavailable');
  el.innerHTML=`<div class="v9-ai-head"><span class="v9-ai-label"><i data-lucide="sparkles" class="icon"></i>Análise avançada</span><span class="v9-ai-chip muted">indisponível</span></div><div class="v9-ai-idle"><div><strong>Seu plano local continua ativo.</strong><p>${esc(message||'A análise avançada não respondeu agora. Você pode continuar com a sessão calculada acima.')}</p></div><button class="v9-ai-btn secondary" type="button" onclick="GabaritoV9AI.run(true)">Tentar novamente</button></div>`;
  iconRefresh();
 }
@@ -65,7 +66,7 @@ function applyToMain(result){
  }
  document.getElementById('v9AdaptiveHome')?.classList.add('v9-ai-enhanced');
 }
-function renderResult(el,result){
+function renderResult(el,result,fp){if(el.dataset.aiState===`result:${fp}`)return;setState(el,`result:${fp}`);
  const a=result.analysis||{};
  applyToMain(result);
  el.innerHTML=`<div class="v9-ai-head"><span class="v9-ai-label"><i data-lucide="sparkles" class="icon"></i>Leitura do Coach</span><span class="v9-ai-chip active">${esc(modelName(result.model))}</span></div><div class="v9-ai-result"><div class="v9-ai-insight"><span>O que o Coach percebeu</span><strong>${esc(a.insight)}</strong></div><div class="v9-ai-signals">${(a.signals||[]).map(item=>`<span><i></i>${esc(item)}</span>`).join('')}</div><div class="v9-ai-check"><div><span>Cheque ao terminar</span><strong>${esc(a.checkpoint)}</strong></div><button class="v9-ai-link" type="button" onclick="GabaritoV9AI.run(true)">Atualizar análise</button></div></div>`;
@@ -74,16 +75,15 @@ function renderResult(el,result){
 function ensure(){
  const el=slot();if(!el)return;
  const data=payload();if(!data){renderIdle(el);return}
- const fp=fingerprint(data);lastFingerprint=fp;
- const cached=readCache(fp);
- if(cached){lastResult=cached;renderResult(el,cached);return}
- if(!busy&&!lastResult)renderIdle(el);
+ const fp=fingerprint(data),cached=readCache(fp);
+ if(cached){renderResult(el,cached,fp);return}
+ if(!busy)renderIdle(el,fp);
 }
 async function run(force=false){
  if(busy)return;
  const el=slot(),data=payload();if(!el||!data)return;
- const fp=fingerprint(data);lastFingerprint=fp;
- if(!force){const cached=readCache(fp);if(cached){lastResult=cached;renderResult(el,cached);return}}
+ const fp=fingerprint(data);
+ if(!force){const cached=readCache(fp);if(cached){renderResult(el,cached,fp);return}}
  busy=true;renderLoading(el);
  try{
   const response=await fetch('/api/coach',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data),cache:'no-store'});
@@ -94,17 +94,17 @@ async function run(force=false){
    else renderUnavailable(el,'A análise avançada está temporariamente indisponível.');
    return;
   }
-  lastResult=body;writeCache(fp,body);renderResult(el,body);
+  writeCache(fp,body);renderResult(el,body,fp);
  }catch{renderUnavailable(el,'Não foi possível conectar à análise avançada agora.');}
  finally{busy=false}
 }
-function scheduleEnsure(){if(scheduled)return;scheduled=true;setTimeout(()=>{scheduled=false;ensure()},50)}
+function scheduleEnsure(){if(scheduled)return;scheduled=true;setTimeout(()=>{scheduled=false;ensure()},80)}
 function boot(){
  ensure();
  const home=document.getElementById('page-home');
- if(home){new MutationObserver(scheduleEnsure).observe(home,{childList:true,subtree:true})}
+ if(home)new MutationObserver(scheduleEnsure).observe(home,{childList:true,subtree:true});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleEnsure()});
 }
 window.GabaritoV9AI={version:VERSION,run,refresh:()=>run(true),ensure};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,100),{once:true});else setTimeout(boot,100);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,140),{once:true});else setTimeout(boot,140);
 })();

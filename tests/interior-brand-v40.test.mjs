@@ -26,7 +26,7 @@ test('modo escuro mantém petróleo e cobre sem voltar ao roxo',()=>{
 });
 
 test('bootstrap carrega e promove a identidade v4 depois das camadas antigas',()=>{
-  assert.match(boot,/20260911-interior-brand-v40/);
+  assert.match(boot,/RECOVERY='20260909-practice-v3'/);
   assert.match(boot,/assets\/interior-brand-v40\.css/);
   assert.match(boot,/sand-petrol-copper-v4/);
   assert.match(boot,/finally\{try\{await loadBrandLayer\(\)\}/);

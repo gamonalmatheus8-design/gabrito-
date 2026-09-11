@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const V9_VERSION='9.1.1';
+const V9_VERSION='9.2.0';
 function polishPublicShell(){
  document.title='Gabarito+ V9 — ENEM & PISM';
  document.getElementById('adminLink')?.remove();
@@ -47,15 +47,23 @@ function loadGuard(){
   loadScript('/js/v9-home-guard.js','v9-home-guard-script',()=>resolve(),()=>resolve());
  });
 }
+function loadProductLayer(){
+ loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');
+ if(window.GabaritoV9Product||document.querySelector('script[data-gplus-layer="v9-product-polish-script"]'))return;
+ loadScript('/js/v9-product-polish.js','v9-product-polish-script',null,()=>console.warn('[Gabarito+] O acabamento visual da V9 não pôde ser carregado.'));
+}
 function loadAiLayer(){
  loadStyle('/assets/v9-refine.css','v9-refine-style');
- if(window.GabaritoV9AI||document.querySelector('script[data-gplus-layer="v9-ai-script"]'))return;
- loadScript('/js/v9-coach-ai.js','v9-ai-script',null,()=>console.warn('[Gabarito+] O Coach avançado não pôde ser carregado.'));
+ if(!window.GabaritoV9AI&&!document.querySelector('script[data-gplus-layer="v9-ai-script"]')){
+  loadScript('/js/v9-coach-ai.js','v9-ai-script',null,()=>console.warn('[Gabarito+] O Coach avançado não pôde ser carregado.'));
+ }
+ loadProductLayer();
 }
 async function loadV9Layer(){
  await loadGuard();
  loadStyle('/assets/v9-adaptive.css','v9-base-style');
  loadStyle('/assets/v9-refine.css','v9-refine-style');
+ loadStyle('/assets/v9-product-polish.css','v9-product-polish-style');
  if(window.GabaritoV9){
   setTimeout(()=>window.GabaritoV9HomeGuard?.check?.(),0);
   loadAiLayer();

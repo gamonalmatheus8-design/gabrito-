@@ -1,20 +1,137 @@
 (()=>{
 'use strict';
-const root=document,cfg=window.ESTUDOS_SUPABASE_CONFIG;const ANON_KEY='gplus_v2_anon_id';
-function anonId(){let id=localStorage.getItem(ANON_KEY);if(id)return id;id='anon_'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2));localStorage.setItem(ANON_KEY,id);return id}
-function track(eventName,metadata={}){if(!cfg?.url||!cfg?.publishableKey)return;const headers={apikey:cfg.publishableKey,authorization:`Bearer ${cfg.publishableKey}`,'content-type':'application/json',prefer:'return=minimal'};fetch(`${cfg.url}/rest/v1/product_events`,{method:'POST',headers,body:JSON.stringify({anonymous_id:anonId(),event_name:eventName,page:'landing',metadata}),keepalive:true}).catch(()=>{})}
-const menu=root.getElementById('menuBtn'),links=root.getElementById('navLinks');if(menu&&links){menu.addEventListener('click',()=>{const open=links.classList.toggle('open');menu.setAttribute('aria-expanded',String(open))});links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{links.classList.remove('open');menu.setAttribute('aria-expanded','false')}))}
-root.querySelectorAll('a[href="/app"]').forEach(a=>a.addEventListener('click',()=>track('landing_start',{placement:a.closest('.hero')?'hero':a.closest('.top')?'header':a.closest('.final-cta')?'final':'other'})));
-const tabs=[...root.querySelectorAll('[data-tab]')],panels=[...root.querySelectorAll('[data-panel]')];tabs.forEach(btn=>btn.addEventListener('click',()=>{tabs.forEach(x=>x.classList.toggle('active',x===btn));panels.forEach(p=>p.classList.toggle('active',p.dataset.panel===btn.dataset.tab));track('landing_demo_tab',{tab:btn.dataset.tab})}));
-const examBtns=[...root.querySelectorAll('[data-exam]')],examPanels=[...root.querySelectorAll('[data-exam-panel]')];examBtns.forEach(btn=>btn.addEventListener('click',()=>{examBtns.forEach(x=>x.classList.toggle('active',x===btn));examPanels.forEach(p=>p.classList.toggle('active',p.dataset.examPanel===btn.dataset.exam));track('landing_exam_view',{exam:btn.dataset.exam})}));
-const obs='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}}),{threshold:.12}):null;root.querySelectorAll('.reveal').forEach(el=>obs?obs.observe(el):el.classList.add('visible'));
-const fallback={exam:'ENEM',subject:'Matemática',topic:'Probabilidade',difficulty:'Médio',text:'Uma caixa contém 4 cartões azuis e 6 cartões brancos. Um cartão é retirado ao acaso. Qual é a probabilidade de ele ser azul?',options:['20%','40%','50%','60%','80%'],answer:1,explanation:'Há 4 cartões azuis em 10 cartões no total. Logo, 4/10 = 0,4 = 40%.'};let current=fallback;
-function set(id,v){const el=root.getElementById(id);if(el)el.textContent=v??'—'}function renderQuestion(q){current=q||fallback;set('qExam',current.exam||'ENEM');set('qSubject',current.subject||'Questão');set('qTopic',current.topic||'Conteúdo');set('qDifficulty',current.difficulty||'Médio');set('qText',current.text||fallback.text);set('qStatus',q?'Questão carregada do banco':'Exemplo demonstrativo');const wrap=root.getElementById('qOptions'),fb=root.getElementById('qFeedback');if(!wrap)return;wrap.innerHTML='';fb.className='feedback';fb.textContent='';(Array.isArray(current.options)&&current.options.length===5?current.options:fallback.options).forEach((opt,i)=>{const b=document.createElement('button');b.type='button';b.className='option';b.innerHTML=`<span class="letter">${String.fromCharCode(65+i)}</span><span></span>`;b.lastElementChild.textContent=String(opt);b.addEventListener('click',()=>answer(i));wrap.appendChild(b)})}
-function answer(index){const opts=[...root.querySelectorAll('#qOptions .option')],answer=Number(current.answer);opts.forEach((b,i)=>{b.disabled=true;if(i===answer)b.classList.add('correct');if(i===index&&i!==answer)b.classList.add('wrong')});const fb=root.getElementById('qFeedback');fb.className='feedback show';fb.textContent=(index===answer?'Correto. ':'Ainda não. ')+(current.explanation||'Confira a explicação completa no aplicativo.');track('landing_demo_answer',{correct:index===answer,exam:current.exam||null,subject:current.subject||null})}
-function apiHeaders(count=false){return{apikey:cfg.publishableKey,Authorization:`Bearer ${cfg.publishableKey}`,...(count?{Prefer:'count=exact'}:{})}}
-async function countRows(filter=''){const r=await fetch(`${cfg.url}/rest/v1/questions?select=id&editorial_status=eq.publicada${filter}&limit=1`,{headers:apiHeaders(true)});if(!r.ok)throw new Error('count');const total=(r.headers.get('content-range')||'').split('/')[1];return total&&total!=='*'?Number(total):null}
-function fmt(n){return Number.isFinite(n)?n.toLocaleString('pt-BR'):'—'}
-async function loadCounts(){const [total,enem,pism,p1,p2,p3]=await Promise.all([countRows(''),countRows('&exam=eq.ENEM'),countRows('&exam=eq.PISM'),countRows('&exam=eq.PISM&module=eq.I'),countRows('&exam=eq.PISM&module=eq.II'),countRows('&exam=eq.PISM&module=eq.III')]);set('bankCount',fmt(total));set('bankEnem',fmt(enem));set('bankPism',fmt(pism));set('distTotal',fmt(total));set('distEnem',fmt(enem));set('distPismI',fmt(p1));set('distPismII',fmt(p2));set('distPismIII',fmt(p3))}
-function renderReviewers(){const list=root.getElementById('reviewerList'),status=root.getElementById('reviewerStatus'),reviewers=window.GABARITO_EDITORIAL?.reviewers;if(!list||!Array.isArray(reviewers)||!reviewers.length)return;status.textContent='Revisores cadastrados';status.style.background='rgba(16,185,129,.12)';status.style.color='#34d399';list.innerHTML='<ul>'+reviewers.map(r=>`<li><strong>${String(r.name||'Revisor')}</strong>${r.qualification?' — '+String(r.qualification):''}</li>`).join('')+'</ul>'}
-async function load(){renderQuestion(null);renderReviewers();track('landing_open',{version:'2.3.0'});if(!cfg?.url||!cfg?.publishableKey)return;loadCounts().catch(()=>{});try{const qRes=await fetch(`${cfg.url}/rest/v1/questions?select=id,exam,module,subject,topic,difficulty,text,options,answer,explanation&editorial_status=eq.publicada&variant_type=ilike.*Autoral*&limit=1&order=id.desc`,{headers:apiHeaders(false)});if(qRes.ok){const rows=await qRes.json();if(rows?.[0])renderQuestion(rows[0])}}catch(_){renderQuestion(null)}}load();
+const root=document;
+const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
+const VERSION='3.0.0';
+const ANON_KEY='gplus_v2_anon_id';
+
+function anonId(){
+  try{
+    let id=localStorage.getItem(ANON_KEY);
+    if(id)return id;
+    id='anon_'+(window.crypto?.randomUUID?.()||Date.now().toString(36)+Math.random().toString(36).slice(2));
+    localStorage.setItem(ANON_KEY,id);
+    return id;
+  }catch(_){return 'anon_landing'}
+}
+
+function track(eventName,metadata={}){
+  if(!cfg.url||!cfg.publishableKey)return;
+  fetch(`${String(cfg.url).replace(/\/$/,'')}/rest/v1/product_events`,{
+    method:'POST',
+    headers:{apikey:cfg.publishableKey,authorization:`Bearer ${cfg.publishableKey}`,'content-type':'application/json',prefer:'return=minimal'},
+    body:JSON.stringify({anonymous_id:anonId(),event_name:eventName,page:'landing-v3',metadata:{version:VERSION,...metadata}}),
+    keepalive:true
+  }).catch(()=>{});
+}
+
+const menu=root.getElementById('menuBtn');
+const links=root.getElementById('navLinks');
+if(menu&&links){
+  menu.addEventListener('click',()=>{
+    const open=links.classList.toggle('open');
+    menu.setAttribute('aria-expanded',String(open));
+  });
+  links.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+    links.classList.remove('open');
+    menu.setAttribute('aria-expanded','false');
+  }));
+}
+
+root.querySelectorAll('a[href="/app"]').forEach(a=>a.addEventListener('click',()=>{
+  const placement=a.closest('.hero')?'hero':a.closest('.topbar')?'header':a.closest('.final-card')?'final':a.closest('.route-card')?'route':'product';
+  track('landing_start',{placement});
+}));
+
+const previewCopy={
+  enem:{
+    greeting:'Continue por Matemática.',
+    focusTitle:'10 questões de Probabilidade',
+    focusText:'Você errou este assunto recentemente. Um bloco curto agora ajuda a transformar erro em revisão útil.',
+    time:'25 min',review:'4 revisões',route:'ENEM',routeText:'áreas e dias de prova',reason:'Seus erros recentes puxaram esta prioridade.'
+  },
+  pism:{
+    greeting:'Continue pelo seu módulo.',
+    focusTitle:'Revisão de Química · PISM II',
+    focusText:'O plano mantém o conteúdo do módulo separado e coloca a revisão perto do que você já estudou e errou.',
+    time:'20 min',review:'3 revisões',route:'PISM II',routeText:'conteúdo do módulo',reason:'Seu módulo e seu histórico definiram esta prioridade.'
+  }
+};
+
+function setText(id,value){const el=root.getElementById(id);if(el)el.textContent=value}
+function setPressed(buttons,active){buttons.forEach(btn=>{const on=btn===active;btn.classList.toggle('active',on);btn.setAttribute('aria-pressed',String(on))})}
+
+const previewButtons=[...root.querySelectorAll('[data-preview-exam]')];
+function renderPreview(exam){
+  const copy=previewCopy[exam]||previewCopy.enem;
+  setText('demoGreeting',copy.greeting);
+  setText('demoFocusTitle',copy.focusTitle);
+  setText('demoFocusText',copy.focusText);
+  setText('demoTime',copy.time);
+  setText('demoReview',copy.review);
+  setText('demoRoute',copy.route);
+  setText('demoRouteText',copy.routeText);
+  setText('demoReason',copy.reason);
+}
+previewButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  setPressed(previewButtons,btn);
+  renderPreview(btn.dataset.previewExam);
+  track('landing_demo_exam',{exam:btn.dataset.previewExam});
+}));
+
+const routes={
+  enem:{
+    label:'ROTA ENEM',title:'Amplitude sem perder direção.',
+    description:'Organize Matemática, Natureza, Humanas e Linguagens com treino, revisão e simulados conectados à sua rotina.',
+    items:['Áreas e 1º/2º dia organizados','Questões reais no Banco de Treino','Revisão ligada aos erros','Redação e desempenho no mesmo fluxo']
+  },
+  pism:{
+    label:'ROTA PISM',title:'Módulo certo. Conteúdo certo.',
+    description:'PISM I, II e III ficam separados para que a rotina respeite a etapa da prova, o conteúdo do módulo e o formato das questões.',
+    items:['PISM I, II e III separados','Objetivas e discursivas organizadas','Rotina ajustada ao módulo','Histórico e revisões no mesmo lugar']
+  }
+};
+const routeButtons=[...root.querySelectorAll('[data-route]')];
+function renderRoute(route){
+  const data=routes[route]||routes.enem;
+  setText('routeLabel',data.label);
+  setText('routeTitle',data.title);
+  setText('routeDescription',data.description);
+  const list=root.getElementById('routeList');
+  if(list)list.innerHTML=data.items.map((item,i)=>`<div><span>${String(i+1).padStart(2,'0')}</span><strong>${item}</strong></div>`).join('');
+}
+routeButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  setPressed(routeButtons,btn);
+  renderRoute(btn.dataset.route);
+  track('landing_route_view',{route:btn.dataset.route});
+}));
+
+const observer='IntersectionObserver' in window?new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){entry.target.classList.add('visible');observer.unobserve(entry.target)}
+  });
+},{threshold:.12}):null;
+root.querySelectorAll('.reveal').forEach(el=>observer?observer.observe(el):el.classList.add('visible'));
+
+async function loadValidatedCount(){
+  const target=root.getElementById('validatedCount');
+  if(!target)return;
+  if(!cfg.url||!cfg.publishableKey){target.textContent='351';return}
+  try{
+    const url=new URL(`${String(cfg.url).replace(/\/$/,'')}/rest/v1/practice_questions`);
+    url.searchParams.set('select','id');
+    url.searchParams.set('status','eq.published');
+    url.searchParams.set('limit','1');
+    const res=await fetch(url,{headers:{apikey:cfg.publishableKey,Authorization:`Bearer ${cfg.publishableKey}`,Prefer:'count=exact'},cache:'no-store'});
+    if(!res.ok)throw new Error('count');
+    const range=res.headers.get('content-range')||'';
+    const total=Number(range.split('/')[1]);
+    target.textContent=Number.isFinite(total)&&total>0?total.toLocaleString('pt-BR'):'351';
+  }catch(_){target.textContent='351'}
+}
+
+renderPreview('enem');
+renderRoute('enem');
+loadValidatedCount();
+track('landing_open');
 })();

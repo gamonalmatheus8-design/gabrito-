@@ -14,7 +14,7 @@ const vercel=fs.readFileSync(path.join(root,'vercel.json'),'utf8');
 test('landing v3 é a página pública servida na raiz',()=>{
   assert.match(vercel,/"src": "\^\/\$"/);
   assert.match(vercel,/"dest": "\/landing-clean\.html"/);
-  assert.match(html,/landing-clean\.css\?v=3\.0\.1/);
+  assert.match(html,/landing-clean\.css\?v=3\.1\.0/);
   assert.match(html,/landing-clean\.js\?v=3\.0\.1/);
 });
 
@@ -22,6 +22,15 @@ test('landing v3 preserva direção minimalista e estrutura comercial curta',()=
   for(const token of ['Estude o que mais importa','Demonstração','Três coisas que precisam funcionar muito bem','ENEM e PISM não deveriam parecer a mesma preparação','Pare de decidir o que estudar'])assert.match(html,new RegExp(token));
   assert.doesNotMatch(html,/questões autorais/i);
   assert.doesNotMatch(html,/FAQ/);
+});
+
+test('landing usa identidade areia, verde petróleo e cobre sem roxo SaaS',()=>{
+  assert.match(css,/--bg:#efe9df/);
+  assert.match(css,/--accent:#1f5d4a/);
+  assert.match(css,/--copper:#a95f3c/);
+  assert.match(css,/--dark:#173f34/);
+  for(const legacy of ['#5b55e7','#6962ed','#4f49d2','#5650cc','#a9a6ff'])assert.doesNotMatch(css,new RegExp(legacy,'i'));
+  assert.match(html,/theme-color" content="#efe9df"/);
 });
 
 test('contador usa somente o Banco de Treino validado',()=>{

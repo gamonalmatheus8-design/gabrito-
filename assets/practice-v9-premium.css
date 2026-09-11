@@ -1,0 +1,44 @@
+/* Gabarito+ V9.2.5 — acabamento da camada real do Banco de Treino */
+#practiceV3.gpv9{max-width:1180px;margin:0 auto;gap:12px}
+#practiceV3.gpv9 .pv3-hero{padding:18px 20px;border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb,var(--card) 96%,var(--primary) 4%),var(--card));box-shadow:0 10px 28px rgba(17,37,33,.05)}
+#practiceV3.gpv9 .pv3-kicker{font-size:11px;letter-spacing:.12em}
+#practiceV3.gpv9 .pv3-hero h1{font-size:clamp(28px,3.2vw,42px);letter-spacing:-.035em;line-height:1.05;margin:2px 0 6px}
+#practiceV3.gpv9 .pv3-hero p{max-width:700px;font-size:14px}
+#practiceV3.gpv9 .pv3-exams{padding:4px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}
+#practiceV3.gpv9 .pv3-exams .btn{min-height:38px;border:0;border-radius:10px;padding:0 14px}
+#practiceV3.gpv9 .gpv9-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:16px;background:var(--card)}
+#practiceV3.gpv9 .gpv9-status{display:flex;gap:6px;flex-wrap:wrap}
+#practiceV3.gpv9 .gpv9-status button{min-height:38px;padding:0 12px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:800;cursor:pointer}
+#practiceV3.gpv9 .gpv9-status button.active{background:color-mix(in srgb,var(--primary) 10%,var(--card));border-color:color-mix(in srgb,var(--primary) 24%,var(--border));color:var(--primary)}
+#practiceV3.gpv9 .gpv9-actions{display:flex;gap:8px}.gpv9-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 13px;border-radius:12px;font:inherit;font-size:12px;font-weight:800;cursor:pointer}.gpv9-btn.secondary{border:1px solid var(--border);background:var(--card);color:var(--text)}.gpv9-btn.primary{border:1px solid var(--primary);background:var(--primary);color:#fff}
+#practiceV3.gpv9 .pv3-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--border);border-radius:16px;background:var(--card);overflow:hidden}
+#practiceV3.gpv9 .pv3-metric{padding:10px 14px;border:0;border-right:1px solid var(--border);border-radius:0;background:transparent}
+#practiceV3.gpv9 .pv3-metric:last-child{border-right:0}#practiceV3.gpv9 .pv3-metric span{font-size:9px}#practiceV3.gpv9 .pv3-metric strong{font-size:18px;margin-top:1px}
+#practiceV3.gpv9 .pv3-filter{grid-template-columns:repeat(5,minmax(0,1fr));padding:14px;border-radius:16px;box-shadow:none}
+#practiceV3.gpv9[data-gpv9-filters="closed"] .pv3-filter{display:none}
+#practiceV3.gpv9 .pv3-filter #pv3New{display:none}
+#practiceV3.gpv9 .gpv9-filter-head{grid-column:1/-1;display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:2px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+#practiceV3.gpv9 .gpv9-filter-head strong{display:block;font-size:13px}.gpv9-filter-head span{display:block;margin-top:2px;font-size:11px;color:var(--muted)}
+#practiceV3.gpv9 .gpv9-filter-chips{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;min-height:0}
+#practiceV3.gpv9 .gpv9-chip{padding:5px 8px;border-radius:999px;background:color-mix(in srgb,var(--primary) 7%,var(--card));color:var(--primary);font-size:10px;font-weight:750}
+#practiceV3.gpv9 .pv3-field select{min-height:42px;border-radius:12px}
+#practiceV3.gpv9 .pv3-layout{grid-template-columns:minmax(0,1fr) 230px;gap:12px}
+#practiceV3.gpv9 .pv3-card{border-radius:22px;box-shadow:0 12px 30px rgba(17,37,33,.045)}
+#practiceV3.gpv9 .pv3-card-head{padding:11px 15px;background:color-mix(in srgb,var(--card) 98%,var(--primary) 2%)}
+#practiceV3.gpv9 .pv33-question{padding:26px 28px 22px}
+#practiceV3.gpv9 .pv33-number{font-size:11px;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
+#practiceV3.gpv9 .pv33-statement{font-size:18px;line-height:1.68;max-width:920px}
+#practiceV3.gpv9 .pv33-options{gap:10px;margin-top:22px}
+#practiceV3.gpv9 .pv33-option{grid-template-columns:38px 1fr;gap:12px;min-height:58px;padding:13px 14px;border-radius:16px;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+#practiceV3.gpv9 .pv33-option:hover{transform:translateY(-1px)}#practiceV3.gpv9 .pv33-letter{width:34px;height:34px;border-radius:11px;color:var(--primary)}
+#practiceV3.gpv9 .pv33-feedback{margin-top:16px;padding:15px 16px;border-radius:15px;font-size:13px}
+#practiceV3.gpv9 .pv33-actions{margin-top:14px}.gpv9 .pv33-actions .btn{min-height:44px}
+#practiceV3.gpv9 .pv33-source{padding:10px 16px}
+#practiceV3.gpv9 .pv3-side{position:sticky;top:78px;padding:14px;border-radius:18px;box-shadow:none}
+#practiceV3.gpv9 .pv3-side h3{font-size:13px}.gpv9 .pv3-side p{font-size:10px}.gpv9 .pv3-bars{gap:8px}.gpv9 .pv3-bar-row{font-size:9px}.gpv9 .pv3-trust{font-size:9px}
+#practiceV3.gpv9 .gpv9-side-label{display:block;margin-bottom:4px;font-size:9px;font-weight:850;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
+body.dark #practiceV3.gpv9 .pv3-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--card) 96%,#16746b 4%),var(--card))}
+@media(max-width:1050px){#practiceV3.gpv9 .pv3-layout{grid-template-columns:1fr}#practiceV3.gpv9 .pv3-side{display:none}#practiceV3.gpv9 .pv3-filter{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:720px){#practiceV3.gpv9{gap:9px}#practiceV3.gpv9 .pv3-hero{padding:15px;border-radius:18px}#practiceV3.gpv9 .pv3-hero h1{font-size:29px}#practiceV3.gpv9 .pv3-hero p{font-size:13px}#practiceV3.gpv9 .gpv9-toolbar{align-items:stretch;flex-direction:column}#practiceV3.gpv9 .gpv9-status{display:grid;grid-template-columns:repeat(4,1fr)}#practiceV3.gpv9 .gpv9-status button{padding:0 6px}#practiceV3.gpv9 .gpv9-actions{display:grid;grid-template-columns:1fr 1fr}#practiceV3.gpv9 .pv3-metrics{grid-template-columns:repeat(2,1fr)}#practiceV3.gpv9 .pv3-metric:nth-child(2){border-right:0}#practiceV3.gpv9 .pv3-metric:nth-child(-n+2){border-bottom:1px solid var(--border)}#practiceV3.gpv9 .pv3-filter{grid-template-columns:1fr}#practiceV3.gpv9 .gpv9-filter-head,#practiceV3.gpv9 .gpv9-filter-chips{grid-column:auto}#practiceV3.gpv9 .pv33-question{padding:19px 15px 17px}#practiceV3.gpv9 .pv33-statement{font-size:16px;line-height:1.62}#practiceV3.gpv9 .pv33-option{grid-template-columns:34px 1fr;padding:12px;min-height:56px}#practiceV3.gpv9 .pv3-card-head{align-items:flex-start}#practiceV3.gpv9 .pv3-meta{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}#practiceV3.gpv9 .pv3-chip{flex:0 0 auto}}
+@media(max-width:430px){#practiceV3.gpv9 .gpv9-status{grid-template-columns:repeat(2,1fr)}#practiceV3.gpv9 .gpv9-actions{grid-template-columns:1fr}#practiceV3.gpv9 .pv3-exams{width:100%}#practiceV3.gpv9 .pv3-exams .btn{flex:1}}
+@media(prefers-reduced-motion:reduce){#practiceV3.gpv9 .pv33-option{transition:none}#practiceV3.gpv9 .pv33-option:hover{transform:none}}

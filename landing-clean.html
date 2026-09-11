@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<meta name="theme-color" content="#efe9df">
-<meta name="description" content="Gabarito+ — uma rotina mais clara para ENEM e PISM, com questões validadas, revisão dos erros e um próximo passo simples para estudar.">
+<meta name="theme-color" content="#f2eee6">
+<meta name="description" content="Gabarito+ V9 organiza questões, erros, revisões e tempo de estudo para mostrar qual é o próximo passo mais útil para ENEM e PISM.">
 <link rel="canonical" href="https://gabarito-mais.vercel.app/">
-<meta property="og:title" content="Gabarito+ — estude o que mais importa">
-<meta property="og:description" content="Questões, revisão e direção para ENEM e PISM em uma experiência simples e objetiva.">
+<meta property="og:title" content="Gabarito+ V9 — seu próximo passo de estudo, já decidido">
+<meta property="og:description" content="Uma rotina adaptativa para ENEM e PISM baseada no seu próprio desempenho.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://gabarito-mais.vercel.app/">
 <meta property="og:image" content="https://gabarito-mais.vercel.app/assets/icons/icon-512.png">
@@ -16,230 +16,131 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/landing-clean.css?v=3.1.0">
-<title>Gabarito+ — ENEM e PISM com direção</title>
+<link rel="stylesheet" href="/assets/landing-v9.css?v=9.0.0">
+<title>Gabarito+ V9 — Inteligência Adaptativa para ENEM e PISM</title>
 </head>
 <body>
 <header class="topbar">
   <nav class="wrap nav" aria-label="Navegação principal">
-    <a class="brand" href="/" aria-label="Gabarito+ — início">
-      <span class="brand-mark">G+</span>
-      <span class="brand-name">Gabarito<span>+</span></span>
-    </a>
+    <a class="brand" href="/" aria-label="Gabarito+ — início"><span class="brand-mark">G+</span><span class="brand-name">Gabarito<span>+</span></span></a>
     <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menu" aria-expanded="false">Menu</button>
     <div class="nav-links" id="navLinks">
+      <a href="#como-funciona">Como funciona</a>
       <a href="#produto">Produto</a>
-      <a href="#beneficios">Por que usar</a>
       <a href="#enem-pism">ENEM &amp; PISM</a>
+      <a href="#metodologia">Transparência</a>
     </div>
-    <div class="nav-actions">
-      <a class="text-link" href="/app">Entrar</a>
-      <a class="button button-dark button-small" href="/app">Começar grátis</a>
-    </div>
+    <div class="nav-actions"><a class="text-link" href="/app">Entrar</a><a class="button button-dark button-small" href="/app">Começar grátis</a></div>
   </nav>
 </header>
 
 <main>
   <section class="hero">
-    <div class="wrap hero-inner">
-      <div class="eyebrow"><span></span> ENEM + PISM em uma rotina mais clara</div>
-      <h1>Estude o que mais importa.<br><em>No momento certo.</em></h1>
-      <p class="hero-lead">O Gabarito+ junta questões, erros e revisões em um fluxo simples para você abrir, estudar e saber qual é o próximo passo.</p>
-      <div class="hero-actions">
-        <a class="button button-dark button-large" href="/app">Começar gratuitamente <span aria-hidden="true">→</span></a>
-        <a class="button button-light button-large" href="#produto">Ver o produto</a>
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow"><i></i> Gabarito+ V9 · Inteligência Adaptativa</div>
+        <h1>Abra e saiba <em>o que estudar agora.</em></h1>
+        <p class="hero-lead">O Gabarito+ cruza suas questões, erros, revisões e tempo de estudo para reduzir a dúvida e transformar cada acesso em uma próxima ação clara.</p>
+        <div class="hero-actions">
+          <a class="button button-dark button-large" href="/app">Começar gratuitamente <span aria-hidden="true">→</span></a>
+          <a class="button button-light button-large" href="#produto">Ver como funciona</a>
+        </div>
+        <div class="hero-proof" aria-label="Destaques do Gabarito+">
+          <span><strong id="validatedCount">—</strong> questões validadas no Banco de Treino</span>
+          <span>Revisão baseada nos seus erros</span>
+          <span>Rotas separadas para ENEM e PISM</span>
+        </div>
       </div>
-      <div class="hero-proof" aria-label="Destaques do Gabarito+">
-        <span><strong id="validatedCount">—</strong> questões validadas no Banco de Treino</span>
-        <span>Erros viram revisão</span>
-        <span>ENEM e PISM em rotas separadas</span>
+
+      <div class="hero-product" aria-label="Prévia do Coach adaptativo">
+        <div class="product-window">
+          <div class="window-top"><i></i><i></i><i></i><small>gabarito+ / início</small></div>
+          <div class="coach-preview">
+            <div class="coach-preview-head"><span class="coach-tag">Coach adaptativo</span><span class="coach-confidence">confiança média</span></div>
+            <h3>Prioridade: Probabilidade.</h3>
+            <p>Seu desempenho recente neste assunto caiu e existem erros ainda sem recuperação confirmada. Este é o melhor ponto para uma sessão curta agora.</p>
+            <div class="coach-steps">
+              <div class="coach-step"><span>Etapa 1 · 10 min</span><strong>Revisão objetiva</strong><small>retome o conceito que travou</small></div>
+              <div class="coach-step"><span>Etapa 2 · 25 min</span><strong>Questões dirigidas</strong><small>prática com feedback</small></div>
+              <div class="coach-step"><span>Etapa 3 · 10 min</span><strong>Recuperação</strong><small>refaça o que ainda não fixou</small></div>
+            </div>
+            <a class="preview-action" href="/app">Começar sessão dirigida</a>
+            <div class="preview-note"><span>Decisão baseada no histórico do aluno</span><strong>ENEM</strong></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="como-funciona">
+    <div class="wrap">
+      <div class="section-heading center reveal"><span class="kicker">Menos escolha. Mais execução.</span><h2>A plataforma aprende com o que você faz.</h2><p>A V9 conecta os dados que antes ficavam espalhados pelo produto e usa isso para ordenar a sua próxima sessão.</p></div>
+      <div class="flow-grid">
+        <article class="flow-card reveal"><span class="flow-number">01</span><h3>Você estuda normalmente.</h3><p>Resolva questões, faça revisões, registre sessões e use simulados. Nada de preencher relatórios extras só para alimentar o sistema.</p><strong>Os sinais vêm do próprio estudo.</strong></article>
+        <article class="flow-card reveal"><span class="flow-number">02</span><h3>O Gabarito+ encontra a prioridade.</h3><p>Erros ativos, revisões vencidas, domínio por assunto, ritmo semanal e prova-alvo entram na mesma leitura.</p><strong>O motivo da escolha fica visível.</strong></article>
+        <article class="flow-card reveal"><span class="flow-number">03</span><h3>Você recebe uma sessão pronta.</h3><p>Em vez de decidir entre várias telas, você recebe um bloco executável com duração, foco e uma ação principal.</p><strong>Clique e comece.</strong></article>
       </div>
     </div>
   </section>
 
   <section class="product-section" id="produto">
     <div class="wrap">
-      <div class="section-heading compact reveal">
-        <span class="kicker">Produto</span>
-        <h2>Abra. Veja o que fazer.<br>E comece.</h2>
-        <p>Sem um painel lotado de números. O que merece atenção aparece primeiro.</p>
-      </div>
+      <div class="section-heading reveal"><span class="kicker">A principal tela da V9</span><h2>O painel deixa de mostrar tudo.<br>Passa a mostrar o que importa agora.</h2><p>A Home prioriza uma decisão. Os detalhes continuam disponíveis, mas não competem pela sua atenção antes de você começar.</p></div>
 
-      <div class="live-demo reveal" aria-label="Demonstração do Gabarito+">
-        <div class="demo-bar">
-          <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="demo-address">gabarito-mais.vercel.app/app</span>
-          <span class="live-label"><i></i> Demonstração</span>
-        </div>
-
+      <div class="live-demo reveal" aria-label="Demonstração do Gabarito+ V9">
+        <div class="demo-bar"><div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div><span class="demo-address">gabarito-mais.vercel.app/app</span><span class="live-label"><i></i> V9 adaptativa</span></div>
         <div class="demo-layout">
-          <aside class="demo-sidebar" aria-hidden="true">
-            <div class="mini-brand">G+</div>
-            <div class="side-items">
-              <span class="active">Início</span>
-              <span>Questões</span>
-              <span>Revisões</span>
-              <span>Simulados</span>
-              <span>Desempenho</span>
-            </div>
-          </aside>
-
+          <aside class="demo-sidebar" aria-hidden="true"><div class="mini-brand">G+</div><div class="side-items"><span class="active">Início</span><span>Plano</span><span>Questões</span><span>Revisões</span><span>Simulados</span><span>Desempenho</span></div></aside>
           <div class="demo-main">
             <div class="demo-head">
-              <div>
-                <small>SEU PRÓXIMO PASSO</small>
-                <h3 id="demoGreeting">Continue por Matemática.</h3>
-              </div>
-              <div class="exam-toggle" role="group" aria-label="Alternar prova na demonstração">
-                <button class="active" type="button" data-preview-exam="enem" aria-pressed="true">ENEM</button>
-                <button type="button" data-preview-exam="pism" aria-pressed="false">PISM</button>
-              </div>
+              <div><small>COACH ADAPTATIVO</small><h3 id="demoGreeting">Continue por Matemática.</h3></div>
+              <div class="exam-toggle" role="group" aria-label="Alternar prova na demonstração"><button class="active" type="button" data-preview-exam="enem" aria-pressed="true">ENEM</button><button type="button" data-preview-exam="pism" aria-pressed="false">PISM</button></div>
             </div>
-
             <div class="focus-card">
-              <div class="focus-copy">
-                <span class="focus-label">FOCO DE AGORA</span>
-                <h4 id="demoFocusTitle">10 questões de Probabilidade</h4>
-                <p id="demoFocusText">Você errou este assunto recentemente. Um bloco curto agora ajuda a transformar erro em revisão útil.</p>
-              </div>
-              <a class="mini-action" href="/app">Treinar agora →</a>
+              <div class="focus-copy"><span class="focus-label">PRIORIDADE DA SESSÃO</span><h4 id="demoFocusTitle">10 questões de Probabilidade</h4><p id="demoFocusText">Você errou este assunto recentemente. Um bloco curto agora ajuda a transformar erro em revisão útil.</p></div>
+              <a class="mini-action" href="/app">Começar agora →</a>
             </div>
-
             <div class="demo-grid">
-              <article>
-                <span>Hoje</span>
-                <strong id="demoTime">25 min</strong>
-                <small>sessão sugerida</small>
-              </article>
-              <article>
-                <span>Depois</span>
-                <strong id="demoReview">4 revisões</strong>
-                <small>dos seus erros</small>
-              </article>
-              <article>
-                <span>Rota</span>
-                <strong id="demoRoute">ENEM</strong>
-                <small id="demoRouteText">áreas e dias de prova</small>
-              </article>
+              <article><span>Sessão</span><strong id="demoTime">25 min</strong><small>tempo sugerido</small></article>
+              <article><span>Revisões</span><strong id="demoReview">4 revisões</strong><small>prioridade de recuperação</small></article>
+              <article><span>Rota</span><strong id="demoRoute">ENEM</strong><small id="demoRouteText">áreas e dias de prova</small></article>
             </div>
-
-            <div class="why-row">
-              <div>
-                <span>Por que isso apareceu?</span>
-                <strong id="demoReason">Seus erros recentes puxaram esta prioridade.</strong>
-              </div>
-              <div class="confidence-pill">Explicável, não mágico</div>
-            </div>
+            <div class="why-row"><div><span>Por que isso apareceu?</span><strong id="demoReason">Seus erros recentes puxaram esta prioridade.</strong></div><div class="confidence-pill">Decisão explicável</div></div>
           </div>
         </div>
       </div>
-
-      <div class="micro-proof reveal">
-        <span>Banco de treino validado</span>
-        <i></i>
-        <span>Filtros por área, disciplina e assunto</span>
-        <i></i>
-        <span>Progresso sincronizado ao entrar</span>
-      </div>
     </div>
   </section>
 
-  <section class="benefits-section" id="beneficios">
+  <section class="section section-soft" id="enem-pism">
     <div class="wrap">
-      <div class="section-heading reveal">
-        <span class="kicker">Feito para estudar, não para distrair</span>
-        <h2>Três coisas que precisam funcionar muito bem.</h2>
-      </div>
-
-      <div class="benefit-grid">
-        <article class="benefit reveal">
-          <span class="benefit-number">01</span>
-          <div class="benefit-icon icon-question" aria-hidden="true"><i>A</i><i>B</i><i>C</i></div>
-          <h3>Questões que realmente foram aplicadas.</h3>
-          <p>O Banco de Treino separa questões validadas por prova, área, disciplina e assunto, sem misturar conteúdo genérico para inflar o acervo.</p>
-        </article>
-
-        <article class="benefit reveal">
-          <span class="benefit-number">02</span>
-          <div class="benefit-icon icon-loop" aria-hidden="true"><b>↻</b></div>
-          <h3>Seu erro não desaparece depois do gabarito.</h3>
-          <p>O que você erra volta para a rotina como revisão. Assim, responder questões serve para decidir o que estudar depois.</p>
-        </article>
-
-        <article class="benefit reveal">
-          <span class="benefit-number">03</span>
-          <div class="benefit-icon icon-next" aria-hidden="true"><b>→</b></div>
-          <h3>Um próximo passo claro.</h3>
-          <p>Em vez de abrir a plataforma e escolher entre dezenas de caminhos, você recebe uma ação pequena, explicada e possível de executar agora.</p>
-        </article>
+      <div class="section-heading reveal"><span class="kicker">Duas provas, duas lógicas</span><h2>ENEM e PISM continuam separados.</h2><p>A inteligência adaptativa não mistura as rotas. O foco muda conforme a prova, o módulo e o conteúdo que realmente importa naquele caminho.</p></div>
+      <div class="route-grid reveal">
+        <div class="route-switch" role="group" aria-label="Escolher rota de preparação"><button class="active" type="button" data-route="enem" aria-pressed="true">ENEM</button><button type="button" data-route="pism" aria-pressed="false">PISM I · II · III</button></div>
+        <div class="route-card"><span class="route-label" id="routeLabel">ROTA ENEM</span><h3 id="routeTitle">Amplitude sem perder direção.</h3><p id="routeDescription">Organize Matemática, Natureza, Humanas e Linguagens com treino, revisão e simulados conectados à sua rotina.</p><div class="route-list" id="routeList"><div><span>01</span><strong>Áreas e 1º/2º dia organizados</strong></div><div><span>02</span><strong>Questões reais no Banco de Treino</strong></div><div><span>03</span><strong>Revisão ligada aos erros</strong></div><div><span>04</span><strong>Redação e desempenho no mesmo fluxo</strong></div></div><a href="/app" class="route-link">Abrir esta rota no Gabarito+ →</a></div>
       </div>
     </div>
   </section>
 
-  <section class="transparency-section" id="metodologia">
-    <div class="wrap transparency-card reveal">
-      <div class="transparency-title">
-        <span class="kicker">Transparência</span>
-        <h2>Direção sem promessas mágicas.</h2>
-        <p>O Gabarito+ mostra o que usa para orientar sua rotina e deixa claro quando uma informação ainda está em construção.</p>
-      </div>
-      <div class="transparency-points" id="editorial">
+  <section class="section" id="metodologia">
+    <div class="wrap trust-card reveal">
+      <div><span class="kicker">Transparência</span><h2>Inteligência sem inventar certeza.</h2><p>A V9 usa dados do próprio aluno para priorizar ações. Gabaritos oficiais, fontes e conteúdo validado continuam separados da camada adaptativa.</p></div>
+      <div class="trust-points" id="editorial">
         <div><strong>Conteúdo validado</strong><p>Questões entram no Banco de Treino com fonte, gabarito e classificação editorial registrados.</p></div>
-        <div><strong>Sincronização clara</strong><p>Sem entrar, o progresso fica neste dispositivo. Ao entrar, a sincronização entre dispositivos fica disponível.</p></div>
-        <div><strong>Prova social responsável</strong><p>Depoimentos só entram com evidência verificável; a landing não inventa taxa de aprovação nem resultado de aluno.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="routes-section" id="enem-pism">
-    <div class="wrap routes-wrap">
-      <div class="section-heading reveal">
-        <span class="kicker">A prova muda. A experiência também.</span>
-        <h2>ENEM e PISM não deveriam parecer a mesma preparação.</h2>
-        <p>Troque a rota abaixo para ver como o foco do produto se adapta ao tipo de prova.</p>
-      </div>
-
-      <div class="route-switch reveal" role="group" aria-label="Escolher rota de preparação">
-        <button class="active" type="button" data-route="enem" aria-pressed="true">ENEM</button>
-        <button type="button" data-route="pism" aria-pressed="false">PISM I · II · III</button>
-      </div>
-
-      <div class="route-card reveal">
-        <div class="route-copy">
-          <span class="route-label" id="routeLabel">ROTA ENEM</span>
-          <h3 id="routeTitle">Amplitude sem perder direção.</h3>
-          <p id="routeDescription">Organize Matemática, Natureza, Humanas e Linguagens com treino, revisão e simulados conectados à sua rotina.</p>
-          <a href="/app" class="route-link">Abrir esta rota no Gabarito+ →</a>
-        </div>
-        <div class="route-list" id="routeList">
-          <div><span>01</span><strong>Áreas e 1º/2º dia organizados</strong></div>
-          <div><span>02</span><strong>Questões reais no Banco de Treino</strong></div>
-          <div><span>03</span><strong>Revisão ligada aos erros</strong></div>
-          <div><span>04</span><strong>Redação e desempenho no mesmo fluxo</strong></div>
-        </div>
+        <div><strong>Motivo visível</strong><p>O aluno consegue entender por que revisão, erros ou um assunto específico apareceram primeiro.</p></div>
+        <div><strong>Sem promessa de aprovação</strong><p>Indicadores ajudam a organizar o estudo; eles não afirmam nota futura nem garantia de resultado.</p></div>
       </div>
     </div>
   </section>
 
   <section class="final-section">
-    <div class="wrap final-card reveal">
-      <span class="kicker light">Menos escolha. Mais estudo.</span>
-      <h2>Pare de decidir o que estudar.<br>Comece a estudar.</h2>
-      <p>Abra o Gabarito+, escolha sua prova e transforme seu próximo bloco de tempo em uma ação concreta.</p>
-      <a class="button button-white button-large" href="/app">Começar gratuitamente <span aria-hidden="true">→</span></a>
-    </div>
+    <div class="wrap final-card reveal"><span class="kicker">Gabarito+ V9</span><h2>Menos tempo escolhendo.<br>Mais tempo estudando.</h2><p>Entre, escolha sua prova e deixe seu próprio histórico organizar o próximo passo.</p><a class="button button-white button-large" href="/app">Começar gratuitamente <span aria-hidden="true">→</span></a></div>
   </section>
 </main>
 
-<footer class="footer">
-  <div class="wrap footer-row">
-    <a class="brand" href="/" aria-label="Gabarito+ — início"><span class="brand-mark">G+</span><span class="brand-name">Gabarito<span>+</span></span></a>
-    <div class="footer-links"><a href="/privacy.html">Privacidade</a><a href="/terms.html">Termos</a><a href="/app">Entrar</a></div>
-    <span class="footer-note">ENEM + PISM</span>
-  </div>
-</footer>
+<footer class="footer"><div class="wrap footer-row"><a class="brand" href="/" aria-label="Gabarito+ — início"><span class="brand-mark">G+</span><span class="brand-name">Gabarito<span>+</span></span></a><div class="footer-links"><a href="/privacy.html">Privacidade</a><a href="/terms.html">Termos</a><a href="/app">Entrar</a></div><span class="footer-note">ENEM + PISM</span></div></footer>
 
-<script src="/js/supabase-config.js?v=3.0.1"></script>
-<script defer src="/js/landing-clean.js?v=3.0.1"></script>
+<script src="/js/supabase-config.js?v=9.0.0"></script>
+<script defer src="/js/landing-clean.js?v=9.0.0"></script>
 </body>
 </html>

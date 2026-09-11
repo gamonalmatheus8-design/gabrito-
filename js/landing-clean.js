@@ -2,7 +2,7 @@
 'use strict';
 const root=document;
 const cfg=window.ESTUDOS_SUPABASE_CONFIG||{};
-const VERSION='3.0.1';
+const VERSION='9.0.0';
 const ANON_KEY='gplus_v2_anon_id';
 
 function anonId(){
@@ -20,7 +20,7 @@ function track(eventName,metadata={}){
   fetch(`${String(cfg.url).replace(/\/$/,'')}/rest/v1/product_events`,{
     method:'POST',
     headers:{apikey:cfg.publishableKey,authorization:`Bearer ${cfg.publishableKey}`,'content-type':'application/json',prefer:'return=minimal'},
-    body:JSON.stringify({anonymous_id:anonId(),event_name:eventName,page:'landing-v3',metadata:{version:VERSION,...metadata}}),
+    body:JSON.stringify({anonymous_id:anonId(),event_name:eventName,page:'landing-v9',metadata:{version:VERSION,...metadata}}),
     keepalive:true
   }).catch(()=>{});
 }
@@ -45,16 +45,16 @@ root.querySelectorAll('a[href="/app"]').forEach(a=>a.addEventListener('click',()
 
 const previewCopy={
   enem:{
-    greeting:'Continue por Matemática.',
-    focusTitle:'10 questões de Probabilidade',
-    focusText:'Você errou este assunto recentemente. Um bloco curto agora ajuda a transformar erro em revisão útil.',
-    time:'25 min',review:'4 revisões',route:'ENEM',routeText:'áreas e dias de prova',reason:'Seus erros recentes puxaram esta prioridade.'
+    greeting:'Seu próximo passo, já decidido.',
+    focusTitle:'Prioridade: Probabilidade',
+    focusText:'Seu histórico recente mostra erros ainda sem recuperação confirmada. Um bloco dirigido agora é mais útil do que abrir um assunto novo.',
+    time:'45 min',review:'4 revisões',route:'ENEM',routeText:'áreas e dias de prova',reason:'Erros ativos e domínio do assunto puxaram esta prioridade.'
   },
   pism:{
-    greeting:'Continue pelo seu módulo.',
-    focusTitle:'Revisão de Química · PISM II',
-    focusText:'O plano mantém o conteúdo do módulo separado e coloca a revisão perto do que você já estudou e errou.',
-    time:'20 min',review:'3 revisões',route:'PISM II',routeText:'conteúdo do módulo',reason:'Seu módulo e seu histórico definiram esta prioridade.'
+    greeting:'Seu módulo define a rota.',
+    focusTitle:'Prioridade: Química · PISM II',
+    focusText:'A leitura considera apenas o módulo selecionado e organiza revisão e treino dentro do conteúdo daquela etapa.',
+    time:'40 min',review:'3 revisões',route:'PISM II',routeText:'conteúdo do módulo',reason:'Seu módulo, revisões e histórico definiram esta prioridade.'
   }
 };
 
@@ -82,13 +82,13 @@ previewButtons.forEach(btn=>btn.addEventListener('click',()=>{
 const routes={
   enem:{
     label:'ROTA ENEM',title:'Amplitude sem perder direção.',
-    description:'Organize Matemática, Natureza, Humanas e Linguagens com treino, revisão e simulados conectados à sua rotina.',
-    items:['Áreas e 1º/2º dia organizados','Questões reais no Banco de Treino','Revisão ligada aos erros','Redação e desempenho no mesmo fluxo']
+    description:'Matemática, Natureza, Humanas e Linguagens permanecem organizadas por áreas e dias de prova, enquanto a V9 prioriza o que o seu histórico pede agora.',
+    items:['Áreas e 1º/2º dia organizados','Questões validadas no Banco de Treino','Revisão ligada aos erros','Redação e desempenho no mesmo fluxo']
   },
   pism:{
     label:'ROTA PISM',title:'Módulo certo. Conteúdo certo.',
-    description:'PISM I, II e III ficam separados para que a rotina respeite a etapa da prova, o conteúdo do módulo e o formato das questões.',
-    items:['PISM I, II e III separados','Objetivas e discursivas organizadas','Rotina ajustada ao módulo','Histórico e revisões no mesmo lugar']
+    description:'PISM I, II e III continuam separados para que a priorização respeite a etapa da prova, o conteúdo do módulo e o formato das questões.',
+    items:['PISM I, II e III separados','Objetivas e discursivas organizadas','Prioridade ajustada ao módulo','Histórico e revisões no mesmo lugar']
   }
 };
 const routeButtons=[...root.querySelectorAll('[data-route]')];
